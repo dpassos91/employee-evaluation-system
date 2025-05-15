@@ -1,4 +1,4 @@
-package aor.projetofinal.config.entity;
+package aor.projetofinal.entity;
 
 
 import jakarta.persistence.*;
