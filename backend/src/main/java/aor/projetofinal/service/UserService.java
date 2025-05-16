@@ -1,5 +1,6 @@
 package aor.projetofinal.service;
 
+import aor.projetofinal.bean.UserBean;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
@@ -23,17 +24,34 @@ public class UserService {
     @Context
     private HttpServletRequest request;
 
-    String ip = request.getRemoteAddr();
-
     // Criar novo utilizador
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser (UserDto userDto) {
-        logger.info("{}, Registration attempt by user: {}", ip, userDto.getEmail());
-        userDto createdUser = userBean.registerUser(userDto);
+    public Response createUser(UserDto userDto) {
+        String ip = getClientIp();
+        String author = getAuthenticatedUser(); // Se tiveres autenticação
 
-        logger.info("{}, User successfully registered: {}", ip, createdUser.getEmail());
+        logger.info("User: {} | IP: {} - Registration attempt for email: {}", author, ip, userDto.getEmail());
+
+        UserDto createdUser = userBean.registerUser(userDto);
+
+        logger.info("User: {} | IP: {} - Successfully registered user with email: {}", author, ip, createdUser.getEmail());
+
         return Response.ok(createdUser).build();
+    }
+
+    private String getClientIp() {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0];
+        }
+        return (ip != null) ? ip.trim() : request.getRemoteAddr();
+    }
+
+    private String getAuthenticatedUser() {
+        return (request.getUserPrincipal() != null)
+                ? request.getUserPrincipal().getName()
+                : "Anonymous";
     }
 }
