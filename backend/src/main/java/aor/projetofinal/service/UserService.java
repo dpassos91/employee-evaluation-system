@@ -1,6 +1,7 @@
 package aor.projetofinal.service;
 
 import aor.projetofinal.bean.UserBean;
+import aor.projetofinal.dto.UserDto;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
@@ -18,8 +19,8 @@ public class UserService {
     @Inject
     UserBean userBean;
 
-    @Inject
-    Notifier notifier;
+    //@Inject
+    //Notifier notifier;
 
     @Context
     private HttpServletRequest request;

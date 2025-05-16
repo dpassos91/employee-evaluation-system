@@ -1,53 +1,64 @@
 package aor.projetofinal.entity;
 
-
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "User")
-
+@Table(name = "users")
 public class UserEntity implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "email", nullable = false, unique = true, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false, length = 60)
     private String password;
 
-    @Column(name = "account_is_confirmed", nullable = false)
-    private boolean confirmed;
+    @Column(name = "is_confirmed", nullable = false)
+    private boolean isConfirmed;
 
-    @Column(name = "accountConfirmToken", nullable = true)
-    private String accountConfirmToken;
+    @Column(name = "confirmation_token")
+    private String confirmationToken;
 
-    @Column(name = "accountConfirm_Token_ExpiryDate", nullable = true)
-    private LocalDateTime accountConfirmTokenExpiryDate;
+    @Column(name = "confirmation_token_expiry")
+    private LocalDateTime confirmationTokenExpiry;
 
-    @Column(name = "forgottenPass_Token", nullable = true)
-    private String forgottenPassToken;
+    @Column(name = "recovery_token")
+    private String recoveryToken;
 
-    @Column(name = "forgottenPass_Token_ExpiryDate", nullable = true)
-    private LocalDateTime forgottenPassTokenExpiryDate;
+    @Column(name = "recovery_token_expiry")
+    private LocalDateTime recoveryTokenExpiry;
 
-    @Column(name = "Active", nullable = false)
-    private boolean active;
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
 
     @CreationTimestamp
-    @Column(name = "register_date", nullable = false, updatable = false)
-    private LocalDateTime registerDate;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    @ManyToMany(mappedBy = "role_function")
-    private List<RoleEntity> role_functions;
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private RoleEntity role;
 
+    // Construtor vazio
+    public UserEntity() {}
 
-    public UserEntity() {
+    // Getters e Setters
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -67,66 +78,66 @@ public class UserEntity implements Serializable {
     }
 
     public boolean isConfirmed() {
-        return confirmed;
+        return isConfirmed;
     }
 
     public void setConfirmed(boolean confirmed) {
-        this.confirmed = confirmed;
+        isConfirmed = confirmed;
     }
 
-    public String getAccountConfirmToken() {
-        return accountConfirmToken;
+    public String getConfirmationToken() {
+        return confirmationToken;
     }
 
-    public void setAccountConfirmToken(String accountConfirmToken) {
-        this.accountConfirmToken = accountConfirmToken;
+    public void setConfirmationToken(String confirmationToken) {
+        this.confirmationToken = confirmationToken;
     }
 
-    public LocalDateTime getAccountConfirmTokenExpiryDate() {
-        return accountConfirmTokenExpiryDate;
+    public LocalDateTime getConfirmationTokenExpiry() {
+        return confirmationTokenExpiry;
     }
 
-    public void setAccountConfirmTokenExpiryDate(LocalDateTime accountConfirmTokenExpiryDate) {
-        this.accountConfirmTokenExpiryDate = accountConfirmTokenExpiryDate;
+    public void setConfirmationTokenExpiry(LocalDateTime confirmationTokenExpiry) {
+        this.confirmationTokenExpiry = confirmationTokenExpiry;
     }
 
-    public String getForgottenPassToken() {
-        return forgottenPassToken;
+    public String getRecoveryToken() {
+        return recoveryToken;
     }
 
-    public void setForgottenPassToken(String forgottenPassToken) {
-        this.forgottenPassToken = forgottenPassToken;
+    public void setRecoveryToken(String recoveryToken) {
+        this.recoveryToken = recoveryToken;
     }
 
-    public LocalDateTime getForgottenPassTokenExpiryDate() {
-        return forgottenPassTokenExpiryDate;
+    public LocalDateTime getRecoveryTokenExpiry() {
+        return recoveryTokenExpiry;
     }
 
-    public void setForgottenPassTokenExpiryDate(LocalDateTime forgottenPassTokenExpiryDate) {
-        this.forgottenPassTokenExpiryDate = forgottenPassTokenExpiryDate;
+    public void setRecoveryTokenExpiry(LocalDateTime recoveryTokenExpiry) {
+        this.recoveryTokenExpiry = recoveryTokenExpiry;
     }
 
     public boolean isActive() {
-        return active;
+        return isActive;
     }
 
     public void setActive(boolean active) {
-        this.active = active;
+        isActive = active;
     }
 
-    public LocalDateTime getRegisterDate() {
-        return registerDate;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setRegisterDate(LocalDateTime registerDate) {
-        this.registerDate = registerDate;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public List<RoleEntity> getRole_functions() {
-        return role_functions;
+    public RoleEntity getRole() {
+        return role;
     }
 
-    public void setRole_function(List<RoleEntity> role_function) {
-        this.role_functions = role_functions;
+    public void setRole(RoleEntity role) {
+        this.role = role;
     }
 }
