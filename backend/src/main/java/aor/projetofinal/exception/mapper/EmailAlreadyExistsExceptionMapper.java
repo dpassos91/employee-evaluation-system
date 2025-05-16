@@ -10,6 +10,8 @@ import jakarta.ws.rs.ext.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Provider
 public class EmailAlreadyExistsExceptionMapper implements ExceptionMapper<EmailAlreadyExistsException> {
 
@@ -18,19 +20,41 @@ public class EmailAlreadyExistsExceptionMapper implements ExceptionMapper<EmailA
     @Context
     private UriInfo uriInfo;
 
+    @Context
+    private HttpServletRequest request;
+
     @Override
     public Response toResponse(EmailAlreadyExistsException exception) {
-        logger.error("Email already exists: {}", exception.getMessage());
+        String ip = getClientIp();
+        String author = getAuthenticatedUser();
+
+        logger.error("User: {} | IP: {} - EmailAlreadyExistsException: {}", author, ip, exception.getMessage());
 
         ErrorResponseDto errorResponse = new ErrorResponseDto(
                 Response.Status.CONFLICT.getStatusCode(),
                 "Conflict",
                 exception.getMessage(),
-                uriInfo.getPath());
+                uriInfo.getPath(),
+                ip,
+                author
+        );
 
         return Response.status(Response.Status.CONFLICT)
                 .entity(errorResponse)
                 .build();
     }
-}
 
+    private String getClientIp() {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0];
+        }
+        return (ip != null) ? ip.trim() : request.getRemoteAddr();
+    }
+
+    private String getAuthenticatedUser() {
+        return (request.getUserPrincipal() != null)
+                ? request.getUserPrincipal().getName()
+                : "Anonymous";
+    }
+}

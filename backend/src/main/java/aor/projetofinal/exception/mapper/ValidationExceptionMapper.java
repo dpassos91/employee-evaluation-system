@@ -16,6 +16,8 @@ import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Provider
 public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
 
@@ -24,9 +26,15 @@ public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViol
     @Context
     private UriInfo uriInfo;
 
+    @Context
+    private HttpServletRequest request;
+
     @Override
     public Response toResponse(ConstraintViolationException exception) {
-        logger.error("Validation exception: {}", exception.getMessage());
+        String ip = getClientIp();
+        String author = getAuthenticatedUser();
+
+        logger.error("User: {} | IP: {} - Validation exception occurred: {}", author, ip, exception.getMessage());
 
         Map<String, String> errors = new HashMap<>();
         Set<ConstraintViolation<?>> violations = exception.getConstraintViolations();
@@ -38,16 +46,32 @@ public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViol
             logger.warn("Validation failed for {}: {}", propertyPath, message);
         }
 
-        logger.error("Validation errors: {}", errors);
-
         ErrorResponseDto errorResponse = new ErrorResponseDto(
                 Response.Status.BAD_REQUEST.getStatusCode(),
                 "Validation Error",
-                errors.toString(),
-                uriInfo.getPath());
+                "One or more fields are invalid.",
+                uriInfo.getPath(),
+                ip,
+                author
+        );
+        errorResponse.setValidationErrors(errors);
 
         return Response.status(Response.Status.BAD_REQUEST)
                 .entity(errorResponse)
                 .build();
+    }
+
+    private String getClientIp() {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0];
+        }
+        return (ip != null) ? ip.trim() : request.getRemoteAddr();
+    }
+
+    private String getAuthenticatedUser() {
+        return (request.getUserPrincipal() != null)
+                ? request.getUserPrincipal().getName()
+                : "Anonymous";
     }
 }
