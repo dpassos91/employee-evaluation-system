@@ -27,4 +27,11 @@ public class UserDao {
     public void create(UserEntity user) {
         em.persist(user);
     }
+
+    public long countAdmins() {
+        return em.createQuery(
+                        "SELECT COUNT(u) FROM UserEntity u WHERE u.role.name = :roleName", Long.class)
+                .setParameter("roleName", "ADMIN")
+                .getSingleResult();
+    }
 }

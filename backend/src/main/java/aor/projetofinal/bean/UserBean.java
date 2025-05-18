@@ -1,11 +1,13 @@
 package aor.projetofinal.bean;
 
+import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.RoleDao;
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.entity.RoleEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.exception.EmailAlreadyExistsException;
+import jakarta.ejb.Stateless;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +17,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@ApplicationScoped
+@Stateless
 public class UserBean {
 
     private static final Logger logger = LogManager.getLogger(UserBean.class);
@@ -30,11 +32,13 @@ public class UserBean {
     //private SettingsDao settingsDao;
 
     public UserDto registerUser(UserDto userDto) {
-        logger.info("Checking if email {} is already in use.", userDto.getEmail());
+        logger.info("User: {} | IP: {} - Checking if email {} is already in use.",
+                RequestContext.getAuthor(), RequestContext.getIp(), userDto.getEmail());
 
         // Verificar se email já existe
         if (userDao.findByEmail(userDto.getEmail()) != null) {
-            logger.warn("Registration failed: email {} already in use.", userDto.getEmail());
+            logger.warn("User: {} | IP: {} - Registration failed: email {} already in use.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), userDto.getEmail());
             throw new EmailAlreadyExistsException("Email already in use.");
         }
 
@@ -45,7 +49,8 @@ public class UserBean {
         // Obter role "USER" e garantir que está configurada
         RoleEntity userRole = roleDao.findByName("USER");
         if (userRole == null) {
-            logger.error("Default role 'USER' not found. Registration aborted.");
+            logger.error("User: {} | IP: {} - Default role 'USER' not found. Registration aborted.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
             throw new IllegalStateException("Default role 'USER' not configured.");
         }
 
@@ -63,9 +68,11 @@ public class UserBean {
         // Persistir
         try {
             userDao.create(user);
-            logger.info("User successfully registered with email: {}", user.getEmail());
+            logger.info("User: {} | IP: {} - User successfully registered with email: {}",
+                    RequestContext.getAuthor(), RequestContext.getIp(), user.getEmail());
         } catch (Exception e) {
-            logger.error("Error while registering user: {}", user.getEmail(), e);
+            logger.error("User: {} | IP: {} - Error while registering user: {}",
+                    RequestContext.getAuthor(), RequestContext.getIp(), user.getEmail(), e);
             throw e;
         }
         // Converter para DTO e devolver
@@ -73,7 +80,7 @@ public class UserBean {
     }
 
     public String hashPassword(String password) {
-        logger.info("Hashing password.");
+        logger.info("User: {} | IP: {} - Hashing password.", RequestContext.getAuthor(), RequestContext.getIp());
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 }

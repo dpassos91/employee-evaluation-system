@@ -5,21 +5,20 @@ import java.io.Serializable;
 
 
 @Entity
-@Table(name = "Settings")
+@Table(name = "settings")
 public class SettingsEntity implements Serializable {
 
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private int id;
 
     @Column(name = "confirmation", nullable = false)
     private int confirmationTokenTimeout;
 
-    @Column(name = "reset", nullable = false)
+    @Column(name = "recovery", nullable = false)
     private int recoveryTokenTimeout;
 
     @Column(name = "session", nullable = false)
