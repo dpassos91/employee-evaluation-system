@@ -2,25 +2,27 @@ package aor.projetofinal.entity;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 
-
 @Entity
-@Table(name = "Course")
+@Table(name = "courses")  // nome da tabela em minúsculas e plural
 public class CourseEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false , updatable = false, unique = true )
+    @Column(name = "id", nullable = false, updatable = false, unique = true)
     private int id;
 
     @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "time_span", nullable = false)
-    private double time_span;
+    private double timeSpan;
 
-    @Column (name="description", nullable = false, unique = false, length = 65535, columnDefinition = "TEXT")
+    @Column(name = "description", nullable = false, length = 65535, columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "link", nullable = false)
@@ -30,17 +32,79 @@ public class CourseEntity implements Serializable {
     private String language;
 
     @Column(name = "course_category", nullable = false)
-    private String course_category;
+    private String courseCategory;
 
     @Column(name = "is_active", nullable = false)
-    private boolean is_active;
+    private boolean active;
 
-    // Relacionamento many to many com User
-    @ManyToMany(mappedBy = "courses")  // "courses" é o nome do atributo na classe Utilizador
-    private Set<UserEntity> users;  // A coleção de users associados à formação
+    @ManyToMany(mappedBy = "courses")
+    private Set<UserEntity> users;
 
+    // Construtor vazio
+    public CourseEntity() {}
 
+    // Getters e Setters
+    public int getId() { return id; }
 
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+
+    public void setName(String name) { this.name = name; }
+
+    public double getTimeSpan() { return timeSpan; }
+
+    public void setTimeSpan(double timeSpan) { this.timeSpan = timeSpan; }
+
+    public String getDescription() { return description; }
+
+    public void setDescription(String description) { this.description = description; }
+
+    public String getLink() { return link; }
+
+    public void setLink(String link) { this.link = link; }
+
+    public String getLanguage() { return language; }
+
+    public void setLanguage(String language) { this.language = language; }
+
+    public String getCourseCategory() { return courseCategory; }
+
+    public void setCourseCategory(String courseCategory) { this.courseCategory = courseCategory; }
+
+    public boolean isActive() { return active; }
+
+    public void setActive(boolean active) { this.active = active; }
+
+    public Set<UserEntity> getUsers() { return users; }
+
+    public void setUsers(Set<UserEntity> users) { this.users = users; }
+
+    // equals e hashCode (útil para testes)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CourseEntity)) return false;
+        CourseEntity that = (CourseEntity) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    // toString (sem campos pesados como descrição longa ou users)
+    @Override
+    public String toString() {
+        return "CourseEntity{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", timeSpan=" + timeSpan +
+                ", courseCategory='" + courseCategory + '\'' +
+                ", active=" + active +
+                '}';
+    }
 }
 
 
