@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Session_Token")
+@Table(name = "session_token")
 public class SessionTokenEntity implements Serializable {
 
     @Id
