@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -45,26 +46,19 @@ public class UserEntity implements Serializable {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    // Relacionamento One to Many com userCourses
+    @OneToMany(mappedBy = "user")
+    private List<UserCourseEntity> userCourses;
+
+    // Relacionamento Many to One com roles
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private RoleEntity role;
-
-
-
-    // Relacionamento Many to Many com Course
-    @ManyToMany
-    @JoinTable(
-            name = "user_course",  // Nome da tabela de relacionamento
-            joinColumns = @JoinColumn(name = "user_id"),  // Chave estrangeira para a tabela 'user'
-            inverseJoinColumns = @JoinColumn(name = "course_id")  // Chave estrangeira para a tabela 'course'
-    )
-    private Set<CourseEntity> courses;
 
     // Construtor vazio
     public UserEntity() {}
 
     // Getters e Setters
-
     public LocalDateTime getConfirmationTokenExpiry() {
         return confirmationTokenExpiry;
     }
@@ -79,14 +73,6 @@ public class UserEntity implements Serializable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public Set<CourseEntity> getCourses() {
-        return courses;
-    }
-
-    public void setCourses(Set<CourseEntity> courses) {
-        this.courses = courses;
     }
 
     public RoleEntity getRole() {
@@ -110,7 +96,7 @@ public class UserEntity implements Serializable {
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active= active;
     }
 
     public LocalDateTime getRecoveryTokenExpiry() {
@@ -142,7 +128,7 @@ public class UserEntity implements Serializable {
     }
 
     public void setConfirmed(boolean confirmed) {
-        isConfirmed = confirmed;
+        this.confirmed = confirmed;
     }
 
     public String getEmail() {
@@ -160,6 +146,23 @@ public class UserEntity implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    /**
+     * Convenience method to get all courses the user is enrolled in.
+     * This ignores participation dates — use getUserCourses() directly if you need full details.
+     */
+
+    /* TODO
+    Propositamente comentado, ver se nos faz sentido de futuro.
+    O que faz: obtém formações do utilizador (sem data)
+
+    @Transient
+    public List<CourseEntity> getEnrolledCourses() {
+        return userCourses == null ? List.of() :
+                userCourses.stream()
+                        .map(UserCourseEntity::getCourse)
+                        .toList();
+    }*/
 
     // Útil para testes
     @Override
