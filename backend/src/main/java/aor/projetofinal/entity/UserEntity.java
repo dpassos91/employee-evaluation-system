@@ -62,6 +62,37 @@ public class UserEntity implements Serializable {
     @JoinColumn(name = "role_id", nullable = false)
     private RoleEntity role;
 
+    //Relacionamento com a tablea mensagens
+    @OneToMany(mappedBy = "sender")
+    private List<MessageEntity> sentMessages;
+
+    @OneToMany(mappedBy = "receiver")
+    private List<MessageEntity> receivedMessages;
+
+    public List<UserCourseEntity> getUserCourses() {
+        return userCourses;
+    }
+
+    public void setUserCourses(List<UserCourseEntity> userCourses) {
+        this.userCourses = userCourses;
+    }
+
+    public List<MessageEntity> getSentMessages() {
+        return sentMessages;
+    }
+
+    public void setSentMessages(List<MessageEntity> sentMessages) {
+        this.sentMessages = sentMessages;
+    }
+
+    public List<MessageEntity> getReceivedMessages() {
+        return receivedMessages;
+    }
+
+    public void setReceivedMessages(List<MessageEntity> receivedMessages) {
+        this.receivedMessages = receivedMessages;
+    }
+
     // Construtor vazio
     public UserEntity() {}
 
