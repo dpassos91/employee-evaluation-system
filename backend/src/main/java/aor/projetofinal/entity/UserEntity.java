@@ -69,6 +69,9 @@ public class UserEntity implements Serializable {
     @OneToMany(mappedBy = "receiver")
     private List<MessageEntity> receivedMessages;
 
+    @OneToOne(mappedBy = "user")  
+    private ProfileEntity profile;
+
     public List<UserCourseEntity> getUserCourses() {
         return userCourses;
     }
