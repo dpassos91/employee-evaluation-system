@@ -6,7 +6,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -45,6 +44,14 @@ public class UserEntity implements Serializable {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // Relacionamento One to Many com evaluations (recebidas)
+    @OneToMany(mappedBy = "evaluated")
+    private List<Evaluation> evaluationsReceived;
+
+    // Relacionamento One to Many com evaluations (dadas)
+    @OneToMany(mappedBy = "evaluator")
+    private List<Evaluation> evaluationsGiven;
 
     // Relacionamento One to Many com userCourses
     @OneToMany(mappedBy = "user")
@@ -134,6 +141,20 @@ public class UserEntity implements Serializable {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Evaluation> getEvaluationsReceived() {
+        return evaluationsReceived;
+    }
+    public void setEvaluationsReceived(List<Evaluation> evaluationsReceived) {
+        this.evaluationsReceived = evaluationsReceived;
+    }
+
+    public List<Evaluation> getEvaluationsGiven() {
+        return evaluationsGiven;
+    }
+    public void setEvaluationsGiven(List<Evaluation> evaluationsGiven) {
+        this.evaluationsGiven = evaluationsGiven;
     }
 
     /**
