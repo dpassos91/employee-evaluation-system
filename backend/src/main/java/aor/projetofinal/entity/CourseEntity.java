@@ -2,6 +2,7 @@ package aor.projetofinal.entity;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -37,8 +38,9 @@ public class CourseEntity implements Serializable {
     @Column(name = "is_active", nullable = false)
     private boolean active;
 
-    @ManyToMany(mappedBy = "courses")
-    private Set<UserEntity> users;
+    // Relação One to Many com a tabela userCourses
+    @OneToMany(mappedBy = "course")
+    private List<UserCourseEntity> userCourses;
 
     // Construtor vazio
     public CourseEntity() {}
@@ -76,9 +78,31 @@ public class CourseEntity implements Serializable {
 
     public void setActive(boolean active) { this.active = active; }
 
-    public Set<UserEntity> getUsers() { return users; }
+    public List<UserCourseEntity> getUserCourses() {
+        return userCourses;
+    }
 
-    public void setUsers(Set<UserEntity> users) { this.users = users; }
+    public void setUserCourses(List<UserCourseEntity> userCourses) {
+        this.userCourses = userCourses;
+    }
+
+    /**
+     * Convenience method to get all users enrolled in this course.
+     * Ignores participation date — use getUserCourses() directly if needed.
+     */
+
+    /*
+    TODO
+    Propositadamente comentado, ver se nos faz sentido de futuro.
+    O que faz: obtém lista de utilizadores participantes (sem data)
+
+    @Transient
+    public List<UserEntity> getEnrolledUsers() {
+        return userCourses == null ? List.of() :
+                userCourses.stream()
+                        .map(UserCourseEntity::getUser)
+                        .toList();
+    }*/
 
     // equals e hashCode (útil para testes)
     @Override

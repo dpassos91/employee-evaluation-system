@@ -153,7 +153,7 @@ public class UserEntity implements Serializable {
      */
 
     /* TODO
-    Propositamente comentado, ver se nos faz sentido de futuro.
+    Propositadamente comentado, ver se nos faz sentido de futuro.
     O que faz: obtém formações do utilizador (sem data)
 
     @Transient
