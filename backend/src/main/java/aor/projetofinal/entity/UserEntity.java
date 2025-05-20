@@ -17,14 +17,14 @@ public class UserEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true, updatable = false)
     private String email;
 
     @Column(name = "password", nullable = false, length = 60)
     private String password;
 
     @Column(name = "is_confirmed", nullable = false)
-    private boolean isConfirmed;
+    private boolean confirmed;
 
     @Column(name = "confirmation_token")
     private String confirmationToken;
@@ -39,7 +39,7 @@ public class UserEntity implements Serializable {
     private LocalDateTime recoveryTokenExpiry;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive;
+    private boolean active;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -51,7 +51,7 @@ public class UserEntity implements Serializable {
 
 
 
-    // Relacionamento Majny to Many com Course
+    // Relacionamento Many to Many com Course
     @ManyToMany
     @JoinTable(
             name = "user_course",  // Nome da tabela de relacionamento
@@ -59,10 +59,6 @@ public class UserEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "course_id")  // Chave estrangeira para a tabela 'course'
     )
     private Set<CourseEntity> courses;
-
-
-
-
 
     // Construtor vazio
     public UserEntity() {}
@@ -110,7 +106,7 @@ public class UserEntity implements Serializable {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
@@ -142,7 +138,7 @@ public class UserEntity implements Serializable {
     }
 
     public boolean isConfirmed() {
-        return isConfirmed;
+        return confirmed;
     }
 
     public void setConfirmed(boolean confirmed) {
@@ -163,5 +159,33 @@ public class UserEntity implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    // Útil para testes
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", confirmed=" + confirmed +
+                ", active=" + active +
+                ", createdAt=" + createdAt +
+                ", role=" + (role != null ? role.getName() : "null") +
+                '}';
+    }
+
+    // Útil para testes
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserEntity that = (UserEntity) o;
+        return id == that.id;
+    }
+
+    // Útil para testes
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
     }
 }

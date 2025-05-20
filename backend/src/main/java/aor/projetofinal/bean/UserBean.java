@@ -8,7 +8,6 @@ import aor.projetofinal.entity.RoleEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.exception.EmailAlreadyExistsException;
 import jakarta.ejb.Stateless;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
