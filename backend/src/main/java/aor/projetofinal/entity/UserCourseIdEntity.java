@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class UserCourseId implements Serializable {
+public class UserCourseIdEntity implements Serializable {
 
     @Column(name = "user_id")
     private int userId;
