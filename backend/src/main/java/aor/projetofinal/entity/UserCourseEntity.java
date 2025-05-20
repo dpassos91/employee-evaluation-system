@@ -7,13 +7,13 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "user_course")
+@Table(name = "user_courses")
 public class UserCourseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
-    private UserCourseIdEntity id = new UserCourseId();
+    private UserCourseIdEntity id = new UserCourseIdEntity();
 
     @ManyToOne
     @MapsId("userId")
@@ -32,18 +32,16 @@ public class UserCourseEntity implements Serializable {
 
     // Getters e setters
 
-    public UserCourseId getId() {
+    public UserCourseIdEntity getId() {
         return id;
     }
-
-    public void setId(UserCourseId id) {
+    public void setId(UserCourseIdEntity id) {
         this.id = id;
     }
 
     public UserEntity getUser() {
         return user;
     }
-
     public void setUser(UserEntity user) {
         this.user = user;
     }
@@ -51,7 +49,6 @@ public class UserCourseEntity implements Serializable {
     public CourseEntity getCourse() {
         return course;
     }
-
     public void setCourse(CourseEntity course) {
         this.course = course;
     }
@@ -59,7 +56,6 @@ public class UserCourseEntity implements Serializable {
     public LocalDateTime getParticipationDate() {
         return participationDate;
     }
-
     public void setParticipationDate(LocalDateTime participationDate) {
         this.participationDate = participationDate;
     }

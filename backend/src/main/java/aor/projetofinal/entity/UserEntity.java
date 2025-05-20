@@ -62,7 +62,6 @@ public class UserEntity implements Serializable {
     public LocalDateTime getConfirmationTokenExpiry() {
         return confirmationTokenExpiry;
     }
-
     public void setConfirmationTokenExpiry(LocalDateTime confirmationTokenExpiry) {
         this.confirmationTokenExpiry = confirmationTokenExpiry;
     }
@@ -70,7 +69,6 @@ public class UserEntity implements Serializable {
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -78,7 +76,6 @@ public class UserEntity implements Serializable {
     public RoleEntity getRole() {
         return role;
     }
-
     public void setRole(RoleEntity role) {
         this.role = role;
     }
@@ -86,7 +83,6 @@ public class UserEntity implements Serializable {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
@@ -94,7 +90,6 @@ public class UserEntity implements Serializable {
     public boolean isActive() {
         return active;
     }
-
     public void setActive(boolean active) {
         this.active= active;
     }
@@ -102,7 +97,6 @@ public class UserEntity implements Serializable {
     public LocalDateTime getRecoveryTokenExpiry() {
         return recoveryTokenExpiry;
     }
-
     public void setRecoveryTokenExpiry(LocalDateTime recoveryTokenExpiry) {
         this.recoveryTokenExpiry = recoveryTokenExpiry;
     }
@@ -110,7 +104,6 @@ public class UserEntity implements Serializable {
     public String getRecoveryToken() {
         return recoveryToken;
     }
-
     public void setRecoveryToken(String recoveryToken) {
         this.recoveryToken = recoveryToken;
     }
@@ -118,7 +111,6 @@ public class UserEntity implements Serializable {
     public String getConfirmationToken() {
         return confirmationToken;
     }
-
     public void setConfirmationToken(String confirmationToken) {
         this.confirmationToken = confirmationToken;
     }
@@ -126,7 +118,6 @@ public class UserEntity implements Serializable {
     public boolean isConfirmed() {
         return confirmed;
     }
-
     public void setConfirmed(boolean confirmed) {
         this.confirmed = confirmed;
     }
@@ -134,7 +125,6 @@ public class UserEntity implements Serializable {
     public String getEmail() {
         return email;
     }
-
     public void setEmail(String email) {
         this.email = email;
     }
@@ -142,7 +132,6 @@ public class UserEntity implements Serializable {
     public String getPassword() {
         return password;
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
