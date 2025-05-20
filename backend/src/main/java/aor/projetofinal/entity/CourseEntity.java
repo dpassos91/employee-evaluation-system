@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "courses")  // nome da tabela em minúsculas e plural
+@Table(name = "courses")
 public class CourseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
