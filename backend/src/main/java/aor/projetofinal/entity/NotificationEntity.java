@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import aor.projetofinal.entity.enums.NotificationType;
 
 @Entity
 @Table(name = "notifications")
@@ -14,24 +15,85 @@ public class NotificationEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-//vamos considerar por agora que uma notificação em especifico é enviada a um unico user
-    @OneToOne
+    // Uma notificação é enviada a um único utilizador, mas um utilizador pode ter várias notificações
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
-
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "is_read", nullable = false)
-    private boolean is_read;
+    private boolean read;
 
-
-    @Column (name="message", nullable = false, unique = false, length = 65535, columnDefinition = "TEXT")
+    @Column(name = "message", nullable = false, columnDefinition = "TEXT")
     private String message;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private String type;
+    private NotificationType type;
 
+    // Getters e Setters
+
+    public int getId() {
+        return id;
+    }
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+    public void setRead(boolean read) {
+        this.read = read;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public NotificationType getType() {
+        return type;
+    }
+    public void setType(NotificationType type) {
+        this.type = type;
+    }
+
+    //hash, equals e toString
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NotificationEntity that = (NotificationEntity) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return "NotificationEntity{" +
+                "id=" + id +
+                ", userId=" + (user != null ? user.getId() : null) +
+                ", type=" + type +
+                ", createdAt=" + createdAt +
+                ", read=" + read +
+                '}';
+    }
 }
+
