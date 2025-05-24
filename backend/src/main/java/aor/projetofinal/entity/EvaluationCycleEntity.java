@@ -24,7 +24,7 @@ public class EvaluationCycleEntity implements Serializable {
 
     // Relação de One to Many com evaluations
     @OneToMany(mappedBy = "cycle")
-    private List<Evaluation> evaluations;
+    private List<EvaluationEntity> evaluationEntities;
 
     // Construtor vazio
     public EvaluationCycleEntity() {}
@@ -42,8 +42,8 @@ public class EvaluationCycleEntity implements Serializable {
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
 
-    public List<Evaluation> getEvaluations() { return evaluations; }
-    public void setEvaluations(List<Evaluation> evaluations) { this.evaluations = evaluations; }
+    public List<EvaluationEntity> getEvaluations() { return evaluationEntities; }
+    public void setEvaluations(List<EvaluationEntity> evaluationEntities) { this.evaluationEntities = evaluationEntities; }
 
     // Útil em testes
     @Override

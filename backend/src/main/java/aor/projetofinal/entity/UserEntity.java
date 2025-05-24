@@ -47,11 +47,11 @@ public class UserEntity implements Serializable {
 
     // Relacionamento One to Many com evaluations (recebidas)
     @OneToMany(mappedBy = "evaluated")
-    private List<Evaluation> evaluationsReceived;
+    private List<EvaluationEntity> evaluationsReceived;
 
     // Relacionamento One to Many com evaluations (dadas)
     @OneToMany(mappedBy = "evaluator")
-    private List<Evaluation> evaluationsGiven;
+    private List<EvaluationEntity> evaluationsGiven;
 
     // Relacionamento One to Many com userCourses
     @OneToMany(mappedBy = "user")
@@ -177,17 +177,17 @@ public class UserEntity implements Serializable {
         this.password = password;
     }
 
-    public List<Evaluation> getEvaluationsReceived() {
+    public List<EvaluationEntity> getEvaluationsReceived() {
         return evaluationsReceived;
     }
-    public void setEvaluationsReceived(List<Evaluation> evaluationsReceived) {
+    public void setEvaluationsReceived(List<EvaluationEntity> evaluationsReceived) {
         this.evaluationsReceived = evaluationsReceived;
     }
 
-    public List<Evaluation> getEvaluationsGiven() {
+    public List<EvaluationEntity> getEvaluationsGiven() {
         return evaluationsGiven;
     }
-    public void setEvaluationsGiven(List<Evaluation> evaluationsGiven) {
+    public void setEvaluationsGiven(List<EvaluationEntity> evaluationsGiven) {
         this.evaluationsGiven = evaluationsGiven;
     }
 

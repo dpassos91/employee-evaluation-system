@@ -39,12 +39,13 @@ public class NotificationEntity implements Serializable {
     public int getId() {
         return id;
     }
+
     public UserEntity getUser() {
         return user;
     }
-
     public void setUser(UserEntity user) {
         this.user = user;
+
     }
     public LocalDateTime getCreatedAt() {
         return createdAt;

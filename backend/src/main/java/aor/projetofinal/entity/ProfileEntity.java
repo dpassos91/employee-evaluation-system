@@ -43,7 +43,6 @@ public class ProfileEntity implements Serializable  {
     public ProfileEntity() {
     }
 
-
     public UserEntity getUser() {
         return user;
     }
@@ -55,7 +54,6 @@ public class ProfileEntity implements Serializable  {
     public String getFirstName() {
         return firstName;
     }
-
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -63,7 +61,6 @@ public class ProfileEntity implements Serializable  {
     public String getLastName() {
         return lastName;
     }
-
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
@@ -71,7 +68,6 @@ public class ProfileEntity implements Serializable  {
     public LocalDateTime getBirthDate() {
         return birthDate;
     }
-
     public void setBirthDate(LocalDateTime birthDate) {
         this.birthDate = birthDate;
     }
@@ -79,7 +75,6 @@ public class ProfileEntity implements Serializable  {
     public String getAddress() {
         return address;
     }
-
     public void setAddress(String address) {
         this.address = address;
     }
@@ -87,7 +82,6 @@ public class ProfileEntity implements Serializable  {
     public String getPhone() {
         return phone;
     }
-
     public void setPhone(String phone) {
         this.phone = phone;
     }
@@ -95,7 +89,6 @@ public class ProfileEntity implements Serializable  {
     public String getPhotograph() {
         return photograph;
     }
-
     public void setPhotograph(String photograph) {
         this.photograph = photograph;
     }
@@ -103,7 +96,6 @@ public class ProfileEntity implements Serializable  {
     public String getBio() {
         return bio;
     }
-
     public void setBio(String bio) {
         this.bio = bio;
     }
@@ -111,8 +103,37 @@ public class ProfileEntity implements Serializable  {
     public String getUsualWorkplace() {
         return usualWorkplace;
     }
-
     public void setUsualWorkplace(String usualWorkplace) {
         this.usualWorkplace = usualWorkplace;
     }
+
+    // equals, hash e toString
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProfileEntity that = (ProfileEntity) o;
+        return Objects.equals(user, that.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user);
+    }
+
+    @Override
+    public String toString() {
+        return "ProfileEntity{" +
+                "userId=" + (user != null ? user.getId() : null) +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", birthDate=" + birthDate +
+                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", photograph='" + photograph + '\'' +
+                ", bio='" + (bio != null ? bio.substring(0, Math.min(20, bio.length())) + "..." : "") + '\'' +
+                ", usualWorkplace='" + usualWorkplace + '\'' +
+                '}';
+    }
+
 }

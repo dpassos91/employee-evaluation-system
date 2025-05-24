@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "evaluations")
-public class Evaluation implements Serializable {
+public class EvaluationEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +37,7 @@ public class Evaluation implements Serializable {
     private UserEntity evaluator;
 
     // Construtor vazio
-    public Evaluation() {}
+    public EvaluationEntity() {}
 
     // Getters e Setters
     public Long getId() { return id; }
@@ -65,8 +65,8 @@ public class Evaluation implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Evaluation)) return false;
-        Evaluation that = (Evaluation) o;
+        if (!(o instanceof EvaluationEntity)) return false;
+        EvaluationEntity that = (EvaluationEntity) o;
         return id != null && id.equals(that.id);
     }
 
