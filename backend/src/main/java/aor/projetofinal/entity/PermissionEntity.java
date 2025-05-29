@@ -19,8 +19,10 @@ public class PermissionEntity implements Serializable {
     @OneToMany(mappedBy = "permission")
     private List<RolePermissionEntity> rolePermissions;
 
+    // Construtor vazio
     public PermissionEntity() {}
 
+    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -42,6 +44,7 @@ public class PermissionEntity implements Serializable {
         this.rolePermissions = rolePermissions;
     }
 
+    // equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -50,8 +53,18 @@ public class PermissionEntity implements Serializable {
         return Objects.equals(id, that.id);
     }
 
+    // hash
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    // toString
+    @Override
+    public String toString() {
+        return "PermissionEntity{" +
+                "id=" + id +
+                ", action='" + action + '\'' +
+                '}';
     }
 }

@@ -28,10 +28,10 @@ public class UserCourseEntity implements Serializable {
     @Column(name = "participation_date", nullable = false)
     private LocalDateTime participationDate;
 
+    // Construtor vazio
     public UserCourseEntity() {}
 
     // Getters e setters
-
     public UserCourseIdEntity getId() {
         return id;
     }
@@ -60,7 +60,7 @@ public class UserCourseEntity implements Serializable {
         this.participationDate = participationDate;
     }
 
-    // equals e hashCode com base no id composto (utéis para testes)
+    // equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -69,12 +69,13 @@ public class UserCourseEntity implements Serializable {
         return Objects.equals(id, that.id);
     }
 
+    // hash
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
 
-    // Útil para testes
+    // toString
     @Override
     public String toString() {
         return "UserCourseEntity{" +

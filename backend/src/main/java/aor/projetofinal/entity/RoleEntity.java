@@ -21,20 +21,20 @@ public class RoleEntity implements Serializable {
     @OneToMany(mappedBy = "role")
     private List<UserEntity> users;
 
+    @OneToMany(mappedBy = "role")
+    private List<RolePermissionEntity> rolePermissions;
+
     // Construtor vazio
     public RoleEntity() {}
 
     // Getters e Setters
     public Long getId() { return id; }
-
     public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
-
     public void setName(String name) { this.name = name; }
 
     public List<UserEntity> getUsers() { return users; }
-
     public void setUsers(List<UserEntity> users) { this.users = users; }
 
     // equals
