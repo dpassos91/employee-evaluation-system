@@ -37,7 +37,7 @@ public class RoleEntity implements Serializable {
 
     public void setUsers(List<UserEntity> users) { this.users = users; }
 
-    // equals e hashCode com base no id (úteis para testes)
+    // equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -46,12 +46,13 @@ public class RoleEntity implements Serializable {
         return Objects.equals(id, that.id);
     }
 
+    // hash
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
 
-    // toString sem expor users (útil para testes)
+    // toString
     @Override
     public String toString() {
         return "RoleEntity{" +

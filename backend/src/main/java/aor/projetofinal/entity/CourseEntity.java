@@ -95,7 +95,7 @@ public class CourseEntity implements Serializable {
                         .toList();
     }*/
 
-    // equals e hashCode (útil para testes)
+    // equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -104,12 +104,14 @@ public class CourseEntity implements Serializable {
         return id == that.id;
     }
 
+    // hash
+
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
 
-    // toString (sem campos pesados como descrição longa ou users)
+    // toString
     @Override
     public String toString() {
         return "CourseEntity{" +

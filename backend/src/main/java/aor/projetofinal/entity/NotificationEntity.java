@@ -72,7 +72,7 @@ public class NotificationEntity implements Serializable {
         this.type = type;
     }
 
-    //hash, equals e toString
+    // equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -81,11 +81,13 @@ public class NotificationEntity implements Serializable {
         return id == that.id;
     }
 
+    // hash
     @Override
     public int hashCode() {
         return Integer.hashCode(id);
     }
 
+    // toString
     @Override
     public String toString() {
         return "NotificationEntity{" +

@@ -21,7 +21,7 @@ public class SessionTokenEntity implements Serializable {
     private UserEntity user;
 
     @Column(name = "token_value", nullable = false)
-    private String sessionTokenValue;
+    private String tokenValue;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -34,7 +34,6 @@ public class SessionTokenEntity implements Serializable {
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -42,23 +41,20 @@ public class SessionTokenEntity implements Serializable {
     public UserEntity getUser() {
         return user;
     }
-
     public void setUser(UserEntity user) {
         this.user = user;
     }
 
-    public String getSessionTokenValue() {
-        return sessionTokenValue;
+    public String getTokenValue() {
+        return tokenValue;
     }
-
-    public void setSessionTokenValue(String sessionTokenValue) {
-        this.sessionTokenValue = sessionTokenValue;
+    public void setTokenValue(String tokenValue) {
+        this.tokenValue = tokenValue;
     }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
@@ -66,8 +62,36 @@ public class SessionTokenEntity implements Serializable {
     public LocalDateTime getExpiryDate() {
         return expiryDate;
     }
-
     public void setExpiryDate(LocalDateTime expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    // equals
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SessionTokenEntity that = (SessionTokenEntity) o;
+
+        return id == that.id;
+    }
+
+    // hash
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
+
+    // toString
+    @Override
+    public String toString() {
+        return "SessionTokenEntity{" +
+                "id=" + id +
+                ", user=" + (user != null ? user.getId() : null) +
+                ", sessionTokenValue='" + sessionTokenValue + '\'' +
+                ", createdAt=" + createdAt +
+                ", expiryDate=" + expiryDate +
+                '}';
     }
 }

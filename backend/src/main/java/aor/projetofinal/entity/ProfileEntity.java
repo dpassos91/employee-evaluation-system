@@ -107,7 +107,7 @@ public class ProfileEntity implements Serializable  {
         this.usualWorkplace = usualWorkplace;
     }
 
-    // equals, hash e toString
+    // equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -116,11 +116,13 @@ public class ProfileEntity implements Serializable  {
         return Objects.equals(user, that.user);
     }
 
+    // hash
     @Override
     public int hashCode() {
         return Objects.hash(user);
     }
 
+    // toString
     @Override
     public String toString() {
         return "ProfileEntity{" +

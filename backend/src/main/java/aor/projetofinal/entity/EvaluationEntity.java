@@ -61,7 +61,7 @@ public class EvaluationEntity implements Serializable {
     public UserEntity getEvaluator() { return evaluator; }
     public void setEvaluator(UserEntity evaluator) { this.evaluator = evaluator; }
 
-    // Útil em testes
+    // equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -70,13 +70,13 @@ public class EvaluationEntity implements Serializable {
         return id != null && id.equals(that.id);
     }
 
-    // Útil em testes
+    // hash
     @Override
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
     }
 
-    // Útil em testes
+    // toString
     @Override
     public String toString() {
         return "Evaluation{" +

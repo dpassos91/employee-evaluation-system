@@ -45,7 +45,7 @@ public class EvaluationCycleEntity implements Serializable {
     public List<EvaluationEntity> getEvaluations() { return evaluationEntities; }
     public void setEvaluations(List<EvaluationEntity> evaluationEntities) { this.evaluationEntities = evaluationEntities; }
 
-    // Útil em testes
+    // equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -54,13 +54,13 @@ public class EvaluationCycleEntity implements Serializable {
         return id != null && id.equals(that.id);
     }
 
-    // Útil em testes
+    // hash
     @Override
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
     }
 
-    // Útil em testes
+    // toString
     @Override
     public String toString() {
         return "EvaluationCycleEntity{" +

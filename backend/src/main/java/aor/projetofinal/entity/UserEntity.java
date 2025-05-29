@@ -208,7 +208,23 @@ public class UserEntity implements Serializable {
                         .toList();
     }*/
 
-    // Útil para testes
+
+    // equals
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserEntity that = (UserEntity) o;
+        return id == that.id;
+    }
+
+    // hash
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
+
+    // toString
     @Override
     public String toString() {
         return "UserEntity{" +
@@ -219,20 +235,5 @@ public class UserEntity implements Serializable {
                 ", createdAt=" + createdAt +
                 ", role=" + (role != null ? role.getName() : "null") +
                 '}';
-    }
-
-    // Útil para testes
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserEntity that = (UserEntity) o;
-        return id == that.id;
-    }
-
-    // Útil para testes
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
     }
 }

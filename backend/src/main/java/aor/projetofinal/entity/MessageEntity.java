@@ -87,8 +87,7 @@ public class MessageEntity implements Serializable {
         this.read = read;
     }
 
-    // hash, equals e toString
-    // equals e hashCode com base em id
+    // equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -97,12 +96,13 @@ public class MessageEntity implements Serializable {
         return id == that.id;
     }
 
+    // hash
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
 
-    // toString com representação clara dos atributos
+    // toString
     @Override
     public String toString() {
         return "MessageEntity{" +
