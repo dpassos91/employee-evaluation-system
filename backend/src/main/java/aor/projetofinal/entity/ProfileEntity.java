@@ -11,6 +11,8 @@ import java.util.Objects;
 @Table(name = "profiles")
 public class ProfileEntity implements Serializable  {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true, updatable = false)

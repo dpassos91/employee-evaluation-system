@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 @Table(name = "session_token")
 public class SessionTokenEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false , updatable = false, unique = true )
@@ -30,7 +32,11 @@ public class SessionTokenEntity implements Serializable {
     @Column(name = "expiry_date", nullable = true)
     private LocalDateTime expiryDate;
 
+    // Construtor vazio
+    public SessionTokenEntity() {
+    }
 
+    // Getters e Setters
     public int getId() {
         return id;
     }
@@ -89,7 +95,7 @@ public class SessionTokenEntity implements Serializable {
         return "SessionTokenEntity{" +
                 "id=" + id +
                 ", user=" + (user != null ? user.getId() : null) +
-                ", sessionTokenValue='" + sessionTokenValue + '\'' +
+                ", tokenValue='" + tokenValue + '\'' +
                 ", createdAt=" + createdAt +
                 ", expiryDate=" + expiryDate +
                 '}';

@@ -24,14 +24,14 @@ public class SettingsEntity implements Serializable {
     @Column(name = "session", nullable = false)
     private int sessionTokenTimeout;
 
-
+    // Construtor vazio
     public SettingsEntity() {
     }
 
+    // Getters e Setters
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -39,7 +39,6 @@ public class SettingsEntity implements Serializable {
     public int getConfirmationTokenTimeout() {
         return confirmationTokenTimeout;
     }
-
     public void setConfirmationTokenTimeout(int confirmationTokenTimeout) {
         this.confirmationTokenTimeout = confirmationTokenTimeout;
     }
@@ -47,7 +46,6 @@ public class SettingsEntity implements Serializable {
     public int getRecoveryTokenTimeout() {
         return recoveryTokenTimeout;
     }
-
     public void setRecoveryTokenTimeout(int recoveryTokenTimeout) {
         this.recoveryTokenTimeout = recoveryTokenTimeout;
     }
@@ -55,9 +53,34 @@ public class SettingsEntity implements Serializable {
     public int getSessionTokenTimeout() {
         return sessionTokenTimeout;
     }
-
     public void setSessionTokenTimeout(int sessionTokenTimeout) {
         this.sessionTokenTimeout = sessionTokenTimeout;
+    }
+
+    // equals
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SettingsEntity that = (SettingsEntity) o;
+        return id == that.id;
+    }
+
+    // hash
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
+
+    // toString
+    @Override
+    public String toString() {
+        return "SettingsEntity{" +
+                "id=" + id +
+                ", confirmationTokenTimeout=" + confirmationTokenTimeout +
+                ", recoveryTokenTimeout=" + recoveryTokenTimeout +
+                ", sessionTokenTimeout=" + sessionTokenTimeout +
+                '}';
     }
 }
 

@@ -9,6 +9,8 @@ import java.util.List;
 @Table(name = "evaluation_cycles")
 public class EvaluationCycleEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

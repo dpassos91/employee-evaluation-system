@@ -41,6 +41,7 @@ public class MessageEntity implements Serializable {
     @JoinColumn(name = "receiver_id", nullable = false)
     private UserEntity receiver;
 
+    // Construtor vazio
     public MessageEntity() {
     }
 
