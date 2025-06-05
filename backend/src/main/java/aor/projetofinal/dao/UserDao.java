@@ -34,4 +34,12 @@ public class UserDao {
                 .setParameter("roleName", "ADMIN")
                 .getSingleResult();
     }
+
+
+
+
+
+
+
+
 }
