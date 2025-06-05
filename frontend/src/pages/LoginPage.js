@@ -8,7 +8,7 @@ export default function LoginPage() {
   MediaType(); // ativa a atualização do tipo de ecrã
 
   return (
-    <div className="flex h-screen bg-secondary">
+    <div className="flex h-screen bg-secondary overflow-hidden">
       {/* Trapézio visível apenas em desktop/laptop */}
       {mediatype.isDesktopOrLaptop && (
         <div className="w-[70%] bg-primary clip-diagonal relative">
@@ -17,7 +17,7 @@ export default function LoginPage() {
       )}
 
       {/* Formulário ocupa o espaço restante */}
-      <div className="w-full md:w-1/2 flex items-center justify-center">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <LoginForm />
       </div>
     </div>
