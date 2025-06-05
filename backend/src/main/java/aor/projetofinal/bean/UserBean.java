@@ -3,8 +3,10 @@ package aor.projetofinal.bean;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.RoleDao;
 import aor.projetofinal.dao.UserDao;
+import aor.projetofinal.dto.LoginUserDto;
 import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.entity.RoleEntity;
+import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.exception.EmailAlreadyExistsException;
 import jakarta.ejb.Stateless;
@@ -78,14 +80,54 @@ public class UserBean {
         return new UserDto(user);
     }
 
+    // Gerar um hash da password
     public String hashPassword(String password) {
         logger.info("User: {} | IP: {} - Hashing password.", RequestContext.getAuthor(), RequestContext.getIp());
         return BCrypt.hashpw(password, BCrypt.gensalt());
+        // o valor default em gensalt será 10: significa que o algoritmo de criptografia bcrypt vai iterar 2^10 = 1024 vezes para criar hash
+    }
+
+    // Verificar se a password inserida corresponde ao hash armazenado
+    public static boolean checkPassword(String rawPassword, String hashedPassword) {
+        logger.info("User: {} | IP: {} - Checking password.", RequestContext.getAuthor(), RequestContext.getIp());
+        boolean match = BCrypt.checkpw(rawPassword, hashedPassword);
+        logger.info("User: {} | IP: {} - Password match: {}", RequestContext.getAuthor(), RequestContext.getIp(), match);
+        return match;
     }
 
 
-    
+    public String login(LoginUserDto logUser) {
+        logger.info("Inicio de logIn para utilizador:{}", logUser.getEmail());
+        UserEntity userEntity = userDao.findByEmail(logUser.getEmail());
 
+        if (userEntity == null) {
+            logger.warn("Utilizador não encontrado para o email:{}", logUser.getEmail());
+            return null;
+        }
+
+        if (!userEntity.isActive()) {
+            logger.warn("Utilizador com email {} está desativado", logUser.getEmail());
+            return null;
+        }
+
+
+        // Verificar a password com hash
+        if (!checkPassword(logUser.getPassword(), userEntity.getPassword())) {
+            logger.warn("Utilizador com email {} inseriu a password incorreta", logUser.getEmail());
+            return null;
+        }
+
+        SessionTokenEntity sessionTokenEntity = new SessionTokenEntity();
+        String sessionToken = UUID.randomUUID().toString();
+        sessionTokenEntity.setTokenValue(sessionToken);
+
+        sessionTokenEntity.setCreatedAt(LocalDateTime.now());
+        //sessionTokenEntity.setExpiryDate(LocalDateTime.now().plusMinutes(settingsBean.getSessionTimeoutMinutes()));
+
+
+        logger.info("Login realizado com sucesso para o utilizador com email {}", userEntity.getEmail());
+        return sessionToken;
+    }
 
 
 
