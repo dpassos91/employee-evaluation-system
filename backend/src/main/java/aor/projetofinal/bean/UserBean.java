@@ -82,5 +82,16 @@ public class UserBean {
         logger.info("User: {} | IP: {} - Hashing password.", RequestContext.getAuthor(), RequestContext.getIp());
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
+
+
+    
+
+
+
+
+
+
+
+
 }
 
