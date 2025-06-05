@@ -62,7 +62,7 @@ public class UserEntity implements Serializable {
     @JoinColumn(name = "role_id", nullable = false)
     private RoleEntity role;
 
-    //Relacionamento com a tablea mensagens
+    //Relacionamento com a tabela mensagens
     @OneToMany(mappedBy = "sender")
     private List<MessageEntity> sentMessages;
 
@@ -72,29 +72,13 @@ public class UserEntity implements Serializable {
     @OneToOne(mappedBy = "user")  
     private ProfileEntity profile;
 
-    public List<UserCourseEntity> getUserCourses() {
-        return userCourses;
-    }
+    // Relacionamento One to Many com SessionTokens
+    @OneToMany(mappedBy = "user")
+    private List<SessionTokenEntity> sessionTokens;
 
-    public void setUserCourses(List<UserCourseEntity> userCourses) {
-        this.userCourses = userCourses;
-    }
-
-    public List<MessageEntity> getSentMessages() {
-        return sentMessages;
-    }
-
-    public void setSentMessages(List<MessageEntity> sentMessages) {
-        this.sentMessages = sentMessages;
-    }
-
-    public List<MessageEntity> getReceivedMessages() {
-        return receivedMessages;
-    }
-
-    public void setReceivedMessages(List<MessageEntity> receivedMessages) {
-        this.receivedMessages = receivedMessages;
-    }
+    // Relacionamento One to Many com Notification
+    @OneToMany(mappedBy = "user")
+    private List<NotificationEntity> notifications;
 
     // Construtor vazio
     public UserEntity() {}
@@ -191,6 +175,41 @@ public class UserEntity implements Serializable {
         this.evaluationsGiven = evaluationsGiven;
     }
 
+    public List<UserCourseEntity> getUserCourses() {
+        return userCourses;
+    }
+    public void setUserCourses(List<UserCourseEntity> userCourses) {
+        this.userCourses = userCourses;
+    }
+
+    public List<MessageEntity> getSentMessages() {
+        return sentMessages;
+    }
+    public void setSentMessages(List<MessageEntity> sentMessages) {
+        this.sentMessages = sentMessages;
+    }
+
+    public List<MessageEntity> getReceivedMessages() {
+        return receivedMessages;
+    }
+    public void setReceivedMessages(List<MessageEntity> receivedMessages) {
+        this.receivedMessages = receivedMessages;
+    }
+
+    public List<SessionTokenEntity> getSessionTokens() {
+        return sessionTokens;
+    }
+    public void setSessionTokens(List<SessionTokenEntity> sessionTokens) {
+        this.sessionTokens = sessionTokens;
+    }
+
+    public List<NotificationEntity> getNotifications() {
+        return notifications;
+    }
+    public void setNotifications(List<NotificationEntity> notifications) {
+        this.notifications = notifications;
+    }
+
     /**
      * Convenience method to get all courses the user is enrolled in.
      * This ignores participation dates — use getUserCourses() directly if you need full details.
@@ -207,7 +226,6 @@ public class UserEntity implements Serializable {
                         .map(UserCourseEntity::getCourse)
                         .toList();
     }*/
-
 
     // equals
     @Override
