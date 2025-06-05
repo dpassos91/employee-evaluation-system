@@ -10,7 +10,10 @@ module.exports = {
         light: "#FFFFFF",
         accent: "#FF9F1C",
       },
+      fontFamily: {
+        hand: ['"Just Another Hand"', 'cursive'],
     },
+  },
   },
   plugins: [],
 };
