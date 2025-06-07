@@ -1,4 +1,4 @@
-import logo from "../images/Logo_branco.png";
+import logo from "../images/logo_white.png";
 
 export default function LoginForm() {
   return (

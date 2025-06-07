@@ -1,4 +1,4 @@
-import Logo_Branco from '../images/Logo_branco.png';
+import logo from '../images/logo_white.png';
 
 export default function LoginShowcase() {
   return (
@@ -8,7 +8,7 @@ export default function LoginShowcase() {
 <div className="absolute top-1/2 left-1/2 transform -translate-x-[75%] -translate-y-[55%] z-10 text-center">
   <div className="relative inline-block">
     <img
-      src={Logo_Branco}
+      src={logo}
       alt="SkillPath logo"
       className="w-[320px]"
     />

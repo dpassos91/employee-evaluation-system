@@ -1,13 +1,26 @@
+import NotificationIcon from "./components/NotificationIcon";
+import MessageIcon from "./components/MessageIcon";
+import LanguageIcon from "./components/LanguageIcon";
+import { userStore } from "./stores/userStore";
 import LoginPage from "./pages/LoginPage";
-import LanguageSelector from "./components/LanguageSelector";
 
-function App() {
+export default function App() {
+  const user = userStore((state) => state.user);
+
   return (
-    <>
-      <LanguageSelector />
+    <div className="relative min-h-screen bg-secondary">
+      {/* Ícones no topo direito */}
+      <div className="fixed top-6 right-6 z-50 flex gap-4 items-center">
+        {user && (
+          <>
+            <NotificationIcon />
+            <MessageIcon />
+          </>
+        )}
+        <LanguageIcon />
+      </div>
+
       <LoginPage />
-    </>
+    </div>
   );
 }
-
-export default App;
