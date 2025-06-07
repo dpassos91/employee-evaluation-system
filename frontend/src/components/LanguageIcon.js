@@ -5,7 +5,7 @@ export default function LanguageIcon() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="absolute top-6 right-6 z-50">
+    <div className="relative w-14 h-14 flex items-center justify-center">
       <div className="relative">
         <button
           onClick={() => setOpen(!open)}
