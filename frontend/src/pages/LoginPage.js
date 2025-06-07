@@ -8,19 +8,20 @@ export default function LoginPage() {
   MediaType(); // ativa a atualização do tipo de ecrã
 
   return (
-    <div className="flex h-screen bg-secondary overflow-hidden">
-      {/* Trapézio visível apenas em desktop/laptop */}
-      {mediatype.isDesktopOrLaptop && (
-        <div className="w-[70%] bg-primary clip-diagonal relative">
-          <LoginShowcase />
-        </div>
-      )}
-
-      {/* Formulário ocupa o espaço restante */}
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <LoginForm />
-      </div>
+   <div className="flex flex-col md:flex-row min-h-screen bg-secondary">
+  {/* Trapézio (desktop only) */}
+  {mediatype.isDesktopOrLaptop && (
+    <div className="w-[65%] bg-primary clip-diagonal relative">
+      <LoginShowcase />
     </div>
+  )}
+
+  {/* Login container */}
+  <div className="w-full md:w-[50%] flex items-center justify-center px-4 py-8">
+    <LoginForm />
+  </div>
+</div>
   );
 }
+
 
