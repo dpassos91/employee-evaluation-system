@@ -5,5 +5,13 @@
   "login.form.password.label": "Palavra-passe",
   "login.form.submit": "Entrar",
   "login.form.noAccount": "Não tem conta?",
-  "login.form.forgotPassword": "Esqueceu-se da palavra-passe?"
+  "login.form.forgotPassword": "Esqueceu-se da palavra-passe?",
+
+  "register.slogan": "Aprender. Evoluir. Liderar.",
+  "register.title": "Registar",
+  "register.form.email.label": "Email",
+  "register.form.password.label": "Palavra-passe",
+  "register.form.passwordconfirmation.label": "Confirme a palavra-passe",
+  "register.form.submit": "Registar",
+  "register.form.goback": "Voltar"
 }
