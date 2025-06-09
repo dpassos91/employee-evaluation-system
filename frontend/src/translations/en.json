@@ -1,17 +1,19 @@
 {
+  "email": "Email",
+  "goback": "Go back",
+  "password": "Password",
+  "slogan": "Learn. Evolve. Lead.",
+  
   "login.title": "Login",
-  "login.slogan": "Learn. Evolve. Lead.",
-  "login.form.email.label": "Email",
-  "login.form.password.label": "Password",
   "login.form.submit": "Sign in",
   "login.form.noAccount": "Don't have an account?",
   "login.form.forgotPassword": "Forgot your password?",
 
-  "register.slogan": "Learn. Evolve. Lead.",
   "register.title": "Register",
-  "register.form.email.label": "Email",
-  "register.form.password.label": "Password",
   "register.form.passwordconfirmation.label": "Confirm password",
   "register.form.submit": "Register",
-  "register.form.goback": "Go back"
+
+  "forgotpassword.title": "Forgot password",
+  "forgotpassword.form.submit": "Recover"
+  
 }

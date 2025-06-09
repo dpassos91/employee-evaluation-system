@@ -2,7 +2,8 @@ import { FormattedMessage } from "react-intl";
 import logo from "../images/logo_white.png";
 import { Link } from "react-router-dom";
 
-export default function LoginForm() {
+
+export default function ForgotPasswordForm() {
   return (
     <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
       
@@ -15,7 +16,7 @@ export default function LoginForm() {
       </div>
 
       <h2 className="text-2xl font-bold mb-6">
-        <FormattedMessage id="login.title" defaultMessage="Login" />
+        <FormattedMessage id="forgotpassword.title" defaultMessage="Esqueci-me da password" />
       </h2>
 
       <form className="space-y-4 text-left">
@@ -28,33 +29,19 @@ export default function LoginForm() {
             className="w-full border border-primary px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
-        <div>
-          <label className="block mb-1">
-            <FormattedMessage id="password" defaultMessage="Password" />
-          </label>
-          <input
-            type="password"
-            className="w-full border border-primary px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
         <button
           type="submit"
           className="w-full bg-primary text-white font-bold py-2 rounded hover:bg-red-700 transition"
         >
-          <FormattedMessage id="login.form.submit" defaultMessage="Login" />
+          <FormattedMessage id="forgotpassword.form.submit" defaultMessage="Recuperar" />
         </button>
       </form>
 
       <div className="flex justify-between text-sm mt-4">
-  <Link to="/register" className="text-primary hover:underline">
-    <FormattedMessage id="login.form.noAccount" defaultMessage="Não tem conta?" />
-  </Link>
-        <Link to="/forgotpassword" className="text-primary hover:underline">
-          <FormattedMessage id="login.form.forgotPassword" defaultMessage="Esqueceu-se da password?" />
+        <Link to="/login" className="text-primary hover:underline">
+          <FormattedMessage id="goback" defaultMessage="Voltar" />
         </Link>
       </div>
     </div>
   );
 }
-
-

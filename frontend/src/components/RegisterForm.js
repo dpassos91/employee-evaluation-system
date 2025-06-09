@@ -11,7 +11,7 @@ export default function RegisterForm() {
       <div className="block md:hidden mb-6">
         <img src={logo} alt="SkillPath logo" className="w-28 mx-auto mb-1" />
         <p className="text-lg italic font-hand leading-none text-primary">
-          <FormattedMessage id="register.slogan" defaultMessage="Learn. Evolve. Lead." />
+          <FormattedMessage id="slogan" defaultMessage="Learn. Evolve. Lead." />
         </p>
       </div>
 
@@ -22,7 +22,7 @@ export default function RegisterForm() {
       <form className="space-y-4 text-left">
         <div>
           <label className="block mb-1">
-            <FormattedMessage id="register.form.email.label" defaultMessage="Email" />
+            <FormattedMessage id="email" defaultMessage="Email" />
           </label>
           <input
             type="email"
@@ -31,7 +31,7 @@ export default function RegisterForm() {
         </div>
         <div>
           <label className="block mb-1">
-            <FormattedMessage id="register.form.password.label" defaultMessage="Password" />
+            <FormattedMessage id="password" defaultMessage="Password" />
           </label>
           <input
             type="password"
@@ -57,7 +57,7 @@ export default function RegisterForm() {
 
       <div className="flex justify-between text-sm mt-4">
         <Link to="/login" className="text-primary hover:underline">
-          <FormattedMessage id="register.form.goback" defaultMessage="Voltar" />
+          <FormattedMessage id="goback" defaultMessage="Voltar" />
         </Link>
       </div>
     </div>
