@@ -1,5 +1,5 @@
 import LoginShowcase from "../components/LoginShowcase";
-import RegisterForm from "../components/RegisterForm";
+import RegisterForm from "../components/forms/RegisterForm";
 import MediaType from "../components/media/MediaType";
 import { userStore } from "../stores/userStore";
 

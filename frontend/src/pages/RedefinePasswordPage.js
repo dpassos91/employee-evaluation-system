@@ -1,5 +1,5 @@
 import LoginShowcase from "../components/LoginShowcase";
-import RedefinePasswordForm from "../components/RedefinePasswordForm";
+import RedefinePasswordForm from "../components/forms/RedefinePasswordForm";
 import MediaType from "../components/media/MediaType";
 import { userStore } from "../stores/userStore";
 
