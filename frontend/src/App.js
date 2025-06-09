@@ -7,6 +7,7 @@ import LanguageIcon from "./components/LanguageIcon";
 
 import { userStore } from "./stores/userStore";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 export default function App() {
   const {
@@ -42,6 +43,7 @@ export default function App() {
         {/* Rotas da aplicação */}
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </Router>
