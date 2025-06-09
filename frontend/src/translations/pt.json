@@ -1,0 +1,9 @@
+{
+  "login.title": "Iniciar sessão",
+  "login.slogan": "Aprender. Evoluir. Liderar.",
+  "login.form.email.label": "Email",
+  "login.form.password.label": "Palavra-passe",
+  "login.form.submit": "Entrar",
+  "login.form.noAccount": "Não tem conta?",
+  "login.form.forgotPassword": "Esqueceu-se da palavra-passe?"
+}

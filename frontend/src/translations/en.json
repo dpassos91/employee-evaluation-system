@@ -1,0 +1,9 @@
+{
+  "login.title": "Login",
+  "login.slogan": "Learn. Evolve. Lead.",
+  "login.form.email.label": "Email",
+  "login.form.password.label": "Password",
+  "login.form.submit": "Sign in",
+  "login.form.noAccount": "Don't have an account?",
+  "login.form.forgotPassword": "Forgot your password?"
+}
