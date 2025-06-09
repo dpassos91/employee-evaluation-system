@@ -3,6 +3,7 @@
   "goback": "Go back",
   "password": "Password",
   "slogan": "Learn. Evolve. Lead.",
+  "passwordconfirmation": "Confirm password",
   
   "login.title": "Login",
   "login.form.submit": "Sign in",
@@ -10,10 +11,12 @@
   "login.form.forgotPassword": "Forgot your password?",
 
   "register.title": "Register",
-  "register.form.passwordconfirmation.label": "Confirm password",
   "register.form.submit": "Register",
 
   "forgotpassword.title": "Forgot password",
-  "forgotpassword.form.submit": "Recover"
+  "forgotpassword.form.submit": "Recover",
+
+  "redefinepassword.title": "Redefine password",
+  "redefinepassword.form.submit": "Redefine"
   
 }

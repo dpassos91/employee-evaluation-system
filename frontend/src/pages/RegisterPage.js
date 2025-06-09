@@ -17,7 +17,7 @@ export default function LoginPage() {
     </div>
   )}
 
-  {/* Login container */}
+  {/* Register container */}
   <div className="w-full md:w-[50%] flex items-center justify-center px-4 py-8">
     <RegisterForm />
   </div>

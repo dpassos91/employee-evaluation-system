@@ -3,6 +3,7 @@
   "goback": "Voltar",
   "slogan": "Learn. Evolve. Lead.",
   "password": "Palavra-passe",
+  "passwordconfirmation": "Confirme a palavra-passe",
 
   "login.title": "Iniciar sessão",
   "login.form.password.label": "Palavra-passe",
@@ -11,11 +12,12 @@
   "login.form.forgotPassword": "Esqueceu-se da palavra-passe?",
 
   "register.title": "Registar",
-  "register.form.password.label": "Palavra-passe",
-  "register.form.passwordconfirmation.label": "Confirme a palavra-passe",
   "register.form.submit": "Registar",
 
   "forgotpassword.title": "Esqueci-me da palavra-passe",
-  "forgotpassword.form.submit": "Recuperar"
+  "forgotpassword.form.submit": "Recuperar",
+
+  "redefinepassword.title": "Redefinir palavra-passe",
+  "redefinepassword.form.submit": "Redefinir"
 
 }

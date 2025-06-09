@@ -3,7 +3,7 @@ import logo from "../images/logo_white.png";
 import { Link } from "react-router-dom";
 
 
-export default function RegisterForm() {
+export default function RecoveryPasswordForm() {
   return (
     <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
       
@@ -16,19 +16,10 @@ export default function RegisterForm() {
       </div>
 
       <h2 className="text-2xl font-bold mb-6">
-        <FormattedMessage id="register.title" defaultMessage="Registar" />
+        <FormattedMessage id="redefinepassword.title" defaultMessage="Redefinir password" />
       </h2>
 
       <form className="space-y-4 text-left">
-        <div>
-          <label className="block mb-1">
-            <FormattedMessage id="email" defaultMessage="Email" />
-          </label>
-          <input
-            type="email"
-            className="w-full border border-primary px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
         <div>
           <label className="block mb-1">
             <FormattedMessage id="password" defaultMessage="Password" />
@@ -51,7 +42,7 @@ export default function RegisterForm() {
           type="submit"
           className="w-full bg-primary text-white font-bold py-2 rounded hover:bg-red-700 transition"
         >
-          <FormattedMessage id="register.form.submit" defaultMessage="Registar" />
+          <FormattedMessage id="redefinepassword.form.submit" defaultMessage="Redifinir" />
         </button>
       </form>
 
