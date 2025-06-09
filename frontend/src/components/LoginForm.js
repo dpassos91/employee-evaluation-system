@@ -1,3 +1,4 @@
+import { FormattedMessage } from "react-intl";
 import logo from "../images/logo_white.png";
 
 export default function LoginForm() {
@@ -8,22 +9,28 @@ export default function LoginForm() {
       <div className="block md:hidden mb-6">
         <img src={logo} alt="SkillPath logo" className="w-28 mx-auto mb-1" />
         <p className="text-lg italic font-hand leading-none text-primary">
-          Learn. Evolve. Lead.
+          <FormattedMessage id="login.slogan" defaultMessage="Learn. Evolve. Lead." />
         </p>
       </div>
 
-      <h2 className="text-2xl font-bold mb-6">Login</h2>
+      <h2 className="text-2xl font-bold mb-6">
+        <FormattedMessage id="login.title" defaultMessage="Login" />
+      </h2>
 
       <form className="space-y-4 text-left">
         <div>
-          <label className="block mb-1">Email</label>
+          <label className="block mb-1">
+            <FormattedMessage id="login.form.email.label" defaultMessage="Email" />
+          </label>
           <input
             type="email"
             className="w-full border border-primary px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <div>
-          <label className="block mb-1">Password</label>
+          <label className="block mb-1">
+            <FormattedMessage id="login.form.password.label" defaultMessage="Password" />
+          </label>
           <input
             type="password"
             className="w-full border border-primary px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-primary"
@@ -33,15 +40,20 @@ export default function LoginForm() {
           type="submit"
           className="w-full bg-primary text-white font-bold py-2 rounded hover:bg-red-700 transition"
         >
-          Login
+          <FormattedMessage id="login.form.submit" defaultMessage="Login" />
         </button>
       </form>
 
       <div className="flex justify-between text-sm mt-4">
-        <a href="#" className="text-primary hover:underline">Não tem conta?</a>
-        <a href="#" className="text-primary hover:underline">Esqueceu-se da password?</a>
+        <a href="#" className="text-primary hover:underline">
+          <FormattedMessage id="login.form.noAccount" defaultMessage="Não tem conta?" />
+        </a>
+        <a href="#" className="text-primary hover:underline">
+          <FormattedMessage id="login.form.forgotPassword" defaultMessage="Esqueceu-se da password?" />
+        </a>
       </div>
     </div>
   );
 }
+
 
