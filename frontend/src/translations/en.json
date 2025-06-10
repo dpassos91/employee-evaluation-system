@@ -17,6 +17,12 @@
   "forgotpassword.form.submit": "Recover",
 
   "redefinepassword.title": "Redefine password",
-  "redefinepassword.form.submit": "Redefine"
+  "redefinepassword.form.submit": "Redefine",
+
+  "sidebar.dashboard": "Dashboard",
+  "sidebar.evaluations": "Evaluations",
+  "sidebar.profile": "Profile",
+  "sidebar.users": "Users List",
+  "sidebar.logout": "Sign Out"
   
 }

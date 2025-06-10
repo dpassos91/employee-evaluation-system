@@ -18,6 +18,12 @@
   "forgotpassword.form.submit": "Recuperar",
 
   "redefinepassword.title": "Redefinir palavra-passe",
-  "redefinepassword.form.submit": "Redefinir"
+  "redefinepassword.form.submit": "Redefinir",
+
+  "sidebar.dashboard": "Dashboard",
+  "sidebar.evaluations": "Avaliações",
+  "sidebar.profile": "Perfil",
+  "sidebar.users": "Lista de Utilizadores",
+  "sidebar.logout": "Sair"
 
 }
