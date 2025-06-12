@@ -1,4 +1,5 @@
 import Sidebar from "../components/Sidebar";
+import AppButton from "../components/AppButton";
 import {
   FaBell,
   FaEnvelope,
@@ -22,7 +23,12 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-bold">Olá, Nome Apelido 👋</h2>
             <p className="text-gray-600">Pronto para continuar a crescer?</p>
           </div>
-          
+          {/* Se quiseres, podes também usar AppButton para estes botões */}
+          {/* <div className="flex space-x-4">
+            <AppButton variant="secondary"><FaBell className="text-xl" /></AppButton>
+            <AppButton variant="secondary"><FaEnvelope className="text-xl" /></AppButton>
+            <AppButton variant="secondary"><FaGlobe className="text-xl" /></AppButton>
+          </div> */}
         </div>
 
         {/* Cards */}
@@ -70,20 +76,21 @@ export default function DashboardPage() {
 
         {/* Bottom Buttons */}
         <div className="flex flex-wrap gap-20 justify-center">
-          <button className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center">
+          <AppButton variant="primary">
             <FaSearch className="mr-2" /> Ver formações
-          </button>
-          <button className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold flex items-center">
+          </AppButton>
+          <AppButton variant="secondary">
             <FaCog className="mr-2" /> Definições da aplicação
-          </button>
-          <button className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center">
+          </AppButton>
+          <AppButton variant="primary">
             <FaFileAlt className="mr-2" /> Consultar avaliações
-          </button>
+          </AppButton>
         </div>
       </main>
     </div>
   );
 }
+
 
 
 

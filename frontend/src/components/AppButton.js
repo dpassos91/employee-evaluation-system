@@ -12,7 +12,7 @@ export default function AppButton({
     sidebar: "w-full gap-3 px-4 py-2 text-sm hover:bg-white/10 mb-1",
   };
   return (
-    <button className={${base} ${variants[variant]} ${className}} {...props}>
+    <button className={`${base} ${variants[variant]} ${className}`} {...props}>
       {children}
     </button>
   );
