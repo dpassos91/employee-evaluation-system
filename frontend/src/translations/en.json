@@ -23,6 +23,24 @@
   "sidebar.evaluations": "Evaluations",
   "sidebar.profile": "Profile",
   "sidebar.users": "Users List",
-  "sidebar.logout": "Sign Out"
+  "sidebar.logout": "Sign Out",
+
+  "dashboard.greeting": "Hello, Firstname Lastname 👋",
+  "dashboard.subtitle": "Ready to keep growing?",
+  "dashboard.cards.activeTrainings": "Active trainings",
+  "dashboard.cards.trainingsOngoing": "2 trainings ongoing",
+  "dashboard.cards.pendingEvaluations": "Open evaluations",
+  "dashboard.cards.evaluationsToFill": "1 evaluation to fill",
+  "dashboard.cards.lastEvaluation": "Last evaluation",
+  "dashboard.cards.lastEvaluationDate": "Done on 05/27/2025",
+  "dashboard.cards.totalTrainingHours": "Total training hours",
+  "dashboard.cards.trainingHours": "24h accumulated this year",
+  "dashboard.agenda.title": "Schedule",
+  "dashboard.agenda.currentEvaluationEnds": "Current evaluation ends on 05/29",
+  "dashboard.agenda.trainingSession": "Training session ",
+  "dashboard.agenda.trainingSessionDate": " on 06/01",
+  "dashboard.buttons.viewTrainings": "View trainings",
+  "dashboard.buttons.settings": "Application settings",
+  "dashboard.buttons.viewEvaluations": "View evaluations"
   
 }

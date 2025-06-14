@@ -1,5 +1,6 @@
 import Sidebar from "../components/Sidebar";
 import AppButton from "../components/AppButton";
+import { FormattedMessage } from "react-intl";
 import {
   FaBell,
   FaEnvelope,
@@ -20,15 +21,14 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold">Olá, Nome Apelido 👋</h2>
-            <p className="text-gray-600">Pronto para continuar a crescer?</p>
+            <h2 className="text-2xl font-bold">
+              {/* Olá, Nome Apelido 👋 */}
+              <FormattedMessage id="dashboard.greeting" defaultMessage="Olá, Nome Apelido 👋" />
+            </h2>
+            <p className="text-gray-600">
+              <FormattedMessage id="dashboard.subtitle" defaultMessage="Pronto para continuar a crescer?" />
+            </p>
           </div>
-          {/* Se quiseres, podes também usar AppButton para estes botões */}
-          {/* <div className="flex space-x-4">
-            <AppButton variant="secondary"><FaBell className="text-xl" /></AppButton>
-            <AppButton variant="secondary"><FaEnvelope className="text-xl" /></AppButton>
-            <AppButton variant="secondary"><FaGlobe className="text-xl" /></AppButton>
-          </div> */}
         </div>
 
         {/* Cards */}
@@ -36,40 +36,62 @@ export default function DashboardPage() {
           <div className="bg-white rounded-lg shadow p-4">
             <div className="flex items-center mb-2">
               <FaBook className="text-red-600 mr-2" />
-              <span className="font-bold">Formações ativas</span>
+              <span className="font-bold">
+                <FormattedMessage id="dashboard.cards.activeTrainings" defaultMessage="Formações ativas" />
+              </span>
             </div>
-            <p className="text-gray-700">2 formações em curso</p>
+            <p className="text-gray-700">
+              <FormattedMessage id="dashboard.cards.trainingsOngoing" defaultMessage="2 formações em curso" />
+            </p>
           </div>
           <div className="bg-white rounded-lg shadow p-4">
             <div className="flex items-center mb-2">
               <FaFileAlt className="text-red-600 mr-2" />
-              <span className="font-bold">Avaliações em aberto</span>
+              <span className="font-bold">
+                <FormattedMessage id="dashboard.cards.pendingEvaluations" defaultMessage="Avaliações em aberto" />
+              </span>
             </div>
-            <p className="text-gray-700">1 avaliação por preencher</p>
+            <p className="text-gray-700">
+              <FormattedMessage id="dashboard.cards.evaluationsToFill" defaultMessage="1 avaliação por preencher" />
+            </p>
           </div>
           <div className="bg-white rounded-lg shadow p-4">
             <div className="flex items-center mb-2">
               <FaCalendarCheck className="text-red-600 mr-2" />
-              <span className="font-bold">Última avaliação</span>
+              <span className="font-bold">
+                <FormattedMessage id="dashboard.cards.lastEvaluation" defaultMessage="Última avaliação" />
+              </span>
             </div>
-            <p className="text-gray-700">Feita a 27/05/2025</p>
+            <p className="text-gray-700">
+              <FormattedMessage id="dashboard.cards.lastEvaluationDate" defaultMessage="Feita a 27/05/2025" />
+            </p>
           </div>
           <div className="bg-white rounded-lg shadow p-4">
             <div className="flex items-center mb-2">
               <FaClock className="text-red-600 mr-2" />
-              <span className="font-bold">Total de horas de formação</span>
+              <span className="font-bold">
+                <FormattedMessage id="dashboard.cards.totalTrainingHours" defaultMessage="Total de horas de formação" />
+              </span>
             </div>
-            <p className="text-gray-700">24h acumuladas este ano</p>
+            <p className="text-gray-700">
+              <FormattedMessage id="dashboard.cards.trainingHours" defaultMessage="24h acumuladas este ano" />
+            </p>
           </div>
         </div>
 
         {/* Agenda */}
         <div className="mb-8">
-          <h3 className="font-semibold text-lg mb-2">Agenda</h3>
+          <h3 className="font-semibold text-lg mb-2">
+            <FormattedMessage id="dashboard.agenda.title" defaultMessage="Agenda" />
+          </h3>
           <ul className="bg-white rounded-lg shadow divide-y">
-            <li className="p-4">Avaliação atual termina a 29/05</li>
             <li className="p-4">
-              Sessão de formação <span className="font-bold">UX/UI</span> a 1/06
+              <FormattedMessage id="dashboard.agenda.currentEvaluationEnds" defaultMessage="Avaliação atual termina a 29/05" />
+            </li>
+            <li className="p-4">
+              <FormattedMessage id="dashboard.agenda.trainingSession" defaultMessage="Sessão de formação " />
+              <span className="font-bold">UX/UI</span>
+              <FormattedMessage id="dashboard.agenda.trainingSessionDate" defaultMessage=" a 1/06" />
             </li>
           </ul>
         </div>
@@ -77,19 +99,23 @@ export default function DashboardPage() {
         {/* Bottom Buttons */}
         <div className="flex flex-wrap gap-20 justify-center">
           <AppButton variant="primary">
-            <FaSearch className="mr-2" /> Ver formações
+            <FaSearch className="mr-2" />
+            <FormattedMessage id="dashboard.buttons.viewTrainings" defaultMessage="Ver formações" />
           </AppButton>
           <AppButton variant="secondary">
-            <FaCog className="mr-2" /> Definições da aplicação
+            <FaCog className="mr-2" />
+            <FormattedMessage id="dashboard.buttons.settings" defaultMessage="Definições da aplicação" />
           </AppButton>
           <AppButton variant="primary">
-            <FaFileAlt className="mr-2" /> Consultar avaliações
+            <FaFileAlt className="mr-2" />
+            <FormattedMessage id="dashboard.buttons.viewEvaluations" defaultMessage="Consultar avaliações" />
           </AppButton>
         </div>
       </main>
     </div>
   );
 }
+
 
 
 

@@ -24,6 +24,24 @@
   "sidebar.evaluations": "Avaliações",
   "sidebar.profile": "Perfil",
   "sidebar.users": "Lista de Utilizadores",
-  "sidebar.logout": "Sair"
+  "sidebar.logout": "Sair",
+
+  "dashboard.greeting": "Olá, Nome Apelido 👋",
+  "dashboard.subtitle": "Pronto para continuar a crescer?",
+  "dashboard.cards.activeTrainings": "Formações ativas",
+  "dashboard.cards.trainingsOngoing": "2 formações em curso",
+  "dashboard.cards.pendingEvaluations": "Avaliações em aberto",
+  "dashboard.cards.evaluationsToFill": "1 avaliação por preencher",
+  "dashboard.cards.lastEvaluation": "Última avaliação",
+  "dashboard.cards.lastEvaluationDate": "Feita a 27/05/2025",
+  "dashboard.cards.totalTrainingHours": "Total de horas de formação",
+  "dashboard.cards.trainingHours": "24h acumuladas este ano",
+  "dashboard.agenda.title": "Agenda",
+  "dashboard.agenda.currentEvaluationEnds": "Avaliação atual termina a 29/05",
+  "dashboard.agenda.trainingSession": "Sessão de formação ",
+  "dashboard.agenda.trainingSessionDate": " a 1/06",
+  "dashboard.buttons.viewTrainings": "Ver formações",
+  "dashboard.buttons.settings": "Definições da aplicação",
+  "dashboard.buttons.viewEvaluations": "Consultar avaliações"
 
 }
