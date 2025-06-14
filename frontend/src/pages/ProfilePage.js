@@ -56,7 +56,13 @@ export default function ProfilePage() {
               <div className="flex flex-col">
                 <label className="font-semibold">Local de Trabalho habitual</label>
                 <select className="border border-[#D41C1C] rounded px-2 py-1">
+                  <option>Boston</option>
                   <option>Coimbra</option>
+                  <option>Lisboa</option>
+                  <option>Munich</option>
+                  <option>Porto</option>
+                  <option>Southampton</option>
+                  <option>Viseu</option>
                   {/* outras opções */}
                 </select>
               </div>
