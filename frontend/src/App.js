@@ -58,3 +58,23 @@ export default function App() {
   );
 }
 
+/*import { PrivateRoute } from "./PrivateRoute"; // <- adiciona isto!
+
+// ...restante App.js...
+
+<Routes>
+  <Route path="/login" element={<LoginPage />} />
+  <Route path="/register" element={<RegisterPage />} />
+  <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
+  <Route path="/redefinepassword" element={<RedefinePasswordPage />} />
+  <Route
+    path="/dashboard"
+    element={
+      <PrivateRoute>
+        <DashboardPage />
+      </PrivateRoute>
+    }
+  />
+  {/* Redireciona para /login se não estiver autenticado */}/*
+  <Route path="*" element={<Navigate to="/login" />} />
+</Routes>*/
