@@ -32,39 +32,44 @@ export default function ProfilePage() {
           <form className="flex flex-col gap-2 w-full">
             {/* Email e Gestor */}
             <div className="grid grid-cols-2 gap-2">
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
-                />
-              </div>
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-1">Gestor</label>
-                <input
-                  type="text"
-                  className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
-                />
-              </div>
-            </div>
+  <div className="flex flex-col">
+    <label className="font-medium mb-2 text-gray-700 mb-1">Email</label>
+    <input
+      type="email"
+      value="exemplo@email.com"
+      disabled
+      className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-gray-100 text-gray-700 cursor-not-allowed"
+    />
+  </div>
+  <div className="flex flex-col">
+    <label className="font-medium mb-2 text-gray-700 mb-1">Gestor</label>
+    <input
+      type="text"
+      value="Joana Ferreira"
+      disabled
+      className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-gray-100 text-gray-700 cursor-not-allowed"
+    />
+  </div>
+</div>
+
 
             <div className="grid grid-cols-3 gap-2 items-start">
   <div className="flex flex-col">
-    <label className="text-sm text-gray-700 mb-1">Nome</label>
+    <label className="text-sm font-bold text-gray-700 mb-1">Nome</label>
     <input
       type="text"
       className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
     />
   </div>
   <div className="flex flex-col">
-    <label className="text-sm text-gray-700 mb-1">Apelido</label>
+    <label className="text-sm font-bold text-gray-700 mb-1">Apelido</label>
     <input
       type="text"
       className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
     />
   </div>
   <div className="flex flex-col">
-    <label className="text-sm text-gray-700 mb-1">Local de Trabalho</label>
+    <label className="text-sm font-bold text-gray-700 mb-1">Local de Trabalho</label>
     <select
       className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
     >
@@ -84,21 +89,21 @@ export default function ProfilePage() {
             {/* Morada, Código Postal, Contacto */}
             <div className="grid grid-cols-3 gap-2 items-end">
               <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-1">Morada</label>
+                <label className="text-sm font-bold text-gray-700 mb-1">Morada</label>
                 <input
                   type="text"
                   className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-1">Código Postal</label>
+                <label className="text-sm font-bold text-gray-700 mb-1">Código Postal</label>
                 <input
                   type="text"
                   className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-1">Contacto telefónico</label>
+                <label className="text-sm font-bold text-gray-700 mb-1">Contacto telefónico</label>
                 <input
                   type="tel"
                   className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
