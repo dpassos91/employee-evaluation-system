@@ -42,6 +42,22 @@
   "dashboard.agenda.trainingSessionDate": " a 1/06",
   "dashboard.buttons.viewTrainings": "Ver formações",
   "dashboard.buttons.settings": "Definições da aplicação",
-  "dashboard.buttons.viewEvaluations": "Consultar avaliações"
+  "dashboard.buttons.viewEvaluations": "Consultar avaliações",
+
+    "profile.title": "Perfil",
+  "profile.changePhoto": "Alterar fotografia",
+  "profile.trainingHistory": "Histórico de formações",
+  "profile.evaluationHistory": "Histórico de avaliações",
+  "profile.email": "Email",
+  "profile.manager": "Gestor",
+  "profile.name": "Nome",
+  "profile.surname": "Apelido",
+  "profile.workplace": "Local de Trabalho",
+  "profile.address": "Morada",
+  "profile.zipcode": "Código Postal",
+  "profile.phone": "Contacto telefónico",
+  "profile.biography": "Biografia",
+  "profile.changePassword": "Alterar password",
+  "profile.save": "Guardar"
 
 }
