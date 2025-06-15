@@ -1,4 +1,3 @@
-// PageLayout.jsx
 import Sidebar from "./Sidebar";
 
 export default function PageLayout({ title, subtitle, children }) {
