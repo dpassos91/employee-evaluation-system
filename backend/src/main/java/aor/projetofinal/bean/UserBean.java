@@ -1,5 +1,6 @@
 package aor.projetofinal.bean;
 
+import aor.projetofinal.Util.JavaConversionUtil;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.RoleDao;
 import aor.projetofinal.dao.UserDao;
@@ -15,11 +16,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Stateless
-public class UserBean {
+public class UserBean implements Serializable {
+
+
+    @Inject
+    JavaConversionUtil javaConversionUtil;
+
 
     private static final Logger logger = LogManager.getLogger(UserBean.class);
 
@@ -132,6 +139,49 @@ public class UserBean {
 
 
 
+
+
+
+
+
+
+    public UserDto findUserByEmail(String email){
+        logger.info("Inicio findByEmail email : {}", email);
+
+        UserEntity userEntity = userDao.findByEmail(email);
+        if (userEntity == null) {
+            logger.warn("Utilizador não encotrado");
+            return null;
+        }
+
+        logger.info("Utilizador com email {} encontrado", userEntity.getEmail());
+        return javaConversionUtil.convertUserEntityToUserDto(userEntity);
+    }
+
+
+
+    public boolean isAccountConfirmed(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+
+        UserEntity user = userDao.findByEmail(email);
+
+        if (user == null) {
+            return false;
+        }
+
+        return user.isConfirmed();
+    }
+
+
+    public String getConfirmToken(String email) {
+        UserEntity user = userDao.findByEmail(email);
+        if (user != null) {
+            return user.getConfirmationToken();
+        }
+        return null;
+    }
 
 
 

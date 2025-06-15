@@ -1,8 +1,19 @@
 package aor.projetofinal.dto;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public class UserDto {
+    private int id;
     private String email;
-    private String password; // só usado na entrada
+    private String password;
+    private boolean confirmed;
+    private String confirmationToken;
+    private LocalDate confirmationTokenExpiry;
+    private String recoveryToken;
+    private LocalDate recoveryTokenExpiry;
+    private boolean active;
+    private LocalDateTime createdAt;
 
     // Construtor vazio obrigatório para Jackson
     public UserDto() {}
