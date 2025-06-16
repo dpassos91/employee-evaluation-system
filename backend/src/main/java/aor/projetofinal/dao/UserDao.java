@@ -1,5 +1,6 @@
 package aor.projetofinal.dao;
 
+import aor.projetofinal.entity.SettingsEntity;
 import aor.projetofinal.entity.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
@@ -24,6 +25,17 @@ public class UserDao {
         }
     }
 
+    public UserEntity findUserByConfirmToken(String confirmToken) {
+        try {
+            TypedQuery<UserEntity> query = em.createQuery(
+                    "SELECT u FROM UserEntity u WHERE u.confirmationToken = :token", UserEntity.class);
+            query.setParameter("token", confirmToken);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
     public void create(UserEntity user) {
         em.persist(user);
     }
@@ -36,7 +48,9 @@ public class UserDao {
     }
 
 
-
+    public void save(UserEntity user) {
+        em.merge(user);
+    }
 
 
 
