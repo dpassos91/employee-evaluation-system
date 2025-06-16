@@ -36,6 +36,20 @@ public class UserDao {
         }
     }
 
+
+    public UserEntity findUserByRecoveryToken(String recoveryToken) {
+        try {
+            TypedQuery<UserEntity> query = em.createQuery(
+                    "SELECT u FROM UserEntity u WHERE u.recoveryToken = :token", UserEntity.class);
+            query.setParameter("token", recoveryToken);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+
+
     public void create(UserEntity user) {
         em.persist(user);
     }

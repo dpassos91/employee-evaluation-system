@@ -85,7 +85,7 @@ public class UserService {
             String confirmToken = userBean.getConfirmToken(userLog.getEmail());
 
 
-            String confirmationlink = "http://localhost:8080/grupo7/rest/users/confirmAccount?confirmToken=" + confirmToken;
+            String confirmationlink = "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=" + confirmToken;
 
             emailUtil.sendEmail(
                     user.getEmail(),
@@ -179,6 +179,111 @@ public class UserService {
                 .build();
 
     }
+
+
+    @POST
+    @Path("/request-reset")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response requestPasswordReset( UserDto userDto) {
+        String email = userDto.getEmail();
+
+
+        if (email == null || email.isEmpty()) {
+            return Response.status(400)
+                    .entity("{\"message\": \"Email inválido.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserDto user = userBean.findUserByEmail(email);
+        if (user == null) {
+            // Por razões de segurança, não revelar se o email existe
+            return Response.ok("{\"message\": \"Se o email existir, o link de recuperação será enviado.\"}").build();
+        }
+
+
+        String recoveryToken = userBean.generateRecoveryToken(user.getEmail());
+
+        String recoveryLink = "https://127.0.0.1:8443/grupo7/rest/users/reset-password?recoveryToken=" + recoveryToken;
+
+
+        emailUtil.sendEmail(
+                user.getEmail(),
+                "Pedido de recuperação de password",
+                "Clique neste link para escolher nova password: " + recoveryLink
+        );
+
+
+        return Response.ok()
+                .entity("{\"message\": \"Se o email existir, o link de recuperação será enviado.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+
+
+    @POST
+    @Path("/reset-password")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response resetPassword(@QueryParam("recoveryToken") String recoveryToken, UserDto userDto) {
+        if (!userBean.isRecoveryTokenValid(recoveryToken)) {
+            return Response.status(Response.Status.BAD_REQUEST)
+
+                    .entity("{\"message\": \"Token expirado ou inválido.\", \"error\": true}")
+
+                    .type(MediaType.APPLICATION_JSON)
+
+                    .build();
+        }
+
+        String newPassword = userDto.getPassword();
+
+
+        if (newPassword.equals(userDto.getEmail())) {
+            logger.warn("Password e nome de utilizador são iguais");
+            return Response.status(400)
+                    .entity("{\"message\": \"A password não pode ser igual ao nome de utilizadro.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        if (newPassword.length() <= 5) {
+            logger.warn("Password com comprimento insuficiente");
+            return Response.status(400)
+                    .entity("{\"message\": \"A password deve ter mais de 5 caracteres.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+
+
+        boolean success = userBean.resetPasswordWithToken(recoveryToken, newPassword);
+
+        if (!success) {
+            return Response.status(Response.Status.BAD_REQUEST)
+
+                    .entity("{\"message\": \"Erro ao redefinir a senha. Tente novamente.\", \"error\": true}")
+
+                    .type(MediaType.APPLICATION_JSON)
+
+                    .build();
+        }
+
+        return Response.ok()
+
+                .entity("{\"message\": \"Password atualizada com sucesso!\", \"error\": false}")
+
+                .type(MediaType.APPLICATION_JSON)
+
+                .build();
+    }
+
+
+
+
 
 
 

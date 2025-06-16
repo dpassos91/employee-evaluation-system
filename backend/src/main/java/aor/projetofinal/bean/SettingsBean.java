@@ -2,7 +2,6 @@ package aor.projetofinal.bean;
 
 import aor.projetofinal.dao.SettingsDao;
 import aor.projetofinal.entity.SettingsEntity;
-import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
@@ -66,7 +65,7 @@ public class SettingsBean implements Serializable {
         }
     }
 
-    public boolean updatePasswordRecoveryTokenTimeout(int minutes) {
+    public boolean updateRecoveryTokenTimeout(int minutes) {
         try {
             SettingsEntity settings = getSettings();
             settings.setRecoveryTokenTimeout(minutes);
@@ -78,9 +77,7 @@ public class SettingsBean implements Serializable {
         }
     }
 
-    public int getForgottenPasswordTokenTimeout() {
-        return getSettings().getRecoveryTokenTimeout();
-    }
+
 
 
 
