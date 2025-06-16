@@ -79,19 +79,6 @@ public class UserService {
                     .build();
         }
 
-        //confirmação de conta por link na consola
-      /* if (!userBean.isAccountConfirmed(userLog.getEmail())) {
-            String accountConfirmToken = userBean.getConfirmToken(userLog.getEmail());
-            String confirmationlink = "http://localhost:8080/david-proj5-1.0-SNAPSHOT/rest/users/confirmAccount?accountConfirmToken=" + accountConfirmToken;
-
-            logger.warn("Conta não confirmada. Link de confirmação: " + confirmationlink);
-
-            return Response.status(Response.Status.FORBIDDEN)
-                    .entity("{\"message\": \"A conta ainda não foi confirmada.\", \"confirmationLink\": \"" + confirmationlink + "\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        } */
-
 
 
         if (!userBean.isAccountConfirmed(userLog.getEmail())) {
@@ -160,6 +147,40 @@ public class UserService {
                     .build();
         }
     }
+
+
+    @POST
+    @Path("/logout") // postman
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response logoutUser(@HeaderParam("sessionToken") String sessionToken) {
+        logger.info("Logout request recebido");
+        if (sessionToken == null) {
+            logger.warn("SessionToken null - ocorreu um erro a fazer logout");
+            return Response.status(401)
+                    .entity("{\"message\": \"Dados inválidos no header para logout\"}")
+                    .type(MediaType.APPLICATION_JSON) // Força Content-Type JSON
+                    .build();
+        }
+
+        if (!userBean.authorization(sessionToken)) {
+            logger.warn("Tentativa de logout com sessionToken sem autorização");
+            return Response.status(403)
+                    .entity("{\"message\": \"Sem utilizador para logout.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        userBean.logout(sessionToken);
+        logger.info("Logout com sucesso");
+        return Response.status(200)
+                .entity("{\"message\": \"Logout bem-sucedido!\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+
+    }
+
+
 
 
 
