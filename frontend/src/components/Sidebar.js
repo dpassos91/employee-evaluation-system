@@ -28,7 +28,7 @@ export default function Sidebar() {
     { id: "sidebar.dashboard", icon: dashboardIcon, path: "/dashboard" },
     { id: "sidebar.evaluations", icon: evaluationsIcon, path: "/evaluations" },
     { id: "sidebar.profile", icon: miniprofileIcon, path: "/profile" },
-    { id: "sidebar.users", icon: usersIcon, path: "/users" },
+    { id: "sidebar.users", icon: usersIcon, path: "/userslist" },
   ];
 
   return (

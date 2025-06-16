@@ -12,6 +12,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import RedefinePasswordPage from "./pages/RedefinePasswordPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
+import UsersListPage from "./pages/UsersListPage";
 
 export default function App() {
   const {
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="/redefinepassword" element={<RedefinePasswordPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/userslist" element={<UsersListPage />} />
           {/* Redireciona para /login se não estiver autenticado */}
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>

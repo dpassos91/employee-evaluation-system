@@ -138,7 +138,7 @@ export default function ProfilePage() {
                 <FormattedMessage id="profile.biography" defaultMessage="Biografia" />
               </label>
               <textarea
-                className="border border-gray-300 focus:border-[#D41C1C] rounded w-full min-h-[120px] max-h-[220px] px-3 py-2 bg-white text-sm"
+                className="border border-gray-300 focus:border-[#D41C1C] rounded w-full min-h-[155px] max-h-[220px] px-3 py-2 bg-white text-sm"
               />
             </div>
 
