@@ -9,9 +9,9 @@ public class UserDto {
     private String password;
     private boolean confirmed;
     private String confirmationToken;
-    private LocalDate confirmationTokenExpiry;
+    private LocalDateTime confirmationTokenExpiry;
     private String recoveryToken;
-    private LocalDate recoveryTokenExpiry;
+    private LocalDateTime recoveryTokenExpiry;
     private boolean active;
     private LocalDateTime createdAt;
 
@@ -25,6 +25,16 @@ public class UserDto {
     }
 
     // Getters e setters
+
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -39,6 +49,62 @@ public class UserDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = confirmed;
+    }
+
+    public String getConfirmationToken() {
+        return confirmationToken;
+    }
+
+    public void setConfirmationToken(String confirmationToken) {
+        this.confirmationToken = confirmationToken;
+    }
+
+    public LocalDateTime getConfirmationTokenExpiry() {
+        return confirmationTokenExpiry;
+    }
+
+    public void setConfirmationTokenExpiry(LocalDateTime confirmationTokenExpiry) {
+        this.confirmationTokenExpiry = confirmationTokenExpiry;
+    }
+
+    public String getRecoveryToken() {
+        return recoveryToken;
+    }
+
+    public void setRecoveryToken(String recoveryToken) {
+        this.recoveryToken = recoveryToken;
+    }
+
+    public LocalDateTime getRecoveryTokenExpiry() {
+        return recoveryTokenExpiry;
+    }
+
+    public void setRecoveryTokenExpiry(LocalDateTime recoveryTokenExpiry) {
+        this.recoveryTokenExpiry = recoveryTokenExpiry;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
 

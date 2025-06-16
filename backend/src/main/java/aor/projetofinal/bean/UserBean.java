@@ -10,6 +10,7 @@ import aor.projetofinal.entity.RoleEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.exception.EmailAlreadyExistsException;
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
@@ -35,6 +36,9 @@ public class UserBean implements Serializable {
 
     @Inject
     private RoleDao roleDao;
+
+    @EJB
+    SettingsBean settingsBean;
 
     //@Inject
     //private SettingsDao settingsDao;
@@ -69,7 +73,9 @@ public class UserBean implements Serializable {
         user.setConfirmed(false);
         user.setActive(true);
         user.setConfirmationToken(UUID.randomUUID().toString());
-        //user.setConfirmationTokenExpiry(LocalDateTime.now().plusMinutes(tokenExpiryMinutes));
+
+        int lifetimeMinutes = settingsBean.getConfirmationTokenTimeout();
+        user.setConfirmationTokenExpiry(LocalDateTime.now().plusMinutes(lifetimeMinutes));
         user.setRole(userRole); // atribuir a role USER
 
 

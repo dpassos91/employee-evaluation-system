@@ -26,6 +26,7 @@ public class UserService {
 
     // Criar novo utilizador
     @POST
+    @Path("/createUser")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createUser(UserDto userDto) {
@@ -41,7 +42,7 @@ public class UserService {
         return Response.ok(createdUser).build();
     }
 
-
+    // login utilizador
     @POST
     @Path("/login") // postman
     @Produces(MediaType.APPLICATION_JSON)

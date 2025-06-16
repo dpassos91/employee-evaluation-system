@@ -5,6 +5,7 @@ import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.entity.UserEntity;
 import jakarta.ejb.EJB;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 @ApplicationScoped
 public class JavaConversionUtil {
 
-    @EJB
+    @Inject
     UserDao userDao;
 
 
@@ -23,15 +24,15 @@ public class JavaConversionUtil {
         userDto.setEmail(userEntity.getEmail());
         userDto.setPassword(userEntity.getPassword());
         userDto.setActive(userEntity.isActive());
-        userDto.setVerified(userEntity.isConfirmed());
-        userDto.setRegisterDate(userEntity.getCreatedAt());
-        userDto.setAccountConfirmToken(userEntity.getConfirmationToken());
-        userDto.setAccountConfirmTokenExpiryDate(userEntity.getConfirmationTokenExpiry());
-        userDto.setForgottenPassToken(userEntity.getRecoveryToken());
-        userDto.setForgottenPassTokenExpiryDate(userEntity.getRecoveryTokenExpiry());
+        userDto.setConfirmed(userEntity.isConfirmed());
+        userDto.setCreatedAt(userEntity.getCreatedAt());
+        userDto.setConfirmationToken(userEntity.getConfirmationToken());
+        userDto.setConfirmationTokenExpiry(userEntity.getConfirmationTokenExpiry());
+        userDto.setRecoveryToken(userEntity.getRecoveryToken());
+        userDto.setRecoveryTokenExpiry(userEntity.getRecoveryTokenExpiry());
 
 
-        userDto.setSessionTokenExpiryDate(userEntity.getSessionTokenExpiryDate());
+        //userDto.setSessionTokenExpiryDate(userEntity.getSessionTokenExpiryDate());
 
         return userDto;
     }

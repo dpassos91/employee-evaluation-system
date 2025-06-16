@@ -16,6 +16,9 @@ public class SettingsDao {
         return em.find(SettingsEntity.class, 1);
     }
 
+
+
+
     public void save(SettingsEntity settings) {
         em.merge(settings);
     }
