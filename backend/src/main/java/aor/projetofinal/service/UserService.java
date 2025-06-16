@@ -1,5 +1,6 @@
 package aor.projetofinal.service;
 
+import aor.projetofinal.Util.EmailUtil;
 import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dto.LoginUserDto;
@@ -20,6 +21,10 @@ public class UserService {
 
     @Inject
     UserBean userBean;
+
+    @Inject
+    EmailUtil emailUtil;
+
 
     //@Inject
     //Notifier notifier;
@@ -51,7 +56,8 @@ public class UserService {
 
         logger.info("Login request recebido");
 
-        if (userLog == null || userLog.getEmail() == null || userLog.getPassword() == null) {
+        if (userLog == null || userLog.getEmail() == null || userLog.getEmail().isEmpty()
+                || userLog.getPassword() == null || userLog.getPassword().isEmpty()) {
             logger.warn("Parametros null recebidos no request");
             return Response.status(401)
                     .entity("{\"message\": \"password ou email vazio ou null\"}")
@@ -73,8 +79,8 @@ public class UserService {
                     .build();
         }
 
-        //confirmação feita diretamente na DB
-       if (!userBean.isAccountConfirmed(userLog.getEmail())) {
+        //confirmação de conta por link na consola
+      /* if (!userBean.isAccountConfirmed(userLog.getEmail())) {
             String accountConfirmToken = userBean.getConfirmToken(userLog.getEmail());
             String confirmationlink = "http://localhost:8080/david-proj5-1.0-SNAPSHOT/rest/users/confirmAccount?accountConfirmToken=" + accountConfirmToken;
 
@@ -84,6 +90,27 @@ public class UserService {
                     .entity("{\"message\": \"A conta ainda não foi confirmada.\", \"confirmationLink\": \"" + confirmationlink + "\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
+        } */
+
+
+
+        if (!userBean.isAccountConfirmed(userLog.getEmail())) {
+            String confirmToken = userBean.getConfirmToken(userLog.getEmail());
+
+
+            String confirmationlink = "http://localhost:8080/grupo7/rest/users/confirmAccount?confirmToken=" + confirmToken;
+
+            emailUtil.sendEmail(
+                    user.getEmail(),
+                    "Confirmação da Conta",
+                    "Clique neste link para confirmar a sua conta: " + confirmationlink
+            );
+
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"A sua conta ainda não foi confirmada. Foi enviado um email de confirmação.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+
         }
 
 
@@ -91,8 +118,8 @@ public class UserService {
 
         if (sessionToken == null) {
             logger.warn("sessionToken null - ocorreu um erro a fazer login");
-            return Response.status(401)
-                    .entity("{\"message\": \"Não foi possivel fazer login\"}")
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"message\": \"Ocorreu um erro interno ao tentar fazer login.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
@@ -105,6 +132,38 @@ public class UserService {
                 .type(MediaType.APPLICATION_JSON) // Força Content-Type JSON
                 .build();
     }
+
+    @GET
+    @Path("/confirmAccount")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response confirmAccount(@QueryParam("confirmToken") String confirmToken) {
+        if (confirmToken == null || confirmToken.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"message\": \"Token de confirmação de conta em falta.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        boolean success = userBean.confirmAccount(confirmToken);
+
+        if (success) {
+            return Response.ok("{\"message\": \"Conta confirmada com sucesso! Já pode fazer login\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+
+        } else {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"message\": \"Link inválido ou expirado. Foi gerado um novo Link de confirmação de conta." +
+                            " Torne a aceder ao seu email registado" +
+                            " para ter acesso ao novo link de confirmação de conta\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+    }
+
+
+
+
 
 
 

@@ -3,6 +3,7 @@ package aor.projetofinal.bean;
 import aor.projetofinal.Util.JavaConversionUtil;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.RoleDao;
+import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.LoginUserDto;
 import aor.projetofinal.dto.UserDto;
@@ -36,6 +37,9 @@ public class UserBean implements Serializable {
 
     @Inject
     private RoleDao roleDao;
+
+    @Inject
+    private SessionTokenDao sessionTokenDao;
 
     @EJB
     SettingsBean settingsBean;
@@ -133,10 +137,11 @@ public class UserBean implements Serializable {
         SessionTokenEntity sessionTokenEntity = new SessionTokenEntity();
         String sessionToken = UUID.randomUUID().toString();
         sessionTokenEntity.setTokenValue(sessionToken);
-
+        sessionTokenEntity.setUser(userEntity);
         sessionTokenEntity.setCreatedAt(LocalDateTime.now());
-        //sessionTokenEntity.setExpiryDate(LocalDateTime.now().plusMinutes(settingsBean.getSessionTimeoutMinutes()));
+        sessionTokenEntity.setExpiryDate(LocalDateTime.now().plusMinutes(settingsBean.getSessionTimeoutMinutes()));
 
+        sessionTokenDao.persist(sessionTokenEntity);
 
         logger.info("Login realizado com sucesso para o utilizador com email {}", userEntity.getEmail());
         return sessionToken;
@@ -188,6 +193,70 @@ public class UserBean implements Serializable {
         }
         return null;
     }
+
+
+    public String generateConfirmToken(String email) {
+        UserEntity user = userDao.findByEmail(email);
+
+        if (user == null) {
+            logger.warn("Utilizador {} não encontrado para gerar token", email);
+            return null;
+        }
+
+        // Se a conta já estiver verificada, não precisa de token
+        if (user.isConfirmed()) {
+            logger.info("Utilizador {} já está verificado. Não é necessário token.", email);
+            return null;
+        }
+
+
+        // Gerar novo token
+        String newConfirmationToken = UUID.randomUUID().toString();
+        user.setConfirmationToken(newConfirmationToken);
+
+        logger.info("Novo token de confirmação de conta gerado para {}", email);
+        return newConfirmationToken;
+    }
+
+
+
+    public boolean confirmAccount(String confirmToken) {
+        UserEntity user = userDao.findUserByConfirmToken(confirmToken);
+
+        if (user == null || user.isConfirmed()) {
+            return false; // conta do user já foi autenticada ou user ou token é inválido
+        }
+
+        // Verificar se o token de confirmação expirou , e se sim gerar um novo
+        if (user.getConfirmationTokenExpiry() != null && user.getConfirmationTokenExpiry().isBefore(LocalDateTime.now())) {
+            String newAccountConfirmToken  = generateConfirmToken(user.getEmail());
+            user.setConfirmationToken(newAccountConfirmToken);
+
+            int lifetimeMinutes = settingsBean.getConfirmationTokenTimeout();
+            user.setConfirmationTokenExpiry(LocalDateTime.now().plusMinutes(lifetimeMinutes));
+            userDao.save(user);
+
+            logger.info("Token expirado. A gerar novo token de confirmação para {}", user.getEmail());
+            return false; // Token expirado
+        }
+
+
+
+        user.setConfirmed(true); // verificar/ativar conta
+
+        user.setConfirmationToken(null); // descartar token após confirmacao de conta
+        user.setConfirmationTokenExpiry(null);
+        userDao.save(user);
+
+        logger.info("Conta confirmada com sucesso para user: {}", user.getEmail());
+        return true;
+    }
+
+
+
+
+
+
 
 
 
