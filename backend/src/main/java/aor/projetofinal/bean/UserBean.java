@@ -253,7 +253,48 @@ public class UserBean implements Serializable {
     }
 
 
+    public boolean logout(String sessionTokenValue) {
+        logger.info("Início de logout");
 
+        SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionTokenValue);
+
+        if (sessionTokenEntity != null) {
+            sessionTokenDao.delete(sessionTokenEntity);
+
+            logger.info("Logout efetuado com sucesso para o utilizador: {}", sessionTokenEntity.getUser().getEmail());
+            return true;
+        }
+
+        logger.warn("Token de sessão não encontrado. Logout não realizado.");
+        return false;
+    }
+
+
+    public boolean authorization(String sessionTokenValue) {
+        logger.info("Pedido de autorização recebido");
+
+        SessionTokenEntity sessionToken = sessionTokenDao.findBySessionToken(sessionTokenValue);
+        if (sessionToken == null) {
+            logger.warn("Autorização recusada: token inexistente ou inválido.");
+            return false;
+        }
+
+        // Verifica se o sessionToken está expirado
+        if (sessionToken.getExpiryDate() != null && sessionToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            logger.warn("Autorização recusada: token expirado.");
+            return false;
+        }
+
+        UserEntity user = sessionToken.getUser();
+
+        if (user == null || !user.isActive()) {
+            logger.warn("Autorização recusada: utilizador inexistente ou inativo.");
+            return false;
+        }
+
+        logger.info("Autorização concedida com sucesso para o utilizador: {}", user.getEmail());
+        return true;
+    }
 
 
 
