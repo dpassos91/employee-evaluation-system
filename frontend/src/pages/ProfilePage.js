@@ -6,27 +6,33 @@ import { FormattedMessage } from "react-intl";
 
 export default function ProfilePage() {
   return (
-    <PageLayout title={<FormattedMessage id="profile.title" defaultMessage="Perfil" />}>
+    <PageLayout>
       <section className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         {/* Coluna 1: Foto + ações secundárias */}
-        <div className="flex flex-col items-center md:items-start">
-          <div className="w-28 h-28 rounded-full overflow-hidden mb-2 border-2 border-[#D41C1C] bg-white">
-            <img
-              src={profilePlaceholder}
-              alt="Foto de perfil"
-              className="object-cover w-full h-full"
-            />
-          </div>
-          <AppButton variant="secondary" className="mb-4 w-full px-3 py-1.5 text-sm">
-            <FormattedMessage id="profile.changePhoto" defaultMessage="Alterar fotografia" />
-          </AppButton>
-          <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm">
-            <FormattedMessage id="profile.trainingHistory" defaultMessage="Histórico de formações" />
-          </AppButton>
-          <AppButton variant="secondary" className="w-full px-3 py-1.5 mt-2 text-sm">
-            <FormattedMessage id="profile.evaluationHistory" defaultMessage="Histórico de avaliações" />
-          </AppButton>
-        </div>
+<div className="flex flex-col items-center w-full">
+  <h2 className="text-3xl font-bold text-center mb-2 w-full">
+    <FormattedMessage id="profile.title" defaultMessage="Perfil" />
+  </h2>
+  <div className="w-28 h-28 rounded-full overflow-hidden mb-8 border-2 border-[#D41C1C] bg-white mx-auto mt-10">
+    <img
+      src={profilePlaceholder}
+      alt="Foto de perfil"
+      className="object-cover w-full h-full"
+    />
+  </div>
+  {/* Botões com gap regular */}
+  <div className="flex flex-col gap-3 w-full mt-6">
+    <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
+      <FormattedMessage id="profile.changePhoto" defaultMessage="Alterar fotografia" />
+    </AppButton>
+    <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
+      <FormattedMessage id="profile.trainingHistory" defaultMessage="Histórico de formações" />
+    </AppButton>
+    <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
+      <FormattedMessage id="profile.evaluationHistory" defaultMessage="Histórico de avaliações" />
+    </AppButton>
+  </div>
+</div>
 
         {/* Coluna 2: Formulário e Biografia */}
         <div className="flex flex-col w-full pl-12">
