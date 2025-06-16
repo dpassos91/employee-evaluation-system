@@ -31,18 +31,7 @@ export default function App() {
       }}
     >
       <Router>
-        {/* Ícones fixos no topo direito */}
-        <div className="fixed top-10 right-[95px] z-50">
-          <div className="flex gap-4 items-center">
-            {user && (
-              <>
-                <NotificationIcon />
-                <MessageIcon />
-              </>
-            )}
-            <LanguageIcon />
-          </div>
-        </div>
+        
 
         {/* Rotas da aplicação */}
         <Routes>
