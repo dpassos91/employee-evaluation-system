@@ -9,6 +9,7 @@ import aor.projetofinal.dto.LoginUserDto;
 import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.entity.RoleEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
+import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.exception.EmailAlreadyExistsException;
 import jakarta.ejb.EJB;
@@ -19,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -377,6 +379,41 @@ public class UserBean implements Serializable {
         logger.info("Password redefinida e atualizada com sucesso para o utilizador {}", user.getEmail());
         return true;
     }
+
+    public SessionStatusDto validateAndRefreshSessionToken(String sessionToken) {
+        if (sessionToken == null || sessionToken.isEmpty()) {
+            return null;
+        }
+
+        SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
+
+        UserEntity user = sessionTokenEntity.getUser();
+        if (user == null || sessionTokenEntity.getExpiryDate() == null || sessionTokenEntity.getExpiryDate().isBefore(LocalDateTime.now()) || !user.isActive()) {
+            if (user != null) {
+                sessionTokenDao.delete(sessionTokenEntity);
+            }
+            return null;
+        }
+
+        // Verificar a diferença entre a data de expiração e a data atual
+        int minutesDifference = (int) Duration.between(LocalDateTime.now(), sessionTokenEntity.getExpiryDate()).toMinutes();
+
+
+
+        // Renovar tempo de sessão se for igual ou superior ao tempo configurado
+
+        if (minutesDifference <= settingsBean.getSessionTimeoutMinutes()) {
+            sessionTokenEntity.setExpiryDate(LocalDateTime.now().plusMinutes(settingsBean.getSessionTimeoutMinutes()));
+            sessionTokenDao.save(sessionTokenEntity);}
+
+        return javaConversionUtil.convertSessionTokenEntityToSessionStatusDto(sessionTokenEntity);
+    }
+
+
+
+
+
+
 
 
 

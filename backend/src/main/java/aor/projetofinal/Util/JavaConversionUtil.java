@@ -1,7 +1,9 @@
 package aor.projetofinal.Util;
 
 import aor.projetofinal.dao.UserDao;
+import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.dto.UserDto;
+import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
 import jakarta.ejb.EJB;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -15,6 +17,20 @@ public class JavaConversionUtil {
 
     @Inject
     UserDao userDao;
+
+
+
+    //Converter de UserEntity para SessionStatusDto
+    public SessionStatusDto convertSessionTokenEntityToSessionStatusDto(SessionTokenEntity sessionTokenEntity) {
+        SessionStatusDto sessionStatusDto = new SessionStatusDto(sessionTokenEntity.getTokenValue(), sessionTokenEntity.getExpiryDate());
+
+
+        sessionStatusDto.setSessionToken(sessionTokenEntity.getTokenValue());
+        sessionStatusDto.setExpiryDate(sessionTokenEntity.getExpiryDate());
+
+        return sessionStatusDto;
+    }
+
 
 
 

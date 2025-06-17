@@ -4,6 +4,7 @@ import aor.projetofinal.Util.EmailUtil;
 import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dto.LoginUserDto;
+import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.dto.UserDto;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
@@ -281,7 +282,38 @@ public class UserService {
                 .build();
     }
 
+    @POST
+    @Path("/validate-session")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response validateSession(@HeaderParam("sessionToken") String sessionToken) {
 
+        // Verifica se o sessionToken foi fornecido
+        if (sessionToken == null || sessionToken.isEmpty()) {
+            return Response.status(400)
+                    .entity("{\"message\": \"Token de sessão não fornecido.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+        // Analisa se a sessão ainda está válida
+        SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
+
+
+        if (sessionStatusDto == null) {
+            // Se o sessionToken for inválido ou expirado, retorna erro 401 (Unauthorized)
+            return Response.status(401)
+                    .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // Se o sessionToken for válido e renovado, retorna a resposta 200 com o SessionStatusDto, convertendo-o em JSON
+        return Response.ok(sessionStatusDto)
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
 
 
 
