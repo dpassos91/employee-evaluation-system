@@ -298,6 +298,89 @@ public class UserBean implements Serializable {
 
 
 
+    public String generateRecoveryToken(String email) {
+        UserEntity user = userDao.findByEmail(email);
+
+        if (user == null) {
+            logger.warn("Utilizador {} não encontrado para gerar token de recuperação", user.getEmail());
+            return null;
+        }
+
+        // Se já existir um token válido, substituir por um novo
+        LocalDateTime expiry = user.getRecoveryTokenExpiry();
+        if (user.getRecoveryToken() != null && expiry != null && expiry.isAfter(LocalDateTime.now())) {
+            logger.info("Token de recuperação de pass ainda válido para {}, mas por motivos de segurança a gerar novo token.", user.getEmail());
+
+            String newRecoveryToken = UUID.randomUUID().toString();
+
+            // Define a nova data de expiração
+            int lifetimeMinutes = settingsBean.getRecoveryTokenTimeout();
+            user.setRecoveryToken(newRecoveryToken);
+            user.setRecoveryTokenExpiry(LocalDateTime.now().plusMinutes(lifetimeMinutes));
+            userDao.save(user);
+
+            logger.info("Novo token de recuperação gerado para {}", user.getEmail());
+            return newRecoveryToken;
+        }
+
+        // Gerar novo token
+        logger.info("A gerar token de recuperação de password para {}", user.getEmail());
+        String recoveryToken = UUID.randomUUID().toString();
+        int lifetimeMinutes = settingsBean.getRecoveryTokenTimeout(); // configurable pelo admin
+
+        user.setRecoveryToken(recoveryToken);
+        user.setRecoveryTokenExpiry(LocalDateTime.now().plusMinutes(lifetimeMinutes));
+        userDao.save(user);
+
+        logger.info("Novo token de recuperação de password gerado para {}", user.getEmail());
+        return recoveryToken;
+    }
+
+
+// Method que quando o frontend chama o endpoint para redefinir a password, com token no URL,
+// verifica se o token ainda é válido antes de aceitar nova password
+
+
+    public boolean isRecoveryTokenValid(String recoveryToken) {
+        UserEntity user = userDao.findUserByRecoveryToken(recoveryToken);
+
+        if (user == null || user.getRecoveryTokenExpiry() == null) {
+            return false;
+        }
+
+        return user.getRecoveryTokenExpiry().isAfter(LocalDateTime.now());
+    }
+
+
+    public boolean resetPasswordWithToken(String forgottenPassToken, String newPassword) {
+        // Verificar se o token é válido
+        UserEntity user = userDao.findUserByRecoveryToken(forgottenPassToken);
+
+        if (user == null) {
+            logger.warn("Token inválido: {}", forgottenPassToken);
+            return false;
+        }
+
+        // Verificar se o token está expirado
+        if (user.getRecoveryTokenExpiry() == null || user.getRecoveryTokenExpiry().isBefore(LocalDateTime.now())) {
+            logger.warn("Token expirado para utilizador {}", user.getEmail());
+            return false;
+        }
+
+        // Hash da nova password
+        String hashedPassword = hashPassword(newPassword);
+        user.setPassword(hashedPassword);  // Armazenar a password com hash
+        user.setRecoveryToken(null);  // Eliminar o token após redefinir a password
+        user.setRecoveryTokenExpiry(null);  // Limpar a expiry date do token
+        userDao.save(user);  // Guardar as alterações na base de dados
+
+        logger.info("Password redefinida e atualizada com sucesso para o utilizador {}", user.getEmail());
+        return true;
+    }
+
+
+
+
 
 
 
