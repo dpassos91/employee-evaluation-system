@@ -2,6 +2,7 @@ package aor.projetofinal.dao;
 
 
 import aor.projetofinal.entity.SessionTokenEntity;
+import aor.projetofinal.entity.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -46,7 +47,9 @@ public class SessionTokenDao {
                 .executeUpdate();
     }
 
-
+    public void save(SessionTokenEntity sessionTokenEntity) {
+        em.merge(sessionTokenEntity);
+    }
 
 
 
