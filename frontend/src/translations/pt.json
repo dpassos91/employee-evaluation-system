@@ -58,6 +58,16 @@
   "profile.phone": "Contacto telefónico",
   "profile.biography": "Biografia",
   "profile.changePassword": "Alterar password",
-  "profile.save": "Guardar"
+  "profile.save": "Guardar",
+
+    "users.list.title": "Listagem de Utilizadores",
+  "users.filter.name": "Nome",
+  "users.filter.manager": "Gestor",
+  "users.button.excel": "Excel",
+  "users.button.view": "Ver",
+  "users.table.name": "Nome",
+  "users.table.office": "Escritório",
+  "users.table.manager": "Gestor",
+  "users.table.contact": "Contacto"
 
 }

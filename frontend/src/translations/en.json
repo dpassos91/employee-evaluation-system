@@ -57,6 +57,16 @@
   "profile.phone": "Phone Number",
   "profile.biography": "Biography",
   "profile.changePassword": "Change Password",
-  "profile.save": "Save"
+  "profile.save": "Save",
+
+    "users.list.title": "User List",
+  "users.filter.name": "Name",
+  "users.filter.manager": "Manager",
+  "users.button.excel": "Excel",
+  "users.button.view": "View",
+  "users.table.name": "Name",
+  "users.table.office": "Office",
+  "users.table.manager": "Manager",
+  "users.table.contact": "Contact"
   
 }

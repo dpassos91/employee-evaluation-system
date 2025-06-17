@@ -1,6 +1,6 @@
 import PageLayout from "../components/PageLayout";
 import profile from "../images/profile_icon.png";
-
+import { FormattedMessage } from "react-intl";
 
 export default function UsersPage() {
   const users = [
@@ -39,68 +39,85 @@ export default function UsersPage() {
   ];
 
   return (
-    <PageLayout title="Listagem de Utilizadores">
+    <PageLayout title={<FormattedMessage id="users.list.title" defaultMessage="Listagem de Utilizadores" />}>
       {/* Filtros */}
       <div className="flex gap-4 mb-4">
-        <input placeholder="Nome" className="border px-2 py-1 rounded" />
+        <FormattedMessage id="users.filter.name" defaultMessage="Nome">
+  {(msg) => (
+    <input
+      placeholder={msg}
+      className="border px-2 py-1 rounded"
+    />
+  )}
+</FormattedMessage>
         <select className="border px-2 py-1 rounded">
-                    <option value=""> </option>
-                  <option value="Boston">Boston</option>
-                  <option value="Coimbra">Coimbra</option>
-                  <option value="Lisboa">Lisboa</option>
-                  <option value="Munich">Munich</option>
-                  <option value="Porto">Porto</option>
-                  <option value="Southampton">Southampton</option>
-                  <option value="Viseu">Viseu</option>
+          <option value=""> </option>
+          <option value="Boston">Boston</option>
+          <option value="Coimbra">Coimbra</option>
+          <option value="Lisboa">Lisboa</option>
+          <option value="Munich">Munich</option>
+          <option value="Porto">Porto</option>
+          <option value="Southampton">Southampton</option>
+          <option value="Viseu">Viseu</option>
         </select>
-        <input placeholder="Gestor" className="border px-2 py-1 rounded" />
-        <button className="bg-green-600 text-white px-3 rounded">Excel</button>
+        <FormattedMessage id="users.filter.manager" defaultMessage="Gestor">
+  {(msg) => (
+    <input
+      placeholder={msg}
+      className="border px-2 py-1 rounded"
+    />
+  )}
+</FormattedMessage>
+        <button className="bg-green-600 text-white px-3 rounded">
+          <FormattedMessage id="users.button.excel" defaultMessage="Excel" />
+        </button>
       </div>
 
       {/* Tabela */}
-<table className="w-full text-left border-collapse table-fixed">
-  <thead>
-    <tr className="bg-gray-200 text-sm">
-      <th className="p-2 w-[180px]">Nome</th>
-      <th className="p-2 w-[140px]">Escritório</th>
-      <th className="p-2 w-[180px]">Gestor</th>
-      <th className="p-2 w-[220px]">Contacto</th> {/* Email */}
-      <th className="p-2 w-[60px]"></th>           {/* Ícone */}
-      <th className="p-2 w-[100px]"></th>          {/* Botão */}
-    </tr>
-  </thead>
-  <tbody>
-    {users.map((user) => (
-      <tr key={user.id} className="border-b hover:bg-gray-50">
-        <td className="p-2">{user.name}</td>
-        <td className="p-2">{user.office}</td>
-        <td className="p-2">{user.manager}</td>
+      <table className="w-full text-left border-collapse table-fixed">
+        <thead>
+          <tr className="bg-gray-200 text-sm">
+            <th className="p-2 w-[180px]">
+              <FormattedMessage id="users.table.name" defaultMessage="Nome" />
+            </th>
+            <th className="p-2 w-[140px]">
+              <FormattedMessage id="users.table.office" defaultMessage="Escritório" />
+            </th>
+            <th className="p-2 w-[180px]">
+              <FormattedMessage id="users.table.manager" defaultMessage="Gestor" />
+            </th>
+            <th className="p-2 w-[220px]">
+              <FormattedMessage id="users.table.contact" defaultMessage="Contacto" />
+            </th>
+            <th className="p-2 w-[60px]"></th>
+            <th className="p-2 w-[100px]"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id} className="border-b hover:bg-gray-50">
+              <td className="p-2">{user.name}</td>
+              <td className="p-2">{user.office}</td>
+              <td className="p-2">{user.manager}</td>
+              <td className="p-2 truncate">{user.email}</td>
+              <td className="p-2 text-center">
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="w-6 h-6 rounded-full mx-auto"
+                />
+              </td>
+              <td className="p-2">
+                <button className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2 ml-10">
+                  <FormattedMessage id="users.button.view" defaultMessage="Ver" /> <span>&gt;</span>
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-        {/* Email */}
-        <td className="p-2 truncate">{user.email}</td>
-
-        {/* Ícone */}
-        <td className="p-2 text-center">
-          <img
-            src={user.avatar}
-            alt={user.name}
-            className="w-6 h-6 rounded-full mx-auto"
-          />
-        </td>
-
-        {/* Botão Ver */}
-        <td className="p-2">
-          <button className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2 ml-12">
-            Ver <span>&gt;</span>
-          </button>
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-
-
-      {/* Paginação fake */} {/*BACKEND BACKEND BACKEND BACKEND BACKEND BACKEND BACKEND BACKEND BACKEND*/}
+      {/* Paginação fake */}
       <div className="mt-4 flex justify-end gap-2 text-blue-700 text-sm">
         <button className="hover:underline">1</button>
         <button className="hover:underline">2</button>
@@ -111,3 +128,4 @@ export default function UsersPage() {
     </PageLayout>
   );
 }
+
