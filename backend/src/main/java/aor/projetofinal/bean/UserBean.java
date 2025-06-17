@@ -6,7 +6,9 @@ import aor.projetofinal.dao.RoleDao;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.LoginUserDto;
+import aor.projetofinal.dto.ProfileDto;
 import aor.projetofinal.dto.UserDto;
+import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.RoleEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.dto.SessionStatusDto;
@@ -407,6 +409,31 @@ public class UserBean implements Serializable {
             sessionTokenDao.save(sessionTokenEntity);}
 
         return javaConversionUtil.convertSessionTokenEntityToSessionStatusDto(sessionTokenEntity);
+    }
+
+
+    public boolean updateInfo(ProfileDto profileDto, String email) {
+
+        UserEntity user = userDao.findByEmail(email);
+
+        if (user == null) {
+            logger.warn("Não foi possivel encontrar o utilizador para atualizar");
+            return false;
+        }
+
+        ProfileEntity profileToUpdate = userDao.findByEmail(email).getProfile();
+
+        profileToUpdate.setFirstName(profileDto.getFirstName());
+        profileToUpdate.setLastName(profileDto.getLastName());
+        profileToUpdate.setBirthDate(profileDto.getBirthDate());
+        profileToUpdate.setAddress(profileDto.getAddress());
+        profileToUpdate.setZipCode(profileDto.getZipCode());
+        profileToUpdate.setPhone(profileDto.getPhone());
+        //campos opcionais
+        profileToUpdate.setPhotograph(profileDto.getPhotograph());
+        profileToUpdate.setBio(profileDto.getBio());
+
+        return true;
     }
 
 

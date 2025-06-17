@@ -161,6 +161,14 @@ public class UserEntity implements Serializable {
         this.password = password;
     }
 
+    public ProfileEntity getProfile() {
+        return profile;
+    }
+
+    public void setProfile(ProfileEntity profile) {
+        this.profile = profile;
+    }
+
     public List<EvaluationEntity> getEvaluationsReceived() {
         return evaluationsReceived;
     }
