@@ -322,7 +322,7 @@ public class UserService {
 
 
     //update password de user
-    @PATCH
+  /*  @PATCH
     @Path("/update/{email}/password")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -330,7 +330,7 @@ public class UserService {
                                UserDto passwordAtualizado) {
 
     }
-
+*/
 
         //update perfil de user
     @PUT
