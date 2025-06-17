@@ -6,21 +6,33 @@ import AuthFormLayout from "../../components/AuthFormLayout";
 import InputField from "../../components/InputField";
 import SubmitButton from "../../components/SubmitButton";
 
+// Importa o custom hook
+import { useAuth } from "../../hooks/useAuth"; // <-- ajusta o caminho conforme o teu projeto
+
 export default function LoginForm() {
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
+  const [loading, setLoading] = useState(false);
+
+  const { login } = useAuth(); // Hook da autenticação
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login:", formData);
-    // Lógica de autenticação aqui
+    setLoading(true);
+    const success = await login(formData);
+    setLoading(false);
+
+    // (Opcional: feedback ou lógica adicional, caso o login falhe)
+    if (!success) {
+      // Podes mostrar uma mensagem de erro aqui, se quiseres
+    }
   };
 
   return (
@@ -58,10 +70,13 @@ export default function LoginForm() {
         <SubmitButton
           id="login.form.submit"
           defaultLabel="Login"
+          loading={loading}
+          disabled={loading}
         />
       </form>
     </AuthFormLayout>
   );
 }
+
 
 

@@ -67,6 +67,10 @@
   "users.table.name": "Name",
   "users.table.office": "Office",
   "users.table.manager": "Manager",
-  "users.table.contact": "Contact"
+  "users.table.contact": "Contact",
+
+  "auth.login.success": "Login successful!",
+  "auth.logout.success": "Logout successful!",
+  "auth.logout.failed": "There was a problem logging out. Please try again."  
   
 }

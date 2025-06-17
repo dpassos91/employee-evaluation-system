@@ -68,6 +68,10 @@
   "users.table.name": "Nome",
   "users.table.office": "Escritório",
   "users.table.manager": "Gestor",
-  "users.table.contact": "Contacto"
+  "users.table.contact": "Contacto",
+
+  "auth.login.success": "Login efetuado com sucesso!",
+  "auth.logout.success": "Logout efetuado com sucesso!",
+  "auth.logout.failed": "Houve um problema ao fazer logout. Por favor tente novamente."
 
 }
