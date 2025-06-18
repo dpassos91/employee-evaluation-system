@@ -20,13 +20,13 @@ const API_ENDPOINTS = {
   /** Authentication endpoints */
   auth: {
     /** @type {string} User login endpoint */
-    login: `${API_BASE_URL}/auth/login`,
+    login: `${API_BASE_URL}/users/login`,
     /** @type {string} User logout endpoint */
-    logout: `${API_BASE_URL}/auth/logout`,
+    logout: `${API_BASE_URL}/users/logout`,
     /** @type {string} Request password reset endpoint */
-    requestResetPassword: `${API_BASE_URL}/auth/request-password-reset`,
+    requestResetPassword: `${API_BASE_URL}/users/request-password-reset`,
     /** @type {string} Reset password endpoint */
-    resetPassword: `${API_BASE_URL}/auth/reset-password`
+    resetPassword: `${API_BASE_URL}/users/reset-password`
   },
 
   /** Course endpoints (to be filled in) */

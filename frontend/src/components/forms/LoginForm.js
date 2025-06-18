@@ -23,14 +23,18 @@ export default function LoginForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  console.log("SUBMIT!", formData);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    console.log("VOU CHAMAR LOGIN");
     const success = await login(formData);
+    console.log("Login terminou com sucesso?", success);
     setLoading(false);
 
     // (Opcional: feedback ou lógica adicional, caso o login falhe)
     if (!success) {
+      console.error("Login falhou");
       // Podes mostrar uma mensagem de erro aqui, se quiseres
     }
   };

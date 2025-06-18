@@ -21,31 +21,30 @@ export function useAuth() {
    * @returns {boolean} true if login successful, false otherwise
    */
   const login = async (credentials) => {
-    try {
-      // Chama a API e obtém o token
-      const data = await authAPI.loginUser(credentials);
+  console.log("HOOK LOGIN FOI CHAMADO", credentials);
+  try {
+    const data = await authAPI.loginUser(credentials);
+    console.log("🔎 LOGIN RESPONSE DATA:", data);
 
-      // Guarda o sessionToken em sessionStorage
-      sessionStorage.setItem("authToken", data.sessionToken);
+    sessionStorage.setItem("authToken", data.sessionToken);
 
-      // (Opcional: se tivesse username no payload, podias guardar já aqui)
-      // updateName(data.username);
+    alert(formatMessage({
+      id: "auth.login.success",
+      defaultMessage: "Login efetuado com sucesso!"
+    }));
 
-      // Mensagem de sucesso (internacionalizada)
-      alert(formatMessage({
-        id: "auth.login.success",
-        defaultMessage: "Login efetuado com sucesso!"
-      }));
+    navigate("/dashboard");
+    return true;
+  } catch (error) {
+    console.error("ERRO NO LOGIN HOOK:", error);
+    alert(formatMessage({
+      id: 'auth.login.failed',
+      defaultMessage: 'Login falhou! Por favor verifique as suas credenciais.'
+    }));
+    return false;
+  }
+};
 
-      // Redireciona para a dashboard/home
-      navigate("/dashboard");
-      return true;
-    } catch (error) {
-      // O apiCall já mostra alert de erro!
-      // Mas podes pôr aqui lógica adicional se quiseres
-      return false;
-    }
-  };
 
   /**
    * Logs out the user: invalidates session server-side and clears storage/state.

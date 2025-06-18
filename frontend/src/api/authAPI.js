@@ -28,20 +28,14 @@ const loginUser = async (credentials) => {
   const loginResponse = await apiCall(API_ENDPOINTS.auth.login, {
     method: 'POST',
     body: JSON.stringify(credentials),
-    // Headers are set automatically by apiCall
   });
 
-  const token = loginResponse.token;
-  sessionStorage.setItem('authToken', token);
-
-  // Optionally fetch full user details using the returned userId
-  const userDetails = await getUserById(loginResponse.userId);
-
-  return {
-    ...userDetails,
-    token,
-  };
+  // Apenas guardar o token e devolver o mesmo — nada de getUserById!
+  const sessionToken = loginResponse.sessionToken;
+  sessionStorage.setItem('authToken', sessionToken);
+  return { sessionToken };
 };
+
 
 /**
  * Logs out the authenticated user and removes the JWT token from sessionStorage.
