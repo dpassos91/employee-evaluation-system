@@ -12,12 +12,15 @@ const messages = {
 export const userStore = create(
   persist(
     (set, get) => ({
-      username: "",
+      user: null, // Objeto com info do user autenticado
       mediatype: {},
-      locale: "pt", // idioma por omissão
+      locale: "pt",
       translations: pt,
 
-      updateName: (username) => set({ username }),
+      // Métodos para manipular o user autenticado
+      setUser: (userObj) => set({ user: userObj }),
+      clearUser: () => set({ user: null }),
+
       updateMediatype: (mediatype) => set({ mediatype }),
 
       initializeLanguage: () => {
@@ -43,10 +46,12 @@ export const userStore = create(
       name: "user-store",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
-        username: state.username,
+        user: state.user,             // <--- GUARDA o objeto user!
         mediatype: state.mediatype,
+        // podes guardar outros campos aqui se precisares
       }),
     }
   )
 );
+
 

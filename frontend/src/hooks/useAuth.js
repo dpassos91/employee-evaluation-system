@@ -14,36 +14,45 @@ export function useAuth() {
   // Aceder a métodos do Zustand store se precisares (podes alargar conforme necessário)
   const updateName = userStore((state) => state.updateName);
 
+  const { setUser, clearUser } = userStore.getState();
+
   /**
    * Attempts to log in a user using provided credentials.
    * On success, stores sessionToken and updates userStore.
    * @param {Object} credentials - { email, password }
    * @returns {boolean} true if login successful, false otherwise
    */
-  const login = async (credentials) => {
-  console.log("HOOK LOGIN FOI CHAMADO", credentials);
-  try {
-    const data = await authAPI.loginUser(credentials);
-    console.log("🔎 LOGIN RESPONSE DATA:", data);
+const login = async (credentials) => {
+    try {
+      // Chama a API e obtém a resposta do backend
+      const data = await authAPI.loginUser(credentials);
+      // Guarda o token
+      sessionStorage.setItem("authToken", data.sessionToken);
 
-    sessionStorage.setItem("authToken", data.sessionToken);
+      // Guarda o user autenticado no userStore (com role, nomes, etc.)
+      setUser({
+        id: data.id,
+        email: data.email,
+        role: data.role,
+        primeiroNome: data.primeiroNome,
+        ultimoNome: data.ultimoNome,
+      });
 
-    alert(formatMessage({
-      id: "auth.login.success",
-      defaultMessage: "Login efetuado com sucesso!"
-    }));
+      alert(formatMessage({
+        id: "auth.login.success",
+        defaultMessage: "Login efetuado com sucesso!"
+      }));
 
-    navigate("/dashboard");
-    return true;
-  } catch (error) {
-    console.error("ERRO NO LOGIN HOOK:", error);
-    alert(formatMessage({
-      id: 'auth.login.failed',
-      defaultMessage: 'Login falhou! Por favor verifique as suas credenciais.'
-    }));
-    return false;
-  }
-};
+      navigate("/dashboard");
+      return true;
+    } catch (error) {
+      alert(formatMessage({
+        id: 'auth.login.failed',
+        defaultMessage: 'Login falhou! Por favor verifique as suas credenciais.'
+      }));
+      return false;
+    }
+  };
 
 
   /**

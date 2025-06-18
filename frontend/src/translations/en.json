@@ -70,6 +70,7 @@
   "users.table.contact": "Contact",
 
   "auth.login.success": "Login successful!",
+  "auth.login.failed": "There was a problem logging in. Please try again.",
   "auth.logout.success": "Logout successful!",
   "auth.logout.failed": "There was a problem logging out. Please try again."  
   

@@ -1,9 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { IntlProvider } from "react-intl";
 
-import NotificationIcon from "./components/NotificationIcon";
-import MessageIcon from "./components/MessageIcon";
-import LanguageIcon from "./components/LanguageIcon";
+import { PrivateRoute } from "./components/PrivateRoute";
 
 import { userStore } from "./stores/userStore";
 import LoginPage from "./pages/LoginPage";
@@ -40,9 +38,30 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
           <Route path="/redefinepassword" element={<RedefinePasswordPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/userslist" element={<UsersListPage />} />
+          <Route
+    path="/dashboard"
+    element={
+      <PrivateRoute>
+        <DashboardPage />
+      </PrivateRoute>
+    }
+    />
+          <Route
+    path="/profile"
+    element={
+      <PrivateRoute>
+        <ProfilePage />
+      </PrivateRoute>
+    }
+    />
+          <Route
+    path="/userslist"
+    element={
+      <PrivateRoute>
+        <UsersListPage />
+      </PrivateRoute>
+    }
+    />
           {/* Redireciona para /login se não estiver autenticado */}
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
@@ -50,24 +69,3 @@ export default function App() {
     </IntlProvider>
   );
 }
-
-/*import { PrivateRoute } from "./PrivateRoute"; // <- adiciona isto!
-
-// ...restante App.js...
-
-<Routes>
-  <Route path="/login" element={<LoginPage />} />
-  <Route path="/register" element={<RegisterPage />} />
-  <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
-  <Route path="/redefinepassword" element={<RedefinePasswordPage />} />
-  <Route
-    path="/dashboard"
-    element={
-      <PrivateRoute>
-        <DashboardPage />
-      </PrivateRoute>
-    }
-  />
-  {/* Redireciona para /login se não estiver autenticado *//*}
-  <Route path="*" element={<Navigate to="/login" />} />
-</Routes>*/
