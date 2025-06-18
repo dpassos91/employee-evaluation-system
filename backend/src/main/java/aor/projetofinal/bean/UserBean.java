@@ -96,6 +96,14 @@ public class UserBean implements Serializable {
         // Persistir
         try {
             userDao.create(user);
+
+            // Criar perfil e associar ao utilizador
+            ProfileEntity profile = new ProfileEntity();
+            profile.setUser(user);
+            user.setProfile(profile);
+
+
+            profileDao.create(profile);
             logger.info("User: {} | IP: {} - User successfully registered with email: {}",
                     RequestContext.getAuthor(), RequestContext.getIp(), user.getEmail());
         } catch (Exception e) {
@@ -446,7 +454,7 @@ public class UserBean implements Serializable {
         profileToUpdate.setPhotograph(profileDto.getPhotograph());
         profileToUpdate.setBio(profileDto.getBio());
 
-        profileDao.saveOrUpdateProfile(profileToUpdate, user);
+        profileDao.save(profileToUpdate);
 
         return true;
     }

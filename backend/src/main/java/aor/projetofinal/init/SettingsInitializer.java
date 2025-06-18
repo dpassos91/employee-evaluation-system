@@ -1,8 +1,10 @@
 package aor.projetofinal.init;
 
+import aor.projetofinal.dao.ProfileDao;
 import aor.projetofinal.dao.RoleDao;
 import aor.projetofinal.dao.SettingsDao;
 import aor.projetofinal.dao.UserDao;
+import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.RoleEntity;
 import aor.projetofinal.entity.SettingsEntity;
 import aor.projetofinal.entity.UserEntity;
@@ -32,6 +34,9 @@ public class SettingsInitializer {
     @Inject
     RoleDao roleDao;
 
+    @Inject
+    ProfileDao profileDao;
+
     @Transactional
     @PostConstruct
     public void init() {
@@ -54,7 +59,7 @@ public class SettingsInitializer {
         createRoleIfMissing("MANAGER");
         createRoleIfMissing("USER");
 
-        // Criar admin, se ainda não existir
+        // Criar admin, se ainda não existir, e atribuir-lhe um perfil
         if (userDao.countAdmins() == 0) {
             UserEntity admin = new UserEntity();
             admin.setEmail("admin@admin.com");
@@ -67,6 +72,14 @@ public class SettingsInitializer {
             admin.setRole(adminRole);
 
             userDao.create(admin);
+
+            // Criar perfil e associar ao utilizador
+            ProfileEntity profile = new ProfileEntity();
+            profile.setUser(admin);
+            admin.setProfile(profile);
+
+            profileDao.create(profile);
+
             System.out.println("🛡️ Administrador criado automaticamente.");
         }
     }
