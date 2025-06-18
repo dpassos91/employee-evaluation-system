@@ -2,6 +2,7 @@ package aor.projetofinal.bean;
 
 import aor.projetofinal.Util.JavaConversionUtil;
 import aor.projetofinal.context.RequestContext;
+import aor.projetofinal.dao.ProfileDao;
 import aor.projetofinal.dao.RoleDao;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
@@ -45,8 +46,13 @@ public class UserBean implements Serializable {
     @Inject
     private SessionTokenDao sessionTokenDao;
 
+    @Inject
+    private ProfileDao profileDao;
+
+
     @EJB
     SettingsBean settingsBean;
+
 
     //@Inject
     //private SettingsDao settingsDao;
@@ -421,8 +427,15 @@ public class UserBean implements Serializable {
             return false;
         }
 
-        ProfileEntity profileToUpdate = userDao.findByEmail(email).getProfile();
+        ProfileEntity profileToUpdate = user.getProfile();
 
+        if (profileToUpdate == null) {
+            profileToUpdate = new ProfileEntity();
+            profileToUpdate.setUser(user);
+            user.setProfile(profileToUpdate);
+        }
+
+        //campos obrigatórios
         profileToUpdate.setFirstName(profileDto.getFirstName());
         profileToUpdate.setLastName(profileDto.getLastName());
         profileToUpdate.setBirthDate(profileDto.getBirthDate());
@@ -432,6 +445,8 @@ public class UserBean implements Serializable {
         //campos opcionais
         profileToUpdate.setPhotograph(profileDto.getPhotograph());
         profileToUpdate.setBio(profileDto.getBio());
+
+        profileDao.saveOrUpdateProfile(profileToUpdate, user);
 
         return true;
     }

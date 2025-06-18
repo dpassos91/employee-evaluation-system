@@ -18,22 +18,22 @@ public class ProfileEntity implements Serializable  {
     @JoinColumn(name = "user_id", nullable = false, unique = true, updatable = false)
     private UserEntity user;
 
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "birth_date", nullable = false, updatable = false)
+    @Column(name = "birth_date")
     private LocalDateTime birthDate;
 
-    @Column(name = "address", nullable = false)
+    @Column(name = "address")
     private String address;
 
-    @Column(name = "zip_code", nullable = false)
+    @Column(name = "zip_code")
     private String zipCode;
 
-    @Column(name = "phone", nullable = false)
+    @Column(name = "phone")
     private String phone;
 
     @Column(name = "photograph")

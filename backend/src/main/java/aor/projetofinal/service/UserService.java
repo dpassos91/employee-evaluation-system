@@ -4,11 +4,13 @@ import aor.projetofinal.Util.EmailUtil;
 import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.SessionTokenDao;
+import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.LoginUserDto;
 import aor.projetofinal.dto.ProfileDto;
 import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.entity.SessionTokenEntity;
+import aor.projetofinal.entity.UserEntity;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
@@ -30,6 +32,8 @@ public class UserService {
     EmailUtil emailUtil;
     @Inject
     private SessionTokenDao sessionTokenDao;
+    @Inject
+    private UserDao userDao;
 
 
     //@Inject
@@ -321,13 +325,31 @@ public class UserService {
     }
 
 
-    //update password de user
-  /*  @PATCH
+    /*//update password de user
+    @PATCH
     @Path("/update/{email}/password")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUserPassword(@HeaderParam("sessionToken") String sessionToken, @PathParam("email") String email,
                                UserDto passwordAtualizado) {
+
+        // Valida e renova a sessão
+        SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
+
+        if (sessionStatusDto == null) {
+            logger.warn("Sessão inválida ou expirada - update user");
+            return Response.status(401)
+                    .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+        UserDto sessionUserDto = userBean.findUserBySessionToken(sessionToken);
+
+
+
+
 
     }
 */
@@ -353,13 +375,25 @@ public class UserService {
         }
 
 
+
+
         SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
 
+        UserEntity currentUserLoggedIn = sessionTokenEntity.getUser();
+        UserEntity currentProfile = userDao.findByEmail(email);
+
+        // Autorização: apenas o próprio ou admin pode atualizar
+        if(!(currentUserLoggedIn.getRole().getName()).equalsIgnoreCase("admin") && (!(currentUserLoggedIn.getEmail().equalsIgnoreCase(currentProfile.getEmail())))) {
+            logger.warn("update user - não autorizado");
+            return Response.status(403)
+                    .entity("{\"message\": \"Não autorizado a atualizar este utilizador.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
 
 
-
-
-        if (profileToUpdate.getPhotograph().length() > 250) {
+        String photo = profileToUpdate.getPhotograph();
+        if (photo != null && photo.length() > 250) {
             logger.warn("Utilizador recebido com informação invalida");
             return Response.status(400)
                     .entity("{\"message\": \"Por favor, coloque um link para a fotografia com até 250 caracteres.\"}")
@@ -368,7 +402,8 @@ public class UserService {
         }
 
         //validar numeros de telefones para apenas permitir dígitos e hifenes - numeros internacionais
-        if (!profileToUpdate.getPhone().matches("^[0-9-]+$")) {
+        String phone = profileToUpdate.getPhone();
+        if (phone == null || !phone.matches("^[0-9-]+$")) {
             logger.warn("Número de telefone inválido");
             return Response.status(400)
                     .entity("{\"message\": \"Por favor, insira apenas dígitos e hífenes no número de telefone.\"}")
