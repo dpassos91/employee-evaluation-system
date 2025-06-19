@@ -36,7 +36,7 @@
 
 /* Erro */
 .Toastify__toast--error {
-  background-color: #FF9F1C !important; /* accent */
+  background-color: #1F1F1F!important; /* accent */
   color: #fff !important;
 }
 /* Info */

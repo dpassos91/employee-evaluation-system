@@ -72,6 +72,7 @@
 
   "auth.login.success": "Login efetuado com sucesso!",
   "auth.login.failed": "Falha no login. Por favor, verifique as suas credenciais.",
+  "auth.login.unconfirmed": "A sua conta ainda não foi confirmada! Por favor, verifique o seu email.",
   "auth.logout.success": "Logout efetuado com sucesso!",
   "auth.logout.failed": "Houve um problema ao fazer logout. Por favor tente novamente."
 

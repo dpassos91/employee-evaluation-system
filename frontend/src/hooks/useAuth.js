@@ -51,10 +51,18 @@ export function useAuth() {
       navigate("/dashboard");
       return true;
     } catch (error) {
-      toast.error(formatMessage({
-        id: 'auth.login.failed',
-        defaultMessage: 'Login falhou! Por favor verifique as suas credenciais.'
-      }));
+  // Conta não confirmada (status 403 + mensagem personalizada)
+  if (error.status === 403 && error.message.includes("not yet been confirmed")) {
+    toast.info(formatMessage({
+      id: 'auth.login.unconfirmed',
+      defaultMessage: 'A sua conta ainda não foi confirmada! Por favor, verifique o seu email.'
+    }));
+  } else {
+    toast.error(formatMessage({
+      id: 'auth.login.failed',
+      defaultMessage: 'Login falhou! Por favor verifique as suas credenciais.'
+    }));
+  }
       return false;
     }
   };
