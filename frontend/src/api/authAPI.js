@@ -49,18 +49,18 @@ const logoutUser = async () => {
     throw new Error("Token does not exist in sessionStorage.");
   }
 
-  // Authorization header is automatically handled by apiCall
   const result = await apiCall(API_ENDPOINTS.auth.logout, {
     method: 'POST',
   });
 
-  if (result === "Successfully logged out!") {
+  if (result && result.message && result.message === "Logout successful!") {
     sessionStorage.removeItem('authToken');
     return true;
   } else {
-    throw new Error("Logout failed: " + result);
+    throw new Error("Logout failed: " + (result?.message || result));
   }
 };
+
 
 /**
  * Requests a password reset for the specified email address.

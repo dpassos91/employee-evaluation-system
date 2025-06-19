@@ -148,13 +148,16 @@ export const apiCall = async (url, options = {}) => {
     const response = await fetch(url, finalOptions);
 
     // Handle expired session (unauthorized)
-    if (response.status === 401) {
-      alert("Sessão expirada. Por favor faça login novamente.");
-      sessionStorage.removeItem("authToken");
-      localStorage.removeItem("userData");
-      window.location.href = "/login";
-      return;
-    }
+if (
+  response.status === 401 &&
+  !(url.endsWith("/logout") || url.includes("/logout"))
+) {
+  alert("Sessão expirada. Por favor faça login novamente.");
+  sessionStorage.removeItem("authToken");
+  localStorage.removeItem("userData");
+  window.location.href = "/login";
+  return;
+}
 
     const contentType = response.headers.get("content-type");
     let responseBody = await response.text();

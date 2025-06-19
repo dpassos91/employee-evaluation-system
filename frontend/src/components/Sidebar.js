@@ -8,9 +8,11 @@ import evaluationsIcon from "../images/evaluations_icon.png";
 import miniprofileIcon from "../images/miniprofile_icon.png";
 import usersIcon from "../images/users_icon.png";
 import { FaSignOutAlt } from "react-icons/fa";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // Responsividade: sidebar aberta só em desktop por defeito
   const [isOpen, setIsOpen] = useState(window.innerWidth >= 1024);
@@ -80,7 +82,7 @@ export default function Sidebar() {
         {/* Bottom Section */}
         <div className="px-4 pb-6">
           <button
-            onClick={() => console.log("logout")} // substitui por lógica real
+            onClick={logout} // substitui por lógica real
             className="w-full flex items-center gap-4 px-6 py-2 rounded text-sm hover:bg-white/10 transition-all mb-1"
           >
             <FaSignOutAlt className="w-5 h-5" />

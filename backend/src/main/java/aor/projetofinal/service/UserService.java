@@ -90,15 +90,6 @@ public Response loginUser(LoginUserDto userLog) {
                         .build();
         }
 
-    if (userEntity == null) {
-        logger.warn("User: {} | IP: {} - Login failed: user not found for email: {}",
-                RequestContext.getAuthor(), RequestContext.getIp(), userLog.getEmail());
-        return Response.status(Response.Status.UNAUTHORIZED)
-                .entity("{\"message\": \"Invalid credentials.\"}")
-                .type(MediaType.APPLICATION_JSON)
-                .build();
-    }
-
     logger.info("User: {} | IP: {} - User found for email: {}",
             RequestContext.getAuthor(), RequestContext.getIp(), userEntity.getEmail());
 
@@ -192,35 +183,47 @@ public Response loginUser(LoginUserDto userLog) {
 
 
     @POST
-    @Path("/logout") // postman
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response logoutUser(@HeaderParam("sessionToken") String sessionToken) {
-        logger.info("Logout request recebido");
-        if (sessionToken == null) {
-            logger.warn("SessionToken null - ocorreu um erro a fazer logout");
-            return Response.status(401)
-                    .entity("{\"message\": \"Dados inválidos no header para logout\"}")
-                    .type(MediaType.APPLICATION_JSON) // Força Content-Type JSON
-                    .build();
-        }
+@Path("/logout")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public Response logoutUser(@HeaderParam("Authorization") String authorization) {
+    logger.info("User: {} | IP: {} - Logout request received",
+            RequestContext.getAuthor(), RequestContext.getIp());
 
-        if (!userBean.authorization(sessionToken)) {
-            logger.warn("Tentativa de logout com sessionToken sem autorização");
-            return Response.status(403)
-                    .entity("{\"message\": \"Sem utilizador para logout.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-        userBean.logout(sessionToken);
-        logger.info("Logout com sucesso");
-        return Response.status(200)
-                .entity("{\"message\": \"Logout bem-sucedido!\"}")
+    if (authorization == null || !authorization.startsWith("Bearer ")) {
+        logger.warn("User: {} | IP: {} - Logout failed: invalid or missing Authorization header",
+                RequestContext.getAuthor(), RequestContext.getIp());
+        return Response.status(401)
+                .entity("{\"message\": \"Invalid Authorization header for logout.\"}")
                 .type(MediaType.APPLICATION_JSON)
                 .build();
-
     }
+
+    String sessionToken = authorization.substring("Bearer ".length());
+
+    if (!userBean.authorization(sessionToken)) {
+        logger.warn("User: {} | IP: {} - Logout failed: unauthorized sessionToken",
+                RequestContext.getAuthor(), RequestContext.getIp());
+        return Response.status(403)
+                .entity("{\"message\": \"No user authorized for logout.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    logger.info("User: {} | IP: {} - SessionToken authorized, proceeding with logout",
+            RequestContext.getAuthor(), RequestContext.getIp());
+
+    userBean.logout(sessionToken);
+
+    logger.info("User: {} | IP: {} - Logout successful",
+            RequestContext.getAuthor(), RequestContext.getIp());
+
+    return Response.status(200)
+            .entity("{\"message\": \"Logout successful!\"}")
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+}
+
 
 
     @POST

@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { IntlProvider } from "react-intl";
 
 import { PrivateRoute } from "./components/PrivateRoute";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { userStore } from "./stores/userStore";
 import LoginPage from "./pages/LoginPage";
@@ -65,6 +67,7 @@ export default function App() {
           {/* Redireciona para /login se não estiver autenticado */}
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
+        <ToastContainer position="top-center" />
       </Router>
     </IntlProvider>
   );
