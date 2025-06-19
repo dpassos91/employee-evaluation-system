@@ -7,3 +7,74 @@
 .clip-diagonal {
   clip-path: polygon(0 0, 65% 0, 100% 100%, 0% 100%);
 }
+
+/* Toastify: Personalização com as tuas cores Tailwind */
+.Toastify__toast-icon svg {
+  color: #fff !important;
+  fill: #fff !important;
+}
+
+.Toastify__progress-bar {
+  background: #fff !important;
+}
+
+.Toastify__toast {
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.16) !important;
+  border-radius: 12px !important;
+}
+
+.Toastify__toast,
+.Toastify__toast-body {
+  font-family: "Just Another Hand", cursive, sans-serif !important;
+  font-size: 1.25rem !important;
+}
+
+.Toastify__toast {
+  padding: 1rem 1.5rem !important;
+}
+
+.Toastify__close {
+  color: #fff !important;
+  opacity: 0.7;
+}
+.Toastify__close:hover {
+  opacity: 1;
+  color: #FF9F1C !important; /* acento ao passar o rato */
+}
+
+.Toastify__toast {
+  transition: all 0.4s cubic-bezier(.68,-0.55,.27,1.55) !important;
+}
+
+/* Sucesso */
+.Toastify__toast--success {
+  background-color: #D41C1C !important; /* primary */
+  color: #fff !important;
+  font-family: "Just Another Hand", cursive, sans-serif;  
+}
+
+/* Erro */
+.Toastify__toast--error {
+  background-color: #FF9F1C !important; /* accent */
+  color: #fff !important;
+}
+/* Info */
+.Toastify__toast--info {
+  background-color: #1F1F1F !important; /* dark */
+  color: #fff !important;
+}
+/* Warning */
+.Toastify__toast--warning {
+  background-color: #F4F4F4 !important; /* secondary */
+  color: #D41C1C !important;
+  border: 1px solid #D41C1C;
+}
+/* Corpo do toast */
+.Toastify__toast-body {
+  font-family: "Just Another Hand", cursive, sans-serif;
+  font-size: 1.15rem;
+}
+/* Botão de fechar */
+.Toastify__close {
+  color: #fff !important;
+}
