@@ -32,13 +32,9 @@ public class JavaConversionUtil {
     }
 
 
-
-
-
     public UserDto convertUserEntityToUserDto(UserEntity userEntity) {
         UserDto userDto = new UserDto();
         userDto.setEmail(userEntity.getEmail());
-        userDto.setPassword(userEntity.getPassword());
         userDto.setActive(userEntity.isActive());
         userDto.setConfirmed(userEntity.isConfirmed());
         userDto.setCreatedAt(userEntity.getCreatedAt());

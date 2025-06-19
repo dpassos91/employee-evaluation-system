@@ -57,14 +57,14 @@ public class UserBean implements Serializable {
     //@Inject
     //private SettingsDao settingsDao;
 
-    public UserDto registerUser(UserDto userDto) {
+    public UserDto registerUser(LoginUserDto loginUserDto) throws EmailAlreadyExistsException {
         logger.info("User: {} | IP: {} - Checking if email {} is already in use.",
-                RequestContext.getAuthor(), RequestContext.getIp(), userDto.getEmail());
+                RequestContext.getAuthor(), RequestContext.getIp(), loginUserDto.getEmail());
 
         // Verificar se email já existe
-        if (userDao.findByEmail(userDto.getEmail()) != null) {
+        if (userDao.findByEmail(loginUserDto.getEmail()) != null) {
             logger.warn("User: {} | IP: {} - Registration failed: email {} already in use.",
-                    RequestContext.getAuthor(), RequestContext.getIp(), userDto.getEmail());
+                    RequestContext.getAuthor(), RequestContext.getIp(), loginUserDto.getEmail());
             throw new EmailAlreadyExistsException("Email already in use.");
         }
 
@@ -82,8 +82,8 @@ public class UserBean implements Serializable {
 
         // Criar novo utilizador com os dados apropriados
         UserEntity user = new UserEntity();
-        user.setEmail(userDto.getEmail());
-        user.setPassword(hashPassword(userDto.getPassword()));
+        user.setEmail(loginUserDto.getEmail());
+        user.setPassword(hashPassword(loginUserDto.getPassword()));
         user.setConfirmed(false);
         user.setActive(true);
         user.setConfirmationToken(UUID.randomUUID().toString());
@@ -171,7 +171,9 @@ public class UserBean implements Serializable {
 
 
 
-
+    public UserEntity findUserEntityByEmail(String email) {
+    return userDao.findByEmail(email);
+}
 
 
     public UserDto findUserByEmail(String email){

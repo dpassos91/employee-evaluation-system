@@ -6,7 +6,9 @@ import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.LoginUserDto;
+import aor.projetofinal.dto.LoginResponseDto;
 import aor.projetofinal.dto.ProfileDto;
+import aor.projetofinal.dto.ResetPasswordDto;
 import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.entity.SessionTokenEntity;
@@ -44,91 +46,121 @@ public class UserService {
     @Path("/createUser")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser(UserDto userDto) {
+    public Response createUser(LoginUserDto loginUserDto) {
 
         logger.info("User: {} | IP: {} - Registration attempt for email: {}",
-                RequestContext.getAuthor(), RequestContext.getIp(), userDto.getEmail());
+                RequestContext.getAuthor(), RequestContext.getIp(), loginUserDto.getEmail());
 
-        UserDto createdUser = userBean.registerUser(userDto);
+        UserDto createdUser = userBean.registerUser(loginUserDto);
 
         logger.info("User: {} | IP: {} - Successfully registered user with email: {}",
-                RequestContext.getAuthor(), RequestContext.getIp(), userDto.getEmail());
+                RequestContext.getAuthor(), RequestContext.getIp(), loginUserDto.getEmail());
 
         return Response.ok(createdUser).build();
     }
 
     // login utilizador
     @POST
-    @Path("/login") // postman
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response loginUser(LoginUserDto userLog) { // retorna um user com email e password
+@Path("/login")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public Response loginUser(LoginUserDto userLog) {
 
-        logger.info("Login request recebido");
+    logger.info("User: {} | IP: {} - Login request received",
+            RequestContext.getAuthor(), RequestContext.getIp());
 
-        if (userLog == null || userLog.getEmail() == null || userLog.getEmail().isEmpty()
-                || userLog.getPassword() == null || userLog.getPassword().isEmpty()) {
-            logger.warn("Parametros null recebidos no request");
-            return Response.status(401)
-                    .entity("{\"message\": \"password ou email vazio ou null\"}")
-                    .type(MediaType.APPLICATION_JSON) // Força Content-Type JSON
-                    .build();
-        }
-
-
-
-        // Obter o utilizador Dto correspondente a este userLog do tipo LoginUserDto
-         UserDto user = userBean.findUserByEmail(userLog.getEmail());
-
-
-        if (user == null) {
-            logger.warn("Utilizador não encontrado");
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("{\"message\": \"Credenciais inválidas\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-
-
-        if (!userBean.isAccountConfirmed(userLog.getEmail())) {
-            String confirmToken = userBean.getConfirmToken(userLog.getEmail());
-
-
-            String confirmationlink = "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=" + confirmToken;
-
-            emailUtil.sendEmail(
-                    user.getEmail(),
-                    "Confirmação da Conta",
-                    "Clique neste link para confirmar a sua conta: " + confirmationlink
-            );
-
-            return Response.status(Response.Status.FORBIDDEN)
-                    .entity("{\"message\": \"A sua conta ainda não foi confirmada. Foi enviado um email de confirmação.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-
-        }
-
-
-        String sessionToken = userBean.login(userLog);
-
-        if (sessionToken == null) {
-            logger.warn("sessionToken null - ocorreu um erro a fazer login");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"message\": \"Ocorreu um erro interno ao tentar fazer login.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-        logger.info("Login com sucesso a enviar sessionToken");
-        return Response.status(200)
-                .entity("{\"sessionToken\": \"" + sessionToken + "\"}") // garante que o token seja enviado dentro de
-                // um objeto JSON e
-                // não como uma string
-                .type(MediaType.APPLICATION_JSON) // Força Content-Type JSON
+    if (userLog == null || userLog.getEmail() == null || userLog.getEmail().isEmpty()
+            || userLog.getPassword() == null || userLog.getPassword().isEmpty()) {
+        logger.warn("User: {} | IP: {} - Null or empty parameters in login request",
+                RequestContext.getAuthor(), RequestContext.getIp());
+        return Response.status(401)
+                .entity("{\"message\": \"Email or password is empty or null.\"}")
+                .type(MediaType.APPLICATION_JSON)
                 .build();
     }
+
+    // Get user from database
+    UserEntity userEntity = userBean.findUserEntityByEmail(userLog.getEmail());
+        if (userEntity == null) {
+                logger.warn("User: {} | IP: {} - Login failed: user not found for email: {}",
+                        RequestContext.getAuthor(), RequestContext.getIp(), userLog.getEmail());
+                return Response.status(Response.Status.UNAUTHORIZED)
+                        .entity("{\"message\": \"Invalid credentials.\"}")
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+        }
+
+    if (userEntity == null) {
+        logger.warn("User: {} | IP: {} - Login failed: user not found for email: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), userLog.getEmail());
+        return Response.status(Response.Status.UNAUTHORIZED)
+                .entity("{\"message\": \"Invalid credentials.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    logger.info("User: {} | IP: {} - User found for email: {}",
+            RequestContext.getAuthor(), RequestContext.getIp(), userEntity.getEmail());
+
+    if (!userBean.isAccountConfirmed(userLog.getEmail())) {
+        String confirmToken = userBean.getConfirmToken(userLog.getEmail());
+
+        String confirmationLink = "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=" + confirmToken;
+
+        emailUtil.sendEmail(
+                userEntity.getEmail(),
+                "Account Confirmation",
+                "Click this link to confirm your account: " + confirmationLink
+        );
+
+        logger.warn("User: {} | IP: {} - Account not confirmed. Confirmation email sent to: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), userEntity.getEmail());
+
+        return Response.status(Response.Status.FORBIDDEN)
+                .entity("{\"message\": \"Your account has not yet been confirmed. A confirmation email has been sent.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    String sessionToken = userBean.login(userLog);
+
+    if (sessionToken == null) {
+        logger.error("User: {} | IP: {} - sessionToken is null. Error during login for email: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), userEntity.getEmail());
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("{\"message\": \"An internal error occurred during login.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    // -- Build LoginResponseDTO --
+    LoginResponseDto response = new LoginResponseDto();
+    response.setSessionToken(sessionToken);
+    response.setId(userEntity.getId());
+    response.setEmail(userEntity.getEmail());
+    response.setRole(userEntity.getRole().getName());
+
+    // Profile fields (firstName, lastName) may be in user.getProfile() or similar
+    if (userEntity.getProfile() != null) {
+        response.setFirstName(userEntity.getProfile().getFirstName());
+        response.setLastName(userEntity.getProfile().getLastName());
+        logger.info("User: {} | IP: {} - Profile data loaded for user id: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), userEntity.getId());
+    } else {
+        response.setFirstName(null);
+        response.setLastName(null);
+        logger.warn("User: {} | IP: {} - Profile data missing for user id: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), userEntity.getId());
+    }
+
+    logger.info("User: {} | IP: {} - Login successful. Returning sessionToken and user info for email: {}",
+            RequestContext.getAuthor(), RequestContext.getIp(), userEntity.getEmail());
+
+    return Response.ok(response)
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+}
+
 
     @GET
     @Path("/confirmAccount")
@@ -237,7 +269,8 @@ public class UserService {
     @Path("/reset-password")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response resetPassword(@QueryParam("recoveryToken") String recoveryToken, UserDto userDto) {
+    public Response resetPassword(@QueryParam("recoveryToken") String recoveryToken, ResetPasswordDto resetDto)
+ {
         if (!userBean.isRecoveryTokenValid(recoveryToken)) {
             return Response.status(Response.Status.BAD_REQUEST)
 
@@ -248,16 +281,7 @@ public class UserService {
                     .build();
         }
 
-        String newPassword = userDto.getPassword();
-
-
-        if (newPassword.equals(userDto.getEmail())) {
-            logger.warn("Password e nome de utilizador são iguais");
-            return Response.status(400)
-                    .entity("{\"message\": \"A password não pode ser igual ao nome de utilizadro.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
+        String newPassword = resetDto.getPassword();
 
         if (newPassword.length() <= 5) {
             logger.warn("Password com comprimento insuficiente");
