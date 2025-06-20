@@ -1,6 +1,7 @@
 package aor.projetofinal.service;
 
 import aor.projetofinal.Util.EmailUtil;
+import aor.projetofinal.Util.ProfileValidator;
 import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.SessionTokenDao;
@@ -11,6 +12,7 @@ import aor.projetofinal.dto.ProfileDto;
 import aor.projetofinal.dto.ResetPasswordDto;
 import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.dto.UserDto;
+import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
 import jakarta.inject.Inject;
@@ -91,7 +93,8 @@ public class UserService {
         return Response.ok(createdUser).build();
     }
 
-    // login utilizador
+
+    // User login
     @POST
 @Path("/login")
 @Produces(MediaType.APPLICATION_JSON)
@@ -113,21 +116,20 @@ public Response loginUser(LoginUserDto userLog) {
 
     // Get user from database
     UserEntity userEntity = userBean.findUserEntityByEmail(userLog.getEmail());
-        if (userEntity == null) {
-                logger.warn("User: {} | IP: {} - Login failed: user not found for email: {}",
-                        RequestContext.getAuthor(), RequestContext.getIp(), userLog.getEmail());
-                return Response.status(Response.Status.UNAUTHORIZED)
-                        .entity("{\"message\": \"Invalid credentials.\"}")
-                        .type(MediaType.APPLICATION_JSON)
-                        .build();
-        }
+    if (userEntity == null) {
+        logger.warn("User: {} | IP: {} - Login failed: user not found for email: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), userLog.getEmail());
+        return Response.status(Response.Status.UNAUTHORIZED)
+                .entity("{\"message\": \"Invalid credentials.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
 
     logger.info("User: {} | IP: {} - User found for email: {}",
             RequestContext.getAuthor(), RequestContext.getIp(), userEntity.getEmail());
 
     if (!userBean.isAccountConfirmed(userLog.getEmail())) {
         String confirmToken = userBean.getConfirmToken(userLog.getEmail());
-
         String confirmationLink = "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=" + confirmToken;
 
         emailUtil.sendEmail(
@@ -156,17 +158,24 @@ public Response loginUser(LoginUserDto userLog) {
                 .build();
     }
 
+    // === NOVO: Validação do perfil ===
+    ProfileEntity profile = userEntity.getProfile();
+    boolean profileComplete = ProfileValidator.isProfileComplete(profile);
+    List<String> missingFields = ProfileValidator.getMissingFields(profile);
+
     // -- Build LoginResponseDTO --
     LoginResponseDto response = new LoginResponseDto();
     response.setSessionToken(sessionToken);
     response.setId(userEntity.getId());
     response.setEmail(userEntity.getEmail());
     response.setRole(userEntity.getRole().getName());
+    response.setProfileComplete(profileComplete);
+    response.setMissingFields(missingFields);
 
     // Profile fields (firstName, lastName) may be in user.getProfile() or similar
-    if (userEntity.getProfile() != null) {
-        response.setFirstName(userEntity.getProfile().getFirstName());
-        response.setLastName(userEntity.getProfile().getLastName());
+    if (profile != null) {
+        response.setFirstName(profile.getFirstName());
+        response.setLastName(profile.getLastName());
         logger.info("User: {} | IP: {} - Profile data loaded for user id: {}",
                 RequestContext.getAuthor(), RequestContext.getIp(), userEntity.getId());
     } else {
@@ -176,15 +185,13 @@ public Response loginUser(LoginUserDto userLog) {
                 RequestContext.getAuthor(), RequestContext.getIp(), userEntity.getId());
     }
 
-    logger.info("User: {} | IP: {} - Login successful. Returning sessionToken and user info for email: {}",
+    logger.info("User: {} | IP: {} - Login successful. Returning sessionToken, user info, and profile status for email: {}",
             RequestContext.getAuthor(), RequestContext.getIp(), userEntity.getEmail());
 
     return Response.ok(response)
             .type(MediaType.APPLICATION_JSON)
             .build();
 }
-
-
 
 
     @POST

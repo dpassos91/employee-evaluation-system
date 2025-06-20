@@ -1,5 +1,7 @@
 package aor.projetofinal.dto;
 
+import java.util.List;
+
 public class LoginResponseDto {
     private String sessionToken;
     private int id;
@@ -7,6 +9,8 @@ public class LoginResponseDto {
     private String role;
     private String firstName;
     private String lastName;
+    private boolean profileComplete;
+    private List<String> missingFields;
 
     public LoginResponseDto() {}
 
@@ -27,4 +31,11 @@ public class LoginResponseDto {
 
     public String getLastName() { return lastName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public boolean isProfileComplete() { return profileComplete; }
+    public void setProfileComplete(boolean profileComplete) { this.profileComplete = profileComplete; }
+
+    public List<String> getMissingFields() { return missingFields; }
+    public void setMissingFields(List<String> missingFields) { this.missingFields = missingFields; }
+}
 }
