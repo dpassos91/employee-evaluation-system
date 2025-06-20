@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import aor.projetofinal.entity.enums.UsualWorkPlaceType;
+
 
 @Entity
 @Table(name = "profiles")
@@ -42,8 +44,9 @@ public class ProfileEntity implements Serializable  {
     @Column (name="bio", length = 65535, columnDefinition = "TEXT")
     private String bio;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "usual_work_place")
-    private String usualWorkplace;
+    private UsualWorkPlaceType usualWorkplace;
 
     public ProfileEntity() {
     }
@@ -113,11 +116,12 @@ public class ProfileEntity implements Serializable  {
         this.bio = bio;
     }
 
-    public String getUsualWorkplace() {
-        return usualWorkplace;
+    public UsualWorkPlaceType getUsualWorkplace() {
+    return usualWorkplace;
     }
-    public void setUsualWorkplace(String usualWorkplace) {
-        this.usualWorkplace = usualWorkplace;
+
+    public void setUsualWorkplace(UsualWorkPlaceType usualWorkplace) {
+    this.usualWorkplace = usualWorkplace;
     }
 
     // equals
@@ -147,7 +151,7 @@ public class ProfileEntity implements Serializable  {
                 ", phone='" + phone + '\'' +
                 ", photograph='" + photograph + '\'' +
                 ", bio='" + (bio != null ? bio.substring(0, Math.min(20, bio.length())) + "..." : "") + '\'' +
-                ", usualWorkplace='" + usualWorkplace + '\'' +
+                ", usualWorkplace='" + (usualWorkplace != null ? usualWorkplace.name() : null) + '\'' +
                 '}';
     }
 
