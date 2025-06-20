@@ -70,15 +70,6 @@ const login = async (credentials) => {
         )
         .join(", ");
 
-      toast.info(
-        formatMessage(
-          {
-            id: "profile.incomplete.fields",
-            defaultMessage: "Por favor, preencha todos os dados obrigatórios do perfil: {fields}",
-          },
-          { fields: missingLabels }
-        )
-      );
       navigate("/profile");
     } else {
       navigate("/dashboard");

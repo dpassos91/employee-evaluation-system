@@ -2,9 +2,42 @@ import PageLayout from "../components/PageLayout";
 import AppButton from "../components/AppButton";
 import profilePlaceholder from "../images/profile_icon.png";
 import { LockClosedIcon } from "@heroicons/react/24/outline";
-import { FormattedMessage } from "react-intl";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { userStore } from "../stores/userStore";
+import { useIntl, FormattedMessage } from "react-intl";
+import { fieldLabelKeys } from "../utils/fieldLabels";
 
 export default function ProfilePage() {
+  const { user, profileComplete, missingFields } = userStore();
+  const { formatMessage } = useIntl();
+
+  console.log("Render ProfilePage");
+console.log("profileComplete:", profileComplete);
+console.log("missingFields:", missingFields);
+
+  useEffect(() => {
+    if (profileComplete === false) {
+      const missingLabels = (missingFields || [])
+        .map((field) =>
+          fieldLabelKeys[field]
+            ? formatMessage({ id: fieldLabelKeys[field] })
+            : field // fallback se faltar tradução
+        )
+        .join(", ");
+
+      toast.info(
+        formatMessage(
+          {
+            id: "profile.incomplete.fields",
+            defaultMessage: "Por favor, preencha todos os dados obrigatórios do perfil: {fields}",
+          },
+          { fields: missingLabels }
+        )
+      );
+    }
+  }, [profileComplete, missingFields, formatMessage]);
+
   return (
     <PageLayout>
       <section className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">

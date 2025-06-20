@@ -24,7 +24,7 @@ export const userStore = create(
       // Métodos para manipular o user autenticado
       setUser: (userObj) => set({ user: userObj }),
       clearUser: () =>
-        set({ user: null, profileComplete: true, missingFields: [] }),
+        set({ user: null, profileComplete: null, missingFields: [] }),
 
       setProfileComplete: (profileComplete) => set({ profileComplete }),
       setMissingFields: (missingFields) => set({ missingFields }),
