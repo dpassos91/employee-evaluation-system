@@ -14,6 +14,18 @@ public class UserDao {
     @PersistenceContext
     private EntityManager em;
 
+
+    public long countAdmins() {
+        return em.createQuery(
+                        "SELECT COUNT(u) FROM UserEntity u WHERE u.role.name = :roleName", Long.class)
+                .setParameter("roleName", "ADMIN")
+                .getSingleResult();
+    }
+
+    public void create(UserEntity user) {
+        em.persist(user);
+    }
+
     public UserEntity findByEmail(String email) {
         try {
             TypedQuery<UserEntity> query = em.createQuery(
@@ -48,26 +60,8 @@ public class UserDao {
         }
     }
 
-
-
-    public void create(UserEntity user) {
-        em.persist(user);
-    }
-
-    public long countAdmins() {
-        return em.createQuery(
-                        "SELECT COUNT(u) FROM UserEntity u WHERE u.role.name = :roleName", Long.class)
-                .setParameter("roleName", "ADMIN")
-                .getSingleResult();
-    }
-
-
     public void save(UserEntity user) {
         em.merge(user);
     }
-
-
-
-
 
 }

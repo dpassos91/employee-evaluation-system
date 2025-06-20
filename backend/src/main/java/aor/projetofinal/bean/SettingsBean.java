@@ -18,32 +18,6 @@ public class SettingsBean implements Serializable {
     private SettingsDao settingsDao;
 
 
-    public SettingsEntity getSettings() {
-        logger.info("A obter as definições da aplicação.");
-
-        SettingsEntity settings = settingsDao.getSettings();
-
-        return settings;
-    }
-
-
-    public int getSessionTimeoutMinutes() {
-        return getSettings().getSessionTokenTimeout();
-    }
-
-    public boolean updateSessionTimeoutMinutes(int minutes) {
-        try {
-            SettingsEntity settings = getSettings();
-            settings.setSessionTokenTimeout(minutes);
-            settingsDao.save(settings);
-            return true;
-        } catch (Exception e) {
-            logger.error("Erro ao atualizar o tempo de vida da sessão: ", e);
-            return false;
-        }
-    }
-
-
 
     public int getConfirmationTokenTimeout() {
         return getSettings().getConfirmationTokenTimeout();
@@ -51,6 +25,18 @@ public class SettingsBean implements Serializable {
 
     public int getRecoveryTokenTimeout() {
         return getSettings().getRecoveryTokenTimeout();
+    }
+
+    public int getSessionTimeoutMinutes() {
+        return getSettings().getSessionTokenTimeout();
+    }
+
+    public SettingsEntity getSettings() {
+        logger.info("A obter as definições da aplicação.");
+
+        SettingsEntity settings = settingsDao.getSettings();
+
+        return settings;
     }
 
     public boolean updateConfirmationTokenTimeout(int minutes) {
@@ -76,6 +62,26 @@ public class SettingsBean implements Serializable {
             return false;
         }
     }
+
+    public boolean updateSessionTimeoutMinutes(int minutes) {
+        try {
+            SettingsEntity settings = getSettings();
+            settings.setSessionTokenTimeout(minutes);
+            settingsDao.save(settings);
+            return true;
+        } catch (Exception e) {
+            logger.error("Erro ao atualizar o tempo de vida da sessão: ", e);
+            return false;
+        }
+    }
+
+
+
+
+
+
+
+
 
 
 

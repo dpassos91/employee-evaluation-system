@@ -41,6 +41,38 @@ public class UserService {
     //@Inject
     //Notifier notifier;
 
+
+
+    @GET
+    @Path("/confirmAccount")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response confirmAccount(@QueryParam("confirmToken") String confirmToken) {
+        if (confirmToken == null || confirmToken.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"message\": \"Token de confirmação de conta em falta.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        boolean success = userBean.confirmAccount(confirmToken);
+
+        if (success) {
+            return Response.ok("{\"message\": \"Conta confirmada com sucesso! Já pode fazer login\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+
+        } else {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"message\": \"Link inválido ou expirado. Foi gerado um novo Link de confirmação de conta." +
+                            " Torne a aceder ao seu email registado" +
+                            " para ter acesso ao novo link de confirmação de conta\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+    }
+
+
+
     // Criar novo utilizador
     @POST
     @Path("/createUser")
@@ -153,33 +185,6 @@ public Response loginUser(LoginUserDto userLog) {
 }
 
 
-    @GET
-    @Path("/confirmAccount")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response confirmAccount(@QueryParam("confirmToken") String confirmToken) {
-        if (confirmToken == null || confirmToken.isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"message\": \"Token de confirmação de conta em falta.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-        boolean success = userBean.confirmAccount(confirmToken);
-
-        if (success) {
-            return Response.ok("{\"message\": \"Conta confirmada com sucesso! Já pode fazer login\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-
-        } else {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("{\"message\": \"Link inválido ou expirado. Foi gerado um novo Link de confirmação de conta." +
-                            " Torne a aceder ao seu email registado" +
-                            " para ter acesso ao novo link de confirmação de conta\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-    }
 
 
     @POST
@@ -318,6 +323,8 @@ public Response logoutUser(@HeaderParam("Authorization") String authorization) {
                 .build();
     }
 
+
+
     @POST
     @Path("/validate-session")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -381,79 +388,7 @@ public Response logoutUser(@HeaderParam("Authorization") String authorization) {
     }
 */
 
-        //update perfil de user
-    @PUT
-    @Path("/update/{email}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUser(@HeaderParam("sessionToken") String sessionToken, @PathParam("email") String email,
-                               ProfileDto profileToUpdate) {
 
-
-        // Valida e renova a sessão
-        SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
-
-        if (sessionStatusDto == null) {
-            logger.warn("Sessão inválida ou expirada - update user");
-            return Response.status(401)
-                    .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-
-
-
-        SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
-
-        UserEntity currentUserLoggedIn = sessionTokenEntity.getUser();
-        UserEntity currentProfile = userDao.findByEmail(email);
-
-        // Autorização: apenas o próprio ou admin pode atualizar
-        if(!(currentUserLoggedIn.getRole().getName()).equalsIgnoreCase("admin") && (!(currentUserLoggedIn.getEmail().equalsIgnoreCase(currentProfile.getEmail())))) {
-            logger.warn("update user - não autorizado");
-            return Response.status(403)
-                    .entity("{\"message\": \"Não autorizado a atualizar este utilizador.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-
-        String photo = profileToUpdate.getPhotograph();
-        if (photo != null && photo.length() > 250) {
-            logger.warn("Utilizador recebido com informação invalida");
-            return Response.status(400)
-                    .entity("{\"message\": \"Por favor, coloque um link para a fotografia com até 250 caracteres.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-        //validar numeros de telefones para apenas permitir dígitos e hifenes - numeros internacionais
-        String phone = profileToUpdate.getPhone();
-        if (phone == null || !phone.matches("^[0-9-]+$")) {
-            logger.warn("Número de telefone inválido");
-            return Response.status(400)
-                    .entity("{\"message\": \"Por favor, insira apenas dígitos e hífenes no número de telefone.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-        if (!userBean.updateInfo(profileToUpdate, email)) {
-            logger.warn("Erro a atualizar utilizador - update user");
-            return Response.status(400)
-                    .entity("{\"message\": \"Não foi possível atualizar o utilizador\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-        logger.info("Update user com sucesso username: {}", email);
-        return Response.status(200)
-                .entity("{\"message\": \"Update de dados com sucesso!\"}")
-                .type(MediaType.APPLICATION_JSON)
-                .build();
-
-
-    }
 
 
 

@@ -62,8 +62,8 @@ public class SettingsInitializer {
         // Criar admin, se ainda não existir, e atribuir-lhe um perfil
         if (userDao.countAdmins() == 0) {
             UserEntity admin = new UserEntity();
-            admin.setEmail("admin@admin.com");
-            admin.setPassword(userBean.hashPassword("admin123"));
+            admin.setEmail("amourinho.grupo7@gmail.com");
+            admin.setPassword(userBean.hashPassword("senha123?"));
             admin.setConfirmed(true);
             admin.setActive(true);
             admin.setCreatedAt(LocalDateTime.now());

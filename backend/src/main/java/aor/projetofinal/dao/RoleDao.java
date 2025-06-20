@@ -13,6 +13,10 @@ public class RoleDao {
     @PersistenceContext
     private EntityManager em;
 
+    public void create(RoleEntity role) {
+        em.persist(role);
+    }
+
     public RoleEntity findByName(String name) {
         try {
             TypedQuery<RoleEntity> query = em.createQuery(
@@ -22,10 +26,6 @@ public class RoleDao {
         } catch (NoResultException e) {
             return null;
         }
-    }
-
-    public void create(RoleEntity role) {
-        em.persist(role);
     }
 }
 

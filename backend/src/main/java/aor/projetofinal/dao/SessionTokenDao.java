@@ -19,20 +19,6 @@ public class SessionTokenDao {
     private static final Logger logger = LogManager.getLogger(SessionTokenDao.class);
 
 
-    public void persist(SessionTokenEntity sessionToken) {
-        em.persist(sessionToken);
-    }
-
-    public SessionTokenEntity findBySessionToken(String token) {
-        try {
-            return em.createQuery("SELECT s FROM SessionTokenEntity s WHERE s.tokenValue = :token", SessionTokenEntity.class)
-                    .setParameter("token", token)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
     public void delete(SessionTokenEntity sessionToken) {
         try {
             em.remove(em.contains(sessionToken) ? sessionToken : em.merge(sessionToken));
@@ -45,6 +31,20 @@ public class SessionTokenDao {
         em.createQuery("DELETE FROM SessionTokenEntity s WHERE s.user.id = :userId")
                 .setParameter("userId", userId)
                 .executeUpdate();
+    }
+
+    public SessionTokenEntity findBySessionToken(String token) {
+        try {
+            return em.createQuery("SELECT s FROM SessionTokenEntity s WHERE s.tokenValue = :token", SessionTokenEntity.class)
+                    .setParameter("token", token)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    public void persist(SessionTokenEntity sessionToken) {
+        em.persist(sessionToken);
     }
 
     public void save(SessionTokenEntity sessionTokenEntity) {
