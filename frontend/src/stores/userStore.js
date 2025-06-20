@@ -17,9 +17,17 @@ export const userStore = create(
       locale: "pt",
       translations: pt,
 
+      // Novos campos de controlo do perfil:
+      profileComplete: null,      // ou false por defeito, depende do fluxo inicial
+      missingFields: [],
+
       // Métodos para manipular o user autenticado
       setUser: (userObj) => set({ user: userObj }),
-      clearUser: () => set({ user: null }),
+      clearUser: () =>
+        set({ user: null, profileComplete: true, missingFields: [] }),
+
+      setProfileComplete: (profileComplete) => set({ profileComplete }),
+      setMissingFields: (missingFields) => set({ missingFields }),
 
       updateMediatype: (mediatype) => set({ mediatype }),
 
@@ -46,12 +54,15 @@ export const userStore = create(
       name: "user-store",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
-        user: state.user,             // <--- GUARDA o objeto user!
+        user: state.user,
         mediatype: state.mediatype,
-        // podes guardar outros campos aqui se precisares
+        profileComplete: state.profileComplete,
+        missingFields: state.missingFields,
+        // adiciona outros campos se quiseres persistir mais alguma coisa
       }),
     }
   )
 );
+
 
 

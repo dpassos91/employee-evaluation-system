@@ -15,6 +15,7 @@ import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
+import java.util.List;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
@@ -42,8 +43,6 @@ public class UserService {
 
     //@Inject
     //Notifier notifier;
-
-
 
     @GET
     @Path("/confirmAccount")

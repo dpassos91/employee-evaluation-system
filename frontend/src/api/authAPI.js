@@ -30,10 +30,11 @@ const loginUser = async (credentials) => {
     body: JSON.stringify(credentials),
   });
 
-  // Apenas guardar o token e devolver o mesmo — nada de getUserById!
-  const sessionToken = loginResponse.sessionToken;
-  sessionStorage.setItem('authToken', sessionToken);
-  return { sessionToken };
+  // Guarda o token (se quiseres)
+  sessionStorage.setItem('authToken', loginResponse.sessionToken);
+
+  // DEVOLVE O OBJETO COMPLETO
+  return loginResponse;
 };
 
 

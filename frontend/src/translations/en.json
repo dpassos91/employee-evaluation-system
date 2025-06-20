@@ -54,10 +54,12 @@
   "profile.workplace": "Workplace",
   "profile.address": "Address",
   "profile.zipcode": "Postal Code",
+  "profile.birthdate": "Birth Date",
   "profile.phone": "Phone Number",
   "profile.biography": "Biography",
   "profile.changePassword": "Change Password",
   "profile.save": "Save",
+  "profile.incomplete.fields": "Please fill in all required fields: {fields}.",
 
     "users.list.title": "User List",
   "users.filter.name": "Name",

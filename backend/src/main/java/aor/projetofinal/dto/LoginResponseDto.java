@@ -38,4 +38,3 @@ public class LoginResponseDto {
     public List<String> getMissingFields() { return missingFields; }
     public void setMissingFields(List<String> missingFields) { this.missingFields = missingFields; }
 }
-}

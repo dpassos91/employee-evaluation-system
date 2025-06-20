@@ -3,6 +3,7 @@ import { authAPI } from "../api/authAPI";
 import { userStore } from "../stores/userStore";
 import { useIntl } from "react-intl";
 import { toast } from "react-toastify";
+import { fieldLabelKeys } from "../utils/fieldLabels";
 
 /**
  * Custom hook to manage authentication logic (login, logout).
@@ -17,7 +18,7 @@ export function useAuth() {
   // Aceder a métodos do Zustand store se precisares (podes alargar conforme necessário)
   const updateName = userStore((state) => state.updateName);
 
-  const { setUser, clearUser } = userStore.getState();
+  const { setUser, setProfileComplete, setMissingFields } = userStore.getState();
 
   /**
    * Attempts to log in a user using provided credentials.
@@ -27,45 +28,80 @@ export function useAuth() {
    * @param {Object} credentials - { email, password }
    * @returns {boolean} true if login successful, false otherwise
    */
-  const login = async (credentials) => {
-    try {
-      // Chama a API e obtém a resposta do backend
-      const data = await authAPI.loginUser(credentials);
-      // Guarda o token
-      sessionStorage.setItem("authToken", data.sessionToken);
 
-      // Guarda o user autenticado no userStore (com role, nomes, etc.)
-      setUser({
-        id: data.id,
-        email: data.email,
-        role: data.role,
-        primeiroNome: data.primeiroNome,
-        ultimoNome: data.ultimoNome,
-      });
 
-      toast.success(formatMessage({
-        id: "auth.login.success",
-        defaultMessage: "Login efetuado com sucesso!"
-      }));
+const login = async (credentials) => {
+  try {
+    // Chama a API e obtém a resposta do backend
+    const data = await authAPI.loginUser(credentials);
+    console.log("data recebida:", data);
+    // Guarda o token
+    sessionStorage.setItem("authToken", data.sessionToken);
 
+    // Guarda o user autenticado no userStore (com role, nomes, etc.)
+    setUser({
+      id: data.id,
+      email: data.email,
+      role: data.role,
+      primeiroNome: data.primeiroNome,
+      ultimoNome: data.ultimoNome,
+    });
+
+    // NOVO: Guarda estado do perfil e campos em falta
+    setProfileComplete(data.profileComplete);
+    setMissingFields(data.missingFields || []);
+
+    console.log("Profile complete?", data.profileComplete);
+    console.log("Missing fields:", data.missingFields);
+
+    toast.success(formatMessage({
+      id: "auth.login.success",
+      defaultMessage: "Login efetuado com sucesso!"
+    }));
+
+    // Redirecionamento inteligente com mensagem personalizada dos campos em falta
+    if (data.profileComplete === false) {
+      // Traduzir nomes dos campos em falta
+      const missingLabels = (data.missingFields || [])
+        .map((field) =>
+          fieldLabelKeys[field]
+            ? formatMessage({ id: fieldLabelKeys[field] })
+            : field // fallback se faltar tradução
+        )
+        .join(", ");
+
+      toast.info(
+        formatMessage(
+          {
+            id: "profile.incomplete.fields",
+            defaultMessage: "Por favor, preencha todos os dados obrigatórios do perfil: {fields}",
+          },
+          { fields: missingLabels }
+        )
+      );
+      navigate("/profile");
+    } else {
       navigate("/dashboard");
-      return true;
-    } catch (error) {
-  // Conta não confirmada (status 403 + mensagem personalizada)
-  if (error.status === 403 && error.message.includes("not yet been confirmed")) {
-    toast.info(formatMessage({
-      id: 'auth.login.unconfirmed',
-      defaultMessage: 'A sua conta ainda não foi confirmada! Por favor, verifique o seu email.'
-    }));
-  } else {
-    toast.error(formatMessage({
-      id: 'auth.login.failed',
-      defaultMessage: 'Login falhou! Por favor verifique as suas credenciais.'
-    }));
-  }
-      return false;
     }
-  };
+
+    return true;
+  } catch (error) {
+    // Conta não confirmada (status 403 + mensagem personalizada)
+    if (error.status === 403 && error.message.includes("not yet been confirmed")) {
+      toast.info(formatMessage({
+        id: "auth.login.unconfirmed",
+        defaultMessage: "A sua conta ainda não foi confirmada! Por favor, verifique o seu email."
+      }));
+    } else {
+      toast.error(formatMessage({
+        id: "auth.login.failed",
+        defaultMessage: "Login falhou! Por favor verifique as suas credenciais."
+      }));
+    }
+    return false;
+  }
+};
+
 
   /**
    * Logs out the user: invalidates session server-side and clears storage/state.

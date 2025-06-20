@@ -55,10 +55,12 @@
   "profile.workplace": "Local de Trabalho",
   "profile.address": "Morada",
   "profile.zipcode": "Código Postal",
+  "profile.birthdate": "Data de nascimento",
   "profile.phone": "Contacto telefónico",
   "profile.biography": "Biografia",
   "profile.changePassword": "Alterar password",
   "profile.save": "Guardar",
+  "profile.incomplete.fields": "Por favor, preencha todos os campos obrigatórios : {fields}.",
 
     "users.list.title": "Listagem de Utilizadores",
   "users.filter.name": "Nome",
