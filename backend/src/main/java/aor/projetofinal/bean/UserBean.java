@@ -14,6 +14,7 @@ import aor.projetofinal.entity.RoleEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.entity.UserEntity;
+import aor.projetofinal.entity.enums.UsualWorkPlaceType;
 import aor.projetofinal.exception.EmailAlreadyExistsException;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -80,10 +81,6 @@ public class UserBean implements Serializable {
         return true;
     }
 
-
-
-
-
     // Verificar se a password inserida corresponde ao hash armazenado
     public static boolean checkPassword(String rawPassword, String hashedPassword) {
         logger.info("User: {} | IP: {} - Checking password.", RequestContext.getAuthor(), RequestContext.getIp());
@@ -123,7 +120,6 @@ public class UserBean implements Serializable {
         logger.info("Conta confirmada com sucesso para user: {}", user.getEmail());
         return true;
     }
-
 
     public UserDto findUserByEmail(String email){
         logger.info("Inicio findByEmail email : {}", email);
@@ -382,36 +378,61 @@ public class UserBean implements Serializable {
 
     public boolean updateInfo(ProfileDto profileDto, String email) {
 
-        UserEntity user = userDao.findByEmail(email);
+    UserEntity user = userDao.findByEmail(email);
 
-        if (user == null) {
-            logger.warn("Não foi possivel encontrar o utilizador para atualizar");
+    if (user == null) {
+        logger.warn("User: {} | IP: {} | Email: {} - Could not find user to update.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return false;
+    }
+
+    ProfileEntity profileToUpdate = user.getProfile();
+
+    if (profileToUpdate == null) {
+        profileToUpdate = new ProfileEntity();
+        profileToUpdate.setUser(user);
+        user.setProfile(profileToUpdate);
+        logger.info("User: {} | IP: {} | Email: {} - Created new profile for user.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+    }
+
+    // Required fields
+    profileToUpdate.setFirstName(profileDto.getFirstName());
+    profileToUpdate.setLastName(profileDto.getLastName());
+    profileToUpdate.setBirthDate(profileDto.getBirthDate());
+    profileToUpdate.setAddress(profileDto.getAddress());
+    profileToUpdate.setZipCode(profileDto.getZipCode());
+    profileToUpdate.setPhone(profileDto.getPhone());
+
+    // Optional fields
+    profileToUpdate.setPhotograph(profileDto.getPhotograph());
+    profileToUpdate.setBio(profileDto.getBio());
+
+    // Conversion and validation for usualWorkplace (Enum)
+    String usualWorkplaceString = profileDto.getUsualWorkplace();
+    if (usualWorkplaceString != null && !usualWorkplaceString.isBlank()) {
+        try {
+            UsualWorkPlaceType type = UsualWorkPlaceType.valueOf(usualWorkplaceString.toUpperCase());
+            profileToUpdate.setUsualWorkplace(type);
+        } catch (IllegalArgumentException e) {
+            logger.warn("User: {} | IP: {} | Email: {} | Value: {} - Invalid usualWorkplace value received.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), email, usualWorkplaceString);
             return false;
         }
-
-        ProfileEntity profileToUpdate = user.getProfile();
-
-        if (profileToUpdate == null) {
-            profileToUpdate = new ProfileEntity();
-            profileToUpdate.setUser(user);
-            user.setProfile(profileToUpdate);
-        }
-
-        //campos obrigatórios
-        profileToUpdate.setFirstName(profileDto.getFirstName());
-        profileToUpdate.setLastName(profileDto.getLastName());
-        profileToUpdate.setBirthDate(profileDto.getBirthDate());
-        profileToUpdate.setAddress(profileDto.getAddress());
-        profileToUpdate.setZipCode(profileDto.getZipCode());
-        profileToUpdate.setPhone(profileDto.getPhone());
-        //campos opcionais
-        profileToUpdate.setPhotograph(profileDto.getPhotograph());
-        profileToUpdate.setBio(profileDto.getBio());
-
-        profileDao.save(profileToUpdate);
-
-        return true;
+    } else {
+        logger.warn("User: {} | IP: {} | Email: {} - Missing required usualWorkplace field.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return false;
     }
+
+    profileDao.save(profileToUpdate);
+
+    logger.info("User: {} | IP: {} | Email: {} - Successfully updated profile for user.",
+            RequestContext.getAuthor(), RequestContext.getIp(), email);
+
+    return true;
+}
+
 
     public SessionStatusDto validateAndRefreshSessionToken(String sessionToken) {
         if (sessionToken == null || sessionToken.isEmpty()) {
@@ -441,20 +462,6 @@ public class UserBean implements Serializable {
 
         return javaConversionUtil.convertSessionTokenEntityToSessionStatusDto(sessionTokenEntity);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 
