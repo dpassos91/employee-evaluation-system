@@ -8,10 +8,17 @@ import aor.projetofinal.dto.ProfileDto;
 import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
+import aor.projetofinal.entity.enums.UsualWorkPlaceType;
+import aor.projetofinal.context.RequestContext;
+import java.util.List;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,7 +37,23 @@ public class ProfileService {
     @Inject
     private SessionTokenDao sessionTokenDao;
 
+    // Get usual workplace options
+    @GET
+    @Path("/usualworkplaces")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<String> getUsualWorkplaceOptions() {
+        logger.info("User: {} | IP: {} - Attempt to fetch usual workplace options",
+                RequestContext.getAuthor(), RequestContext.getIp());
 
+        List<String> options = Arrays.stream(UsualWorkPlaceType.values())
+            .map(Enum::name)
+            .collect(Collectors.toList());
+
+        logger.info("User: {} | IP: {} - Fetched {} usual workplace options: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), options.size(), options);
+
+        return options;
+    }
 
 
     //update perfil de user
