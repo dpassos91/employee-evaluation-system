@@ -1,75 +1,117 @@
+import { useState, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import AppButton from "../components/AppButton";
 import profilePlaceholder from "../images/profile_icon.png";
 import { LockClosedIcon } from "@heroicons/react/24/outline";
-import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { userStore } from "../stores/userStore";
 import { useIntl, FormattedMessage } from "react-intl";
-import { fieldLabelKeys } from "../utils/fieldLabels";
+import { profileAPI } from "../api/profileAPI";
+import { fieldLabelKeys } from "../utils/fieldLabels"; // Importa os rótulos dos campos
 
 export default function ProfilePage() {
   const { user, profileComplete, missingFields } = userStore();
   const { formatMessage } = useIntl();
 
-  console.log("Render ProfilePage");
-console.log("profileComplete:", profileComplete);
-console.log("missingFields:", missingFields);
+  // 1. Controlar os campos do formulário
+  const [firstName, setFirstName] = useState(user?.firstName || "");
+  const [lastName, setLastName] = useState(user?.lastName || "");
+  const [address, setAddress] = useState(user?.address || "");
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [birthDate, setBirthDate] = useState(user?.birthDate ? user.birthDate.slice(0,10) : "");
+  const [usualWorkplace, setUsualWorkplace] = useState(user?.usualWorkplace || "");
+  const [bio, setBio] = useState(user?.bio || "");
 
+  // Atualizar campos caso userStore mude (ex: depois de login)
   useEffect(() => {
-    if (profileComplete === false) {
-      const missingLabels = (missingFields || [])
-        .map((field) =>
-          fieldLabelKeys[field]
-            ? formatMessage({ id: fieldLabelKeys[field] })
-            : field // fallback se faltar tradução
-        )
-        .join(", ");
+    setFirstName(user?.firstName || "");
+    setLastName(user?.lastName || "");
+    setAddress(user?.address || "");
+    setPhone(user?.phone || "");
+    setBirthDate(user?.birthDate ? user.birthDate.slice(0,10) : "");
+    setUsualWorkplace(user?.usualWorkplace || "");
+    setBio(user?.bio || "");
+  }, [user]);
 
-      toast.info(
-        formatMessage(
-          {
-            id: "profile.incomplete.fields",
-            defaultMessage: "Por favor, preencha todos os dados obrigatórios do perfil: {fields}",
-          },
-          { fields: missingLabels }
-        )
-      );
+  // Mostra toast se o perfil estiver incompleto (avisa o utilizador)
+useEffect(() => {
+  if (profileComplete === false) {
+    const missingLabels = (missingFields || [])
+      .map((field) =>
+        fieldLabelKeys[field]
+          ? formatMessage({ id: fieldLabelKeys[field] })
+          : field // fallback se faltar tradução
+      )
+      .join(", ");
+
+    toast.info(
+      formatMessage(
+        {
+          id: "profile.incomplete.fields",
+          defaultMessage: "Por favor, preencha todos os dados obrigatórios do perfil: {fields}",
+        },
+        { fields: missingLabels }
+      )
+    );
+  }
+}, [profileComplete, missingFields, formatMessage]);
+
+  // 2. Handler de submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const sessionToken = sessionStorage.getItem("authToken");
+    const profileData = {
+      firstName,
+      lastName,
+      address,
+      phone,
+      birthDate: birthDate ? `${birthDate}T00:00:00` : null,
+      usualWorkplace,
+      bio,
+      // Se quiseres atualizar foto agora, adiciona o campo aqui.
+    };
+
+    try {
+      await profileAPI.updateProfile(user.email, profileData, sessionToken);
+      toast.success(formatMessage({ id: "profile.update.success", defaultMessage: "Perfil atualizado com sucesso!" }));
+      // Opcional: atualiza o userStore se o backend devolver o novo perfil.
+    } catch (err) {
+      toast.error(formatMessage({ id: "profile.update.error", defaultMessage: "Erro ao atualizar perfil!" }));
     }
-  }, [profileComplete, missingFields, formatMessage]);
+  };
 
   return (
     <PageLayout>
       <section className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         {/* Coluna 1: Foto + ações secundárias */}
-<div className="flex flex-col items-center w-full">
-  <h2 className="text-3xl font-bold text-center mb-2 w-full">
-    <FormattedMessage id="profile.title" defaultMessage="Perfil" />
-  </h2>
-  <div className="w-28 h-28 rounded-full overflow-hidden mb-8 border-2 border-[#D41C1C] bg-white mx-auto mt-10">
-    <img
-      src={profilePlaceholder}
-      alt="Foto de perfil"
-      className="object-cover w-full h-full"
-    />
-  </div>
-  {/* Botões com gap regular */}
-  <div className="flex flex-col gap-3 w-full mt-6">
-    <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
-      <FormattedMessage id="profile.changePhoto" defaultMessage="Alterar fotografia" />
-    </AppButton>
-    <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
-      <FormattedMessage id="profile.trainingHistory" defaultMessage="Histórico de formações" />
-    </AppButton>
-    <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
-      <FormattedMessage id="profile.evaluationHistory" defaultMessage="Histórico de avaliações" />
-    </AppButton>
-  </div>
-</div>
+        <div className="flex flex-col items-center w-full">
+          <h2 className="text-3xl font-bold text-center mb-2 w-full">
+            <FormattedMessage id="profile.title" defaultMessage="Perfil" />
+          </h2>
+          <div className="w-28 h-28 rounded-full overflow-hidden mb-8 border-2 border-[#D41C1C] bg-white mx-auto mt-10">
+            <img
+              src={profilePlaceholder}
+              alt="Foto de perfil"
+              className="object-cover w-full h-full"
+            />
+          </div>
+          {/* Botões com gap regular */}
+          <div className="flex flex-col gap-3 w-full mt-6">
+            <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
+              <FormattedMessage id="profile.changePhoto" defaultMessage="Alterar fotografia" />
+            </AppButton>
+            <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
+              <FormattedMessage id="profile.trainingHistory" defaultMessage="Histórico de formações" />
+            </AppButton>
+            <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
+              <FormattedMessage id="profile.evaluationHistory" defaultMessage="Histórico de avaliações" />
+            </AppButton>
+          </div>
+        </div>
 
         {/* Coluna 2: Formulário e Biografia */}
         <div className="flex flex-col w-full pl-12">
-          <form className="flex flex-col gap-2 w-full">
+          <form className="flex flex-col gap-2 w-full" onSubmit={handleSubmit}>
             {/* Email e Gestor */}
             <div className="grid grid-cols-2 gap-2">
               <div className="flex flex-col">
@@ -78,7 +120,7 @@ console.log("missingFields:", missingFields);
                 </label>
                 <input
                   type="email"
-                  value="exemplo@email.com"
+                  value={user.email}
                   disabled
                   className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-gray-100 text-gray-700 cursor-not-allowed"
                 />
@@ -89,7 +131,7 @@ console.log("missingFields:", missingFields);
                 </label>
                 <input
                   type="text"
-                  value="Joana Ferreira"
+                  value={user.managerName || ""}
                   disabled
                   className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-gray-100 text-gray-700 cursor-not-allowed"
                 />
@@ -103,6 +145,8 @@ console.log("missingFields:", missingFields);
                 </label>
                 <input
                   type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                   className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
                 />
               </div>
@@ -112,6 +156,8 @@ console.log("missingFields:", missingFields);
                 </label>
                 <input
                   type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
                 />
               </div>
@@ -120,6 +166,8 @@ console.log("missingFields:", missingFields);
                   <FormattedMessage id="profile.workplace" defaultMessage="Local de Trabalho" />
                 </label>
                 <select
+                  value={usualWorkplace}
+                  onChange={(e) => setUsualWorkplace(e.target.value)}
                   className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
                 >
                   <option value=""> </option>
@@ -142,15 +190,19 @@ console.log("missingFields:", missingFields);
                 </label>
                 <input
                   type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
                 />
               </div>
               <div className="flex flex-col">
                 <label className="text-sm font-bold text-gray-700 mb-1">
-                  <FormattedMessage id="profile.birthdate" defaultMessage="Data de nascimeno" />
+                  <FormattedMessage id="profile.birthdate" defaultMessage="Data de nascimento" />
                 </label>
                 <input
-                  type="text"
+                  type="date"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
                   className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
                 />
               </div>
@@ -160,6 +212,8 @@ console.log("missingFields:", missingFields);
                 </label>
                 <input
                   type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                   className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
                 />
               </div>
@@ -171,6 +225,8 @@ console.log("missingFields:", missingFields);
                 <FormattedMessage id="profile.biography" defaultMessage="Biografia" />
               </label>
               <textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
                 className="border border-gray-300 focus:border-[#D41C1C] rounded w-full min-h-[155px] max-h-[220px] px-3 py-2 bg-white text-sm"
               />
             </div>
@@ -199,6 +255,7 @@ console.log("missingFields:", missingFields);
     </PageLayout>
   );
 }
+
 
 
 
