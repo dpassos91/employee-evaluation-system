@@ -1,6 +1,7 @@
 package aor.projetofinal.service;
 
 
+import aor.projetofinal.bean.ProfileBean;
 import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
@@ -13,6 +14,7 @@ import aor.projetofinal.context.RequestContext;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.postgresql.shaded.com.ongres.stringprep.Profile;
 
 @Path("/profiles")
 public class ProfileService {
@@ -32,13 +35,14 @@ public class ProfileService {
     @Inject
     UserBean userBean;
 
-
     @Inject
     private UserDao userDao;
 
     @Inject
     private SessionTokenDao sessionTokenDao;
 
+    @Inject
+    private ProfileBean profileBean;    
 
     /*@GET
     @Path("/list-users-by-filters")
@@ -138,7 +142,7 @@ public class ProfileService {
                     .build();
         }
 
-        if (!userBean.updateInfo(profileToUpdate, email)) {
+        if (!profileBean.updateProfile(profileToUpdate, email)) {
             logger.warn("Erro a atualizar utilizador - update user");
             return Response.status(400)
                     .entity("{\"message\": \"Não foi possível atualizar o utilizador\"}")

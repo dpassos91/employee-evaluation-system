@@ -28,7 +28,7 @@ public class ProfileBean implements Serializable {
     @Inject
     private ProfileDao profileDao;
 
-    public boolean updateInfo(ProfileDto profileDto, String email) {
+    public boolean updateProfile(ProfileDto profileDto, String email) {
 
     UserEntity user = userDao.findByEmail(email);
 
