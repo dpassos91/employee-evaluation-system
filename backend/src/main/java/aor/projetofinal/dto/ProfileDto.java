@@ -14,7 +14,6 @@ public class ProfileDto {
     private String lastName;
     private LocalDateTime birthDate;
     private String address;
-    private String zipCode;
     private String phone;
     private String photograph;
     private String bio;
@@ -65,14 +64,6 @@ public class ProfileDto {
 
     public void setAddress(String address) {
         this.address = address;
-    }
-    @XmlElement
-    public String getZipCode() {
-        return zipCode;
-    }
-
-    public void setZipCode(String zipCode) {
-        this.zipCode = zipCode;
     }
 
     @XmlElement

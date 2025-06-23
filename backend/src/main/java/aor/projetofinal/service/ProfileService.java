@@ -64,20 +64,7 @@ public class ProfileService {
         ArrayList<ProductDto> products = productBean.getAllProductsByFilters(seller, state, category, active,
                 sellerExcluded, updated);
 
-
-
-
     }
-
-
-
-
-
-
-
-
-
-
 
     // Get usual workplace options
     @GET
@@ -96,7 +83,6 @@ public class ProfileService {
 
         return options;
     }
-
 
     //update perfil de user
     @PUT
@@ -168,11 +154,4 @@ public class ProfileService {
 
 
     }
-
-
-
-
-
-
-
 }

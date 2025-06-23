@@ -53,32 +53,22 @@ const API_ENDPOINTS = {
     // e.g.: send: `${API_BASE_URL}/messages/send`,
   },
 
+/** Profile endpoints */
+profiles: {
+  /** @function Update user profile by email */
+  update: (email) => `${API_BASE_URL}/profiles/update/${encodeURIComponent(email)}`,
+  /** @function List users by filters */
+  listUsersByFilters: `${API_BASE_URL}/profiles/list-users-by-filters`,
+  /** @type {string} Get list of possible usual workplaces */
+  usualWorkplaces: `${API_BASE_URL}/profiles/usualworkplaces`,
+},
+
   /** Settings endpoints */
   settings: {
     /** @type {string} Get current settings */
     getSettings: `${API_BASE_URL}/settings`,
     /** @type {string} Update settings */
     updateSettings: `${API_BASE_URL}/settings`,
-  },
-
-  /** User endpoints */
-  users: {
-    /** @function Get or update user by ID */
-    byId: (id) => `${API_BASE_URL}/users/${id}`,
-    /** @function Update user by ID */
-    update: (id) => `${API_BASE_URL}/users/${id}`,
-    /** @function Delete user by ID */
-    delete: (id) => `${API_BASE_URL}/users/${id}`,
-    /** @function Get user profile by username */
-    profile: (username) => `${API_BASE_URL}/users/profile/${username}`,
-    /** @function Update user status by ID */
-    updateStatus: (id) => `${API_BASE_URL}/users/${id}/status`,
-    /** @function Update user password by ID */
-    updatePassword: (id) => `${API_BASE_URL}/users/${id}/password`,
-    /** @function Get user by username */
-    byUsername: (username) => `${API_BASE_URL}/users/username/${username}`,
-    /** @type {string} Get deleted users */
-    deleted: `${API_BASE_URL}/users/deleted`,
   },
 };
 
