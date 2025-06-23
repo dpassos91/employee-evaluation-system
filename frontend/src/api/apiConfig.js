@@ -19,14 +19,20 @@ const API_BASE_URL = 'https://localhost:8443/grupo7/rest';
 const API_ENDPOINTS = {
   /** Authentication endpoints */
   auth: {
+    /** @function Confirm user registration with token */
+    confirm: (token) => `${API_BASE_URL}/users/confirm?token=${token}`,
     /** @type {string} User login endpoint */
     login: `${API_BASE_URL}/users/login`,
     /** @type {string} User logout endpoint */
     logout: `${API_BASE_URL}/users/logout`,
+    /** @type {string} User registration endpoint */
+    register: `${API_BASE_URL}/users/createUser`,
     /** @type {string} Request password reset endpoint */
-    requestResetPassword: `${API_BASE_URL}/users/request-password-reset`,
+    requestResetPassword: `${API_BASE_URL}/users/request-reset`,
     /** @type {string} Reset password endpoint */
-    resetPassword: `${API_BASE_URL}/users/reset-password`
+    resetPassword: `${API_BASE_URL}/users/reset-password`,
+    /** @type {string} Validate session endpoint */
+    validateSession: `${API_BASE_URL}/users/validate-session`
   },
 
   /** Course endpoints (to be filled in) */
@@ -57,10 +63,6 @@ const API_ENDPOINTS = {
 
   /** User endpoints */
   users: {
-    /** @type {string} Base users endpoint */
-    base: `${API_BASE_URL}/users`,
-    /** @function Confirm user registration with token */
-    confirm: (token) => `${API_BASE_URL}/users/confirm?token=${token}`,
     /** @function Get or update user by ID */
     byId: (id) => `${API_BASE_URL}/users/${id}`,
     /** @function Update user by ID */

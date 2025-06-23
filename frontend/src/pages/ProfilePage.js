@@ -134,7 +134,7 @@ console.log("missingFields:", missingFields);
               </div>
             </div>
 
-            {/* Morada, Código Postal, Contacto */}
+            {/* Morada, Aniversário, Contacto */}
             <div className="grid grid-cols-3 gap-2 items-end">
               <div className="flex flex-col">
                 <label className="text-sm font-bold text-gray-700 mb-1">
@@ -147,7 +147,7 @@ console.log("missingFields:", missingFields);
               </div>
               <div className="flex flex-col">
                 <label className="text-sm font-bold text-gray-700 mb-1">
-                  <FormattedMessage id="profile.zipcode" defaultMessage="Código Postal" />
+                  <FormattedMessage id="profile.birthdate" defaultMessage="Data de nascimeno" />
                 </label>
                 <input
                   type="text"

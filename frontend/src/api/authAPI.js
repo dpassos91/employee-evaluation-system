@@ -8,38 +8,47 @@
  * await authAPI.logoutUser();
  * await authAPI.requestPasswordReset(email);
  * await authAPI.resetPassword(token, newPassword);
+ * await authAPI.validateSession(sessionToken);
  */
 
 import { apiConfig } from './apiConfig.js';
-import { userAPI } from './userAPI.js';
 
 const { apiCall, API_ENDPOINTS } = apiConfig;
-const { getUserById } = userAPI;
 
 /**
- * Logs in a user, stores the JWT token in sessionStorage,
- * and retrieves full user details.
+ * Confirms a user account using the confirmation token sent by email.
+ * @param {string} confirmToken - The confirmation token from the email link.
+ * @returns {Promise<Object>} API response indicating success or failure.
+ */
+const confirmAccount = async (confirmToken) => {
+  return apiCall(
+    `${API_ENDPOINTS.auth.confirm(confirmToken)}`,
+    { method: "GET" }
+  );
+};
+
+/**
+ * Logs in a user, stores the session token in sessionStorage,
+ * and returns the login response with user info and profile status.
  * 
  * @param {Object} credentials - User credentials (e.g., { email, password }).
- * @returns {Promise<Object>} An object containing user details and the JWT token.
+ * @returns {Promise<Object>} Login response.
  * @throws {Error} If login fails.
  */
 const loginUser = async (credentials) => {
   const loginResponse = await apiCall(API_ENDPOINTS.auth.login, {
     method: 'POST',
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials),
   });
 
-  // Guarda o token (se quiseres)
   sessionStorage.setItem('authToken', loginResponse.sessionToken);
 
-  // DEVOLVE O OBJETO COMPLETO
   return loginResponse;
 };
 
-
 /**
- * Logs out the authenticated user and removes the JWT token from sessionStorage.
+ * Logs out the authenticated user and removes the session token from sessionStorage.
  * 
  * @returns {Promise<boolean>} True if logout is successful.
  * @throws {Error} If logout fails or token does not exist.
@@ -49,9 +58,9 @@ const logoutUser = async () => {
   if (!token) {
     throw new Error("Token does not exist in sessionStorage.");
   }
-
   const result = await apiCall(API_ENDPOINTS.auth.logout, {
     method: 'POST',
+    headers: { Authorization: `Bearer ${token}` }
   });
 
   if (result && result.message && result.message === "Logout successful!") {
@@ -62,6 +71,18 @@ const logoutUser = async () => {
   }
 };
 
+/**
+ * Registers a new user in the system.
+ * @param {Object} userData - User registration data.
+ * @returns {Promise<Object>} The created user data or API response.
+ */
+const registerUser = async (userData) => {
+  return apiCall(API_ENDPOINTS.auth.register, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(userData),
+  });
+};
 
 /**
  * Requests a password reset for the specified email address.
@@ -72,28 +93,50 @@ const logoutUser = async () => {
 const requestPasswordReset = async (email) => {
   return apiCall(API_ENDPOINTS.auth.requestResetPassword, {
     method: 'POST',
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
-    // Headers are set automatically by apiCall
   });
 };
 
 /**
- * Resets the user's password using a reset token and the new password.
+ * Resets the user's password using a recovery token and the new password.
  * 
- * @param {string} token - The password reset token.
+ * @param {string} token - The password reset (recovery) token.
  * @param {string} newPassword - The new password to set.
  * @returns {Promise<Object|string>} The API response.
  */
 const resetPassword = async (token, newPassword) => {
-  return apiCall(API_ENDPOINTS.auth.resetPassword, {
+  const url = `${API_ENDPOINTS.auth.resetPassword}?recoveryToken=${encodeURIComponent(token)}`;
+  return apiCall(url, {
     method: 'POST',
-    body: JSON.stringify({ token, newPassword }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password: newPassword }),
+  });
+};
+
+/**
+ * Validates and refreshes a session token.
+ * 
+ * @param {string} sessionToken - The session token to validate.
+ * @returns {Promise<Object>} Session status info if valid, error if expired or invalid.
+ */
+const validateSession = async (sessionToken) => {
+  return apiCall(API_ENDPOINTS.auth.validateSession, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      sessionToken: sessionToken
+    }
   });
 };
 
 export const authAPI = {
+  confirmAccount,
   loginUser,
   logoutUser,
+  registerUser,
   requestPasswordReset,
   resetPassword,
+  validateSession,
 };
+
