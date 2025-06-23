@@ -10,6 +10,8 @@ import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.UsualWorkPlaceType;
 import aor.projetofinal.context.RequestContext;
+
+import java.util.ArrayList;
 import java.util.List;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -36,6 +38,46 @@ public class ProfileService {
 
     @Inject
     private SessionTokenDao sessionTokenDao;
+
+
+    @GET
+    @Path("/list-users-by-filters")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listUsers(
+            @HeaderParam("sessionToken") String sessionToken,
+            @QueryParam("profile-name") String profileName,
+            @QueryParam("usual-work-place") UsualWorkPlaceType usualLocation,
+            @QueryParam("manager-name") String managerName
+    )
+    {
+        // Valida e renova a sessão
+        SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
+
+        if (sessionStatusDto == null) {
+            logger.warn("Sessão inválida ou expirada - update user");
+            return Response.status(401)
+                    .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        ArrayList<ProductDto> products = productBean.getAllProductsByFilters(seller, state, category, active,
+                sellerExcluded, updated);
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
 
     // Get usual workplace options
     @GET
@@ -126,6 +168,9 @@ public class ProfileService {
 
 
     }
+
+
+
 
 
 
