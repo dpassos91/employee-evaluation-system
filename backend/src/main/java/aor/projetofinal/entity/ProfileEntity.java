@@ -32,9 +32,6 @@ public class ProfileEntity implements Serializable  {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "zip_code")
-    private String zipCode;
-
     @Column(name = "phone")
     private String phone;
 
@@ -85,14 +82,6 @@ public class ProfileEntity implements Serializable  {
     }
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getZipCode() {
-        return zipCode;
-    }
-
-    public void setZipCode(String zipCode) {
-        this.zipCode = zipCode;
     }
 
     public String getPhone() {
