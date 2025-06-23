@@ -40,7 +40,7 @@ public class ProfileService {
     private SessionTokenDao sessionTokenDao;
 
 
-    @GET
+    /*@GET
     @Path("/list-users-by-filters")
     @Produces(MediaType.APPLICATION_JSON)
     public Response listUsers(
@@ -64,7 +64,7 @@ public class ProfileService {
         ArrayList<ProductDto> products = productBean.getAllProductsByFilters(seller, state, category, active,
                 sellerExcluded, updated);
 
-    }
+    }*/
 
     // Get usual workplace options
     @GET

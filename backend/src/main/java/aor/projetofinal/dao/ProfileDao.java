@@ -2,14 +2,12 @@ package aor.projetofinal.dao;
 
 
 import aor.projetofinal.entity.ProfileEntity;
-import aor.projetofinal.entity.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import org.postgresql.shaded.com.ongres.stringprep.Profile;
-import aor.projetofinal.util.StringUtils;
+
 import java.util.Collections;
 import java.util.List;
 

@@ -36,7 +36,6 @@ public class ProfileValidator {
             missing.add("lastName");
             missing.add("birthDate");
             missing.add("address");
-            missing.add("zipCode");
             missing.add("phone");
             missing.add("usualWorkplace");
             return missing;
@@ -60,11 +59,6 @@ public class ProfileValidator {
         // Address
         if (isNullOrBlank(profile.getAddress())) {
             missing.add("address");
-        }
-
-        // ZipCode 
-        if (isNullOrBlank(profile.getZipCode())) {
-            missing.add("zipCode");
         }
 
         // Phone

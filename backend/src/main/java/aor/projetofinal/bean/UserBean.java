@@ -401,7 +401,6 @@ public class UserBean implements Serializable {
     profileToUpdate.setLastName(profileDto.getLastName());
     profileToUpdate.setBirthDate(profileDto.getBirthDate());
     profileToUpdate.setAddress(profileDto.getAddress());
-    profileToUpdate.setZipCode(profileDto.getZipCode());
     profileToUpdate.setPhone(profileDto.getPhone());
 
     // Optional fields
