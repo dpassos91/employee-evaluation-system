@@ -5,10 +5,7 @@ import aor.projetofinal.bean.ProfileBean;
 import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
-import aor.projetofinal.dto.PhotographDto;
-import aor.projetofinal.dto.ProfileDto;
-import aor.projetofinal.dto.ResetPasswordDto;
-import aor.projetofinal.dto.SessionStatusDto;
+import aor.projetofinal.dto.*;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.UsualWorkPlaceType;
@@ -131,11 +128,12 @@ public class ProfileService {
     @GET
     @Path("/list-users-by-filters")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listUsers(
+    public Response listUsersPaginated(
             @HeaderParam("sessionToken") String sessionToken,
             @QueryParam("profile-name") String profileName,
             @QueryParam("usual-work-place") UsualWorkPlaceType usualLocation,
-            @QueryParam("manager-email") String managerEmail
+            @QueryParam("manager-email") String managerEmail,
+            @QueryParam("page") @DefaultValue("1") int page
     ) {
         // Valida e renova a sessão
         SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
@@ -148,26 +146,20 @@ public class ProfileService {
                     .build();
         }
 
-        ArrayList<ProfileDto> profiles = profileBean.findProfilesWithFilters(
-                profileName,
-                usualLocation,
-                managerEmail
-        );
+        PaginatedProfilesDto paginatedResult = profileBean.findProfilesWithFiltersPaginated(
+                profileName, usualLocation, managerEmail, page);
 
         //se não foram encontrados resultados
-        if (profiles == null || profiles.isEmpty()) {
-            return Response.ok(Collections.emptyList())
+        if (paginatedResult.getProfiles() == null || paginatedResult.getProfiles().isEmpty()) {
+            return Response.ok(paginatedResult)
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-        logger.info("Users found: {} | Filtros - Nome: {}, Local: {}, Gestor: {}", profiles.size(), profileName, usualLocation, managerEmail);
-        return Response.status(200)
-                .entity(profiles)
+        logger.info("Resultados encontrados | Filtros - Nome: {}, Local: {}, Gestor: {}", profileName, usualLocation, managerEmail);
+        return Response.ok(paginatedResult)
                 .type(MediaType.APPLICATION_JSON)
                 .build();
-
-
     }
 
     //exportar lista de users para Excel em formato csv

@@ -1,6 +1,7 @@
 package aor.projetofinal.bean;
 
 import aor.projetofinal.Util.JavaConversionUtil;
+import aor.projetofinal.dto.PaginatedProfilesDto;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
@@ -43,6 +44,25 @@ public class ProfileBean implements Serializable {
 
         return javaConversionUtil.convertProfileEntityListtoProfileDtoList(new ArrayList<>(profilesDB));
     }
+
+
+    public PaginatedProfilesDto findProfilesWithFiltersPaginated(String employeeName, UsualWorkPlaceType workplace, String managerEmail, int page) {
+
+        List<ProfileEntity> profilesDB = profileDao.findProfilesWithFiltersPaginated(employeeName, workplace, managerEmail, page);
+        //Contar o total de perfis correspondentes aos filtros
+        long totalCount = profileDao.countProfilesWithFilters(employeeName, workplace, managerEmail);
+
+        //Converter os resultados para DTO
+        List<ProfileDto> profileDtos = javaConversionUtil.convertProfileEntityListtoProfileDtoList(new ArrayList<>(profilesDB));
+
+        //Calcular número total de páginas
+        int pageSize = 10; // valor fixo por agora
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+        // Construir o DTO de resposta com paginação
+        return new PaginatedProfilesDto(profileDtos, totalCount, totalPages, page);
+    }
+
 
 
     public boolean updateProfile(ProfileDto profileDto, String email) {
