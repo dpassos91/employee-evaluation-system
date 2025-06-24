@@ -1,5 +1,6 @@
 package aor.projetofinal.bean;
 
+import aor.projetofinal.Util.JavaConversionUtil;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
@@ -16,6 +17,8 @@ import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dao.ProfileDao;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Stateless
 public class ProfileBean implements Serializable {
@@ -27,6 +30,21 @@ public class ProfileBean implements Serializable {
 
     @Inject
     private ProfileDao profileDao;
+
+
+    @Inject
+    JavaConversionUtil javaConversionUtil;
+
+    public ArrayList<ProfileDto> findProfilesWithFilters(String employeeName, UsualWorkPlaceType workplace, String managerEmail){
+
+        List<ProfileEntity> profilesDB = profileDao.findProfilesWithFilters( employeeName, workplace, managerEmail);
+
+        return javaConversionUtil.convertProfileEntityListtoProfileDtoList(new ArrayList<>(profilesDB));
+    }
+
+
+
+
 
     public boolean updateProfile(ProfileDto profileDto, String email) {
 

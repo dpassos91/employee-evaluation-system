@@ -13,6 +13,7 @@ import aor.projetofinal.entity.enums.UsualWorkPlaceType;
 import aor.projetofinal.context.RequestContext;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import jakarta.inject.Inject;
@@ -44,31 +45,7 @@ public class ProfileService {
     @Inject
     private ProfileBean profileBean;    
 
-    /*@GET
-    @Path("/list-users-by-filters")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response listUsers(
-            @HeaderParam("sessionToken") String sessionToken,
-            @QueryParam("profile-name") String profileName,
-            @QueryParam("usual-work-place") UsualWorkPlaceType usualLocation,
-            @QueryParam("manager-name") String managerName
-    )
-    {
-        // Valida e renova a sessão
-        SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
 
-        if (sessionStatusDto == null) {
-            logger.warn("Sessão inválida ou expirada - update user");
-            return Response.status(401)
-                    .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-        ArrayList<ProductDto> products = productBean.getAllProductsByFilters(seller, state, category, active,
-                sellerExcluded, updated);
-
-    }*/
 
 
     // Consultar perfil de utilizador por email
@@ -149,6 +126,53 @@ public Response getProfile(@PathParam("email") String email, @HeaderParam("sessi
 
         return options;
     }
+
+
+    @GET
+    @Path("/list-users-by-filters")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listUsers(
+            @HeaderParam("sessionToken") String sessionToken,
+            @QueryParam("profile-name") String profileName,
+            @QueryParam("usual-work-place") UsualWorkPlaceType usualLocation,
+            @QueryParam("manager-email") String managerEmail
+    )
+    {
+        // Valida e renova a sessão
+        SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
+
+        if (sessionStatusDto == null) {
+            logger.warn("Sessão inválida ou expirada - update user");
+            return Response.status(401)
+                    .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        ArrayList<ProfileDto> profiles = profileBean.findProfilesWithFilters(
+                profileName,
+                usualLocation,
+                managerEmail
+        );
+
+        //se não foram encontrados resultados
+        if (profiles == null || profiles.isEmpty()) {
+            return Response.ok(Collections.emptyList())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        logger.info("Users found: {} | Filtros - Nome: {}, Local: {}, Gestor: {}", profiles.size(), profileName, usualLocation, managerEmail);
+        return Response.status(200)
+                .entity(profiles)
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+
+
+    }
+
+
+
 
     //update perfil de user
     @PUT

@@ -26,6 +26,14 @@ public class ProfileEntity implements Serializable  {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "normalized_first_name")
+    private String normalizedFirstName;
+
+
+    @Column(name = "normalized_last_name")
+    private String normalizedLastName;
+
+
     @Column(name = "birth_date")
     private LocalDateTime birthDate;
 
@@ -68,6 +76,22 @@ public class ProfileEntity implements Serializable  {
     }
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getNormalizedFirstName() {
+        return normalizedFirstName;
+    }
+
+    public void setNormalizedFirstName(String normalizedFirstName) {
+        this.normalizedFirstName = normalizedFirstName;
+    }
+
+    public String getNormalizedLastName() {
+        return normalizedLastName;
+    }
+
+    public void setNormalizedLastName(String normalizedLastName) {
+        this.normalizedLastName = normalizedLastName;
     }
 
     public LocalDateTime getBirthDate() {

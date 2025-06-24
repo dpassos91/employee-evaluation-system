@@ -1,6 +1,7 @@
 package aor.projetofinal.bean;
 
 import aor.projetofinal.Util.JavaConversionUtil;
+import aor.projetofinal.Util.StringUtils;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.ProfileDao;
 import aor.projetofinal.dao.RoleDao;
@@ -399,6 +400,12 @@ public class UserBean implements Serializable {
     // Required fields
     profileToUpdate.setFirstName(profileDto.getFirstName());
     profileToUpdate.setLastName(profileDto.getLastName());
+
+
+    profileToUpdate.setNormalizedFirstName(StringUtils.normalize(profileDto.getFirstName()));
+    profileToUpdate.setNormalizedLastName(StringUtils.normalize(profileDto.getLastName()));
+
+
     profileToUpdate.setBirthDate(profileDto.getBirthDate());
     profileToUpdate.setAddress(profileDto.getAddress());
     profileToUpdate.setPhone(profileDto.getPhone());
