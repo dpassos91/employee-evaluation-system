@@ -170,6 +170,60 @@ public class ProfileService {
 
     }
 
+    //exportar lista de users para Excel em formato csv
+    @GET
+    @Path("/export-users-csv")
+    @Produces("text/csv")
+    public Response exportUsersToCSV(
+            @HeaderParam("sessionToken") String sessionToken,
+            @QueryParam("profile-name") String profileName,
+            @QueryParam("usual-work-place") UsualWorkPlaceType usualLocation,
+            @QueryParam("manager-email") String managerEmail
+    ) {
+        // 1. Verifica sessão
+        SessionStatusDto sessionStatus = userBean.validateAndRefreshSessionToken(sessionToken);
+        if (sessionStatus == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("Sessão expirada ou inválida.")
+                    .build();
+        }
+
+        // 2. Obtem perfis filtrados
+        ArrayList<ProfileDto> profiles = profileBean.findProfilesWithFilters(
+                profileName, usualLocation, managerEmail);
+
+        // 3. Constrói CSV manualmente
+        StringBuilder csvBuilder = new StringBuilder();
+        csvBuilder.append("Nome completo,Local de Trabalho,Gestor,Contacto,Fotografia\n");
+
+        for (ProfileDto p : profiles) {
+            String nome = (p.getFirstName() != null ? p.getFirstName() : "") + " " +
+                    (p.getLastName() != null ? p.getLastName() : "");
+            String workplace = p.getUsualWorkplace() != null ? p.getUsualWorkplace() : "";
+            String gestor = p.getUser() != null && p.getUser().getManager() != null
+                    ? p.getUser().getManager().getEmail() : "";
+            String contacto = p.getPhone() != null ? p.getPhone() : "";
+            String foto = p.getPhotograph() != null ? p.getPhotograph() : "";
+
+            csvBuilder.append(String.format("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+                    nome, workplace, gestor, contacto, foto));
+        }
+
+        // 4. Retorna como anexo CSV
+        return Response.ok(csvBuilder.toString())
+                .header("Content-Disposition", "attachment; filename=users_export.csv")
+                .type("text/csv")
+                .build();
+    }
+
+
+
+
+
+
+
+
+
 
     //update perfil de user
     @PUT

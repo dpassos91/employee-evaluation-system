@@ -45,6 +45,16 @@ public class UserEntity implements Serializable {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    // Gestor (um utilizador pode ter um gestor)
+    @ManyToOne
+    @JoinColumn(name = "manager_id")
+    private UserEntity manager;
+
+    // Subordinados (um utilizador pode ser gestor de vários outros)
+    @OneToMany(mappedBy = "manager")
+    private List<UserEntity> subordinates;
+
+
     // Relacionamento One to Many com evaluations (recebidas)
     @OneToMany(mappedBy = "evaluated")
     private List<EvaluationEntity> evaluationsReceived;
@@ -167,6 +177,22 @@ public class UserEntity implements Serializable {
 
     public void setProfile(ProfileEntity profile) {
         this.profile = profile;
+    }
+
+    public UserEntity getManager() {
+        return manager;
+    }
+
+    public void setManager(UserEntity manager) {
+        this.manager = manager;
+    }
+
+    public List<UserEntity> getSubordinates() {
+        return subordinates;
+    }
+
+    public void setSubordinates(List<UserEntity> subordinates) {
+        this.subordinates = subordinates;
     }
 
     public List<EvaluationEntity> getEvaluationsReceived() {
