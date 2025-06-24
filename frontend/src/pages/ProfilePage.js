@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import PageLayout from "../components/PageLayout";
 import AppButton from "../components/AppButton";
 import profilePlaceholder from "../images/profile_icon.png";
@@ -14,49 +14,67 @@ export default function ProfilePage() {
   const { formatMessage } = useIntl();
 
   // 1. Controlar os campos do formulário
-  const [firstName, setFirstName] = useState(user?.firstName || "");
-  const [lastName, setLastName] = useState(user?.lastName || "");
-  const [address, setAddress] = useState(user?.address || "");
-  const [phone, setPhone] = useState(user?.phone || "");
-  const [birthDate, setBirthDate] = useState(user?.birthDate ? user.birthDate.slice(0,10) : "");
-  const [usualWorkplace, setUsualWorkplace] = useState(user?.usualWorkplace || "");
-  const [bio, setBio] = useState(user?.bio || "");
+const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [usualWorkplace, setUsualWorkplace] = useState("");
+  const [bio, setBio] = useState("");
 
-  // Atualizar campos caso userStore mude (ex: depois de login)
+  // Função reutilizável para buscar perfil (useCallback evita warnings no React)
+  const fetchProfile = useCallback(async () => {
+    if (!user?.email) return;
+    try {
+      const sessionToken = sessionStorage.getItem("authToken");
+      const profile = await profileAPI.getProfile(user.email, sessionToken);
+
+      setFirstName(profile.firstName || "");
+      setLastName(profile.lastName || "");
+      setAddress(profile.address || "");
+      setPhone(profile.phone || "");
+      setBirthDate(profile.birthDate ? profile.birthDate.slice(0, 10) : "");
+      setUsualWorkplace(profile.usualWorkplace || "");
+      setBio(profile.bio || "");
+    } catch (err) {
+      toast.error(
+        formatMessage({
+          id: "profile.fetch.error",
+          defaultMessage: "Erro ao carregar dados do perfil!",
+        })
+      );
+    }
+  }, [user?.email, formatMessage]);
+
+  // Chama fetchProfile ao montar e quando o email muda
   useEffect(() => {
-    setFirstName(user?.firstName || "");
-    setLastName(user?.lastName || "");
-    setAddress(user?.address || "");
-    setPhone(user?.phone || "");
-    setBirthDate(user?.birthDate ? user.birthDate.slice(0,10) : "");
-    setUsualWorkplace(user?.usualWorkplace || "");
-    setBio(user?.bio || "");
-  }, [user]);
+    fetchProfile();
+  }, [fetchProfile]);
 
-  // Mostra toast se o perfil estiver incompleto (avisa o utilizador)
-useEffect(() => {
-  if (profileComplete === false) {
-    const missingLabels = (missingFields || [])
-      .map((field) =>
-        fieldLabelKeys[field]
-          ? formatMessage({ id: fieldLabelKeys[field] })
-          : field // fallback se faltar tradução
-      )
-      .join(", ");
+  // Toast do perfil incompleto (igual ao teu)
+  useEffect(() => {
+    if (profileComplete === false) {
+      const missingLabels = (missingFields || [])
+        .map((field) =>
+          fieldLabelKeys[field]
+            ? formatMessage({ id: fieldLabelKeys[field] })
+            : field // fallback se faltar tradução
+        )
+        .join(", ");
 
-    toast.info(
-      formatMessage(
-        {
-          id: "profile.incomplete.fields",
-          defaultMessage: "Por favor, preencha todos os dados obrigatórios do perfil: {fields}",
-        },
-        { fields: missingLabels }
-      )
-    );
-  }
-}, [profileComplete, missingFields, formatMessage]);
+      toast.info(
+        formatMessage(
+          {
+            id: "profile.incomplete.fields",
+            defaultMessage: "Por favor, preencha todos os dados obrigatórios do perfil: {fields}",
+          },
+          { fields: missingLabels }
+        )
+      );
+    }
+  }, [profileComplete, missingFields, formatMessage]);
 
-  // 2. Handler de submit
+  // Handler de submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     const sessionToken = sessionStorage.getItem("authToken");
@@ -68,15 +86,25 @@ useEffect(() => {
       birthDate: birthDate ? `${birthDate}T00:00:00` : null,
       usualWorkplace,
       bio,
-      // Se quiseres atualizar foto agora, adiciona o campo aqui.
     };
 
     try {
       await profileAPI.updateProfile(user.email, profileData, sessionToken);
-      toast.success(formatMessage({ id: "profile.update.success", defaultMessage: "Perfil atualizado com sucesso!" }));
-      // Opcional: atualiza o userStore se o backend devolver o novo perfil.
+      toast.success(
+        formatMessage({
+          id: "profile.update.success",
+          defaultMessage: "Perfil atualizado com sucesso!",
+        })
+      );
+      // Refresca os dados do perfil após update
+      fetchProfile();
     } catch (err) {
-      toast.error(formatMessage({ id: "profile.update.error", defaultMessage: "Erro ao atualizar perfil!" }));
+      toast.error(
+        formatMessage({
+          id: "profile.update.error",
+          defaultMessage: "Erro ao atualizar perfil!",
+        })
+      );
     }
   };
 
