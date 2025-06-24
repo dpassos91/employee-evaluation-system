@@ -5,14 +5,14 @@ import aor.projetofinal.entity.UserEntity;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @XmlRootElement
 public class ProfileDto {
     private UserEntity user;
     private String firstName;
     private String lastName;
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
     private String address;
     private String phone;
     private String photograph;
@@ -50,11 +50,11 @@ public class ProfileDto {
         this.lastName = lastName;
     }
     @XmlElement
-    public LocalDateTime getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(LocalDateTime birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
     @XmlElement

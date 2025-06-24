@@ -24,16 +24,18 @@ const [firstName, setFirstName] = useState("");
 
   // Função reutilizável para buscar perfil (useCallback evita warnings no React)
   const fetchProfile = useCallback(async () => {
+    
     if (!user?.email) return;
     try {
       const sessionToken = sessionStorage.getItem("authToken");
       const profile = await profileAPI.getProfile(user.email, sessionToken);
+      console.log("PROFILE JSON:", profile);
 
       setFirstName(profile.firstName || "");
       setLastName(profile.lastName || "");
       setAddress(profile.address || "");
       setPhone(profile.phone || "");
-      setBirthDate(profile.birthDate ? profile.birthDate.slice(0, 10) : "");
+      setBirthDate(profile.birthDate || "");
       setUsualWorkplace(profile.usualWorkplace || "");
       setBio(profile.bio || "");
     } catch (err) {
@@ -89,7 +91,9 @@ const [firstName, setFirstName] = useState("");
     };
 
     try {
+      console.log(profileData)
       await profileAPI.updateProfile(user.email, profileData, sessionToken);
+      
       toast.success(
         formatMessage({
           id: "profile.update.success",
@@ -98,6 +102,7 @@ const [firstName, setFirstName] = useState("");
       );
       // Refresca os dados do perfil após update
       fetchProfile();
+      console.log(profileData)
     } catch (err) {
       toast.error(
         formatMessage({
@@ -199,13 +204,13 @@ const [firstName, setFirstName] = useState("");
                   className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
                 >
                   <option value=""> </option>
-                  <option value="Boston">Boston</option>
-                  <option value="Coimbra">Coimbra</option>
-                  <option value="Lisboa">Lisboa</option>
-                  <option value="Munich">Munich</option>
-                  <option value="Porto">Porto</option>
-                  <option value="Southampton">Southampton</option>
-                  <option value="Viseu">Viseu</option>
+                  <option value="BOSTON">Boston</option>
+                  <option value="COIMBRA">Coimbra</option>
+                  <option value="LISBOA">Lisboa</option>
+                  <option value="MUNICH">Munich</option>
+                  <option value="PORTO">Porto</option>
+                  <option value="SOUTHAMPTON">Southampton</option>
+                  <option value="VISEU">Viseu</option>
                 </select>
               </div>
             </div>

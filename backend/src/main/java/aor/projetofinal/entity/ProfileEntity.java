@@ -2,7 +2,7 @@ package aor.projetofinal.entity;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,7 +35,7 @@ public class ProfileEntity implements Serializable  {
 
 
     @Column(name = "birth_date")
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "address")
     private String address;
@@ -94,10 +94,10 @@ public class ProfileEntity implements Serializable  {
         this.normalizedLastName = normalizedLastName;
     }
 
-    public LocalDateTime getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
-    public void setBirthDate(LocalDateTime birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 

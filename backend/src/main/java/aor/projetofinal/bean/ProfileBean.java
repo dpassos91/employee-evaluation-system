@@ -47,6 +47,9 @@ public class ProfileBean implements Serializable {
 
     public boolean updateProfile(ProfileDto profileDto, String email) {
 
+        logger.info("birthDate recebido no DTO: {}", profileDto.getBirthDate());
+        logger.info("usualWorkplace recebido no DTO: {}", profileDto.getUsualWorkplace());
+
         UserEntity user = userDao.findByEmail(email);
 
         if (user == null) {
@@ -94,6 +97,8 @@ public class ProfileBean implements Serializable {
         }
 
         profileDao.save(profileToUpdate);
+        logger.info("birthDate depois de guardar: {}", profileToUpdate.getBirthDate());
+        logger.info("usualWorkplace depois de guardar: {}", profileToUpdate.getUsualWorkplace());
 
         logger.info("User: {} | IP: {} | Email: {} - Successfully updated profile for user.",
                 RequestContext.getAuthor(), RequestContext.getIp(), email);
