@@ -15,6 +15,7 @@ import aor.projetofinal.entity.enums.UsualWorkPlaceType;
 
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dao.ProfileDao;
+import aor.projetofinal.Util.PasswordUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,14 +27,17 @@ public class ProfileBean implements Serializable {
     private static final Logger logger = LogManager.getLogger(ProfileBean.class);
 
     @Inject
+    JavaConversionUtil javaConversionUtil;
+
+
+    @Inject
     private UserDao userDao;
 
     @Inject
     private ProfileDao profileDao;
 
 
-    @Inject
-    JavaConversionUtil javaConversionUtil;
+
 
     public ArrayList<ProfileDto> findProfilesWithFilters(String employeeName, UsualWorkPlaceType workplace, String managerEmail){
 
@@ -101,6 +105,28 @@ public class ProfileBean implements Serializable {
 
     return true;
 }
+
+    public boolean resetPasswordOnProfile(UserEntity currentProfile, String newPassword){
+
+        if(currentProfile == null){
+            return false;
+        }
+
+        // Hash da nova password
+        String hashedPassword = PasswordUtil.hashPassword(newPassword);
+        currentProfile.setPassword(hashedPassword);  // Armazenar a password com hash
+
+        userDao.save(currentProfile);  // Guardar as alterações na base de dados
+        return true;
+    }
+
+
+
+
+
+
+
+
 
 public ProfileDto convertToDto(ProfileEntity entity) {
     if (entity == null) return null;

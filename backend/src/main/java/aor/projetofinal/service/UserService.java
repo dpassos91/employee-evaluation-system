@@ -365,34 +365,7 @@ public Response logoutUser(@HeaderParam("Authorization") String authorization) {
     }
 
 
-    /*//update password de user
-    @PATCH
-    @Path("/update/{email}/password")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUserPassword(@HeaderParam("sessionToken") String sessionToken, @PathParam("email") String email,
-                               UserDto passwordAtualizado) {
 
-        // Valida e renova a sessão
-        SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
-
-        if (sessionStatusDto == null) {
-            logger.warn("Sessão inválida ou expirada - update user");
-            return Response.status(401)
-                    .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-
-        UserDto sessionUserDto = userBean.findUserBySessionToken(sessionToken);
-
-
-
-
-
-    }
-*/
 
 
 

@@ -351,6 +351,11 @@ public class UserBean implements Serializable {
         return new UserDto(user);
     }
 
+
+
+
+
+
     public boolean resetPasswordWithToken(String forgottenPassToken, String newPassword) {
         // Verificar se o token é válido
         UserEntity user = userDao.findUserByRecoveryToken(forgottenPassToken);

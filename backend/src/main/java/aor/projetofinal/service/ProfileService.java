@@ -6,6 +6,7 @@ import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.ProfileDto;
+import aor.projetofinal.dto.ResetPasswordDto;
 import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
@@ -43,70 +44,68 @@ public class ProfileService {
     private SessionTokenDao sessionTokenDao;
 
     @Inject
-    private ProfileBean profileBean;    
-
-
+    private ProfileBean profileBean;
 
 
     // Consultar perfil de utilizador por email
     @GET
-@Path("/{email}")
-@Produces(MediaType.APPLICATION_JSON)
-public Response getProfile(@PathParam("email") String email, @HeaderParam("sessionToken") String sessionToken) {
-    // Valida sessão
-    SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
-    if (sessionStatusDto == null) {
-        logger.warn("User: {} | IP: {} - Sessão inválida ou expirada ao tentar consultar perfil de '{}'.",
+    @Path("/{email}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProfile(@PathParam("email") String email, @HeaderParam("sessionToken") String sessionToken) {
+        // Valida sessão
+        SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
+        if (sessionStatusDto == null) {
+            logger.warn("User: {} | IP: {} - Sessão inválida ou expirada ao tentar consultar perfil de '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), email);
+            return Response.status(401)
+                    .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // Apenas o próprio ou admin podem ver o perfil
+        SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
+        UserEntity currentUser = sessionTokenEntity.getUser();
+        UserEntity profileOwner = userDao.findByEmail(email);
+
+        if (profileOwner == null) {
+            logger.warn("User: {} | IP: {} - Tentativa de consulta a perfil de utilizador inexistente: '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), email);
+            return Response.status(404)
+                    .entity("{\"message\": \"Utilizador não encontrado.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        if (!(currentUser.getRole().getName().equalsIgnoreCase("admin") ||
+                currentUser.getEmail().equalsIgnoreCase(profileOwner.getEmail()))) {
+            logger.warn("User: {} | IP: {} - Não autorizado a consultar o perfil de '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), email);
+            return Response.status(403)
+                    .entity("{\"message\": \"Não autorizado a consultar este perfil.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // Obter o ProfileEntity associado
+        var profileEntity = profileOwner.getProfile();
+        if (profileEntity == null) {
+            logger.warn("User: {} | IP: {} - Perfil não encontrado para utilizador '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), email);
+            return Response.status(404)
+                    .entity("{\"message\": \"Perfil não encontrado para este utilizador.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // Converter para DTO (podes já ter um método utilitário para isto)
+        ProfileDto profileDto = profileBean.convertToDto(profileEntity);
+
+        logger.info("User: {} | IP: {} - Perfil de '{}' consultado com sucesso.",
                 RequestContext.getAuthor(), RequestContext.getIp(), email);
-        return Response.status(401)
-                .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
-                .type(MediaType.APPLICATION_JSON)
-                .build();
+
+        return Response.ok(profileDto).build();
     }
-
-    // Apenas o próprio ou admin podem ver o perfil
-    SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
-    UserEntity currentUser = sessionTokenEntity.getUser();
-    UserEntity profileOwner = userDao.findByEmail(email);
-
-    if (profileOwner == null) {
-        logger.warn("User: {} | IP: {} - Tentativa de consulta a perfil de utilizador inexistente: '{}'.",
-                RequestContext.getAuthor(), RequestContext.getIp(), email);
-        return Response.status(404)
-                .entity("{\"message\": \"Utilizador não encontrado.\"}")
-                .type(MediaType.APPLICATION_JSON)
-                .build();
-    }
-
-    if (!(currentUser.getRole().getName().equalsIgnoreCase("admin") ||
-            currentUser.getEmail().equalsIgnoreCase(profileOwner.getEmail()))) {
-        logger.warn("User: {} | IP: {} - Não autorizado a consultar o perfil de '{}'.",
-                RequestContext.getAuthor(), RequestContext.getIp(), email);
-        return Response.status(403)
-                .entity("{\"message\": \"Não autorizado a consultar este perfil.\"}")
-                .type(MediaType.APPLICATION_JSON)
-                .build();
-    }
-
-    // Obter o ProfileEntity associado
-    var profileEntity = profileOwner.getProfile();
-    if (profileEntity == null) {
-        logger.warn("User: {} | IP: {} - Perfil não encontrado para utilizador '{}'.",
-                RequestContext.getAuthor(), RequestContext.getIp(), email);
-        return Response.status(404)
-                .entity("{\"message\": \"Perfil não encontrado para este utilizador.\"}")
-                .type(MediaType.APPLICATION_JSON)
-                .build();
-    }
-
-    // Converter para DTO (podes já ter um método utilitário para isto)
-    ProfileDto profileDto = profileBean.convertToDto(profileEntity);
-
-    logger.info("User: {} | IP: {} - Perfil de '{}' consultado com sucesso.",
-            RequestContext.getAuthor(), RequestContext.getIp(), email);
-
-    return Response.ok(profileDto).build();
-}
 
 
     // Get usual workplace options
@@ -118,8 +117,8 @@ public Response getProfile(@PathParam("email") String email, @HeaderParam("sessi
                 RequestContext.getAuthor(), RequestContext.getIp());
 
         List<String> options = Arrays.stream(UsualWorkPlaceType.values())
-            .map(Enum::name)
-            .collect(Collectors.toList());
+                .map(Enum::name)
+                .collect(Collectors.toList());
 
         logger.info("User: {} | IP: {} - Fetched {} usual workplace options: {}",
                 RequestContext.getAuthor(), RequestContext.getIp(), options.size(), options);
@@ -136,8 +135,7 @@ public Response getProfile(@PathParam("email") String email, @HeaderParam("sessi
             @QueryParam("profile-name") String profileName,
             @QueryParam("usual-work-place") UsualWorkPlaceType usualLocation,
             @QueryParam("manager-email") String managerEmail
-    )
-    {
+    ) {
         // Valida e renova a sessão
         SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
 
@@ -172,15 +170,13 @@ public Response getProfile(@PathParam("email") String email, @HeaderParam("sessi
     }
 
 
-
-
     //update perfil de user
     @PUT
     @Path("/update/{email}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateProfile(@HeaderParam("sessionToken") String sessionToken, @PathParam("email") String email,
-                               ProfileDto profileToUpdate) {
+                                  ProfileDto profileToUpdate) {
 
 
         // Valida e renova a sessão
@@ -200,7 +196,7 @@ public Response getProfile(@PathParam("email") String email, @HeaderParam("sessi
         UserEntity currentProfile = userDao.findByEmail(email);
 
         // Autorização: apenas o próprio ou admin pode atualizar
-        if(!(currentUserLoggedIn.getRole().getName()).equalsIgnoreCase("admin") && (!(currentUserLoggedIn.getEmail().equalsIgnoreCase(currentProfile.getEmail())))) {
+        if (!(currentUserLoggedIn.getRole().getName()).equalsIgnoreCase("admin") && (!(currentUserLoggedIn.getEmail().equalsIgnoreCase(currentProfile.getEmail())))) {
             logger.warn("update user - não autorizado");
             return Response.status(403)
                     .entity("{\"message\": \"Não autorizado a atualizar este utilizador.\"}")
@@ -244,4 +240,68 @@ public Response getProfile(@PathParam("email") String email, @HeaderParam("sessi
 
 
     }
+
+    //update password de user
+    @PATCH
+    @Path("/update/{email}/password")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUserPassword(@HeaderParam("sessionToken") String sessionToken, @PathParam("email") String email,
+                                       ResetPasswordDto passwordAtualizado) {
+
+        // Valida e renova a sessão
+        SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
+
+        if (sessionStatusDto == null) {
+            logger.warn("Sessão inválida ou expirada - update user");
+            return Response.status(401)
+                    .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+        SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
+
+        UserEntity currentUserLoggedIn = sessionTokenEntity.getUser();
+        UserEntity currentProfile = userDao.findByEmail(email);
+
+        // Autorização: apenas o próprio pode atualizar a password
+        if (!(currentUserLoggedIn.getEmail()).equals(currentProfile.getEmail())) {
+            logger.warn("update user - não autorizado");
+            return Response.status(403)
+                    .entity("{\"message\": \"You are not authorized to updated this user.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+        String newPassword = passwordAtualizado.getPassword();
+
+        if (newPassword.length() <= 5) {
+            logger.warn("Password com comprimento insuficiente");
+            return Response.status(400)
+                    .entity("{\"message\": \"Passowrd's length must be over 5 characters.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        boolean success = profileBean.resetPasswordOnProfile(currentProfile, newPassword);
+
+
+        if (!success) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"message\": \"Error while redifining password. Please, try agaian.\", \"error\": true}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        return Response.ok()
+                .entity("{\"message\": \"Password successfully updated!\", \"error\": false}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+
+    }
+
+
 }
