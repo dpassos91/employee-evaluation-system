@@ -1,7 +1,7 @@
 package aor.projetofinal.bean;
 
-import aor.projetofinal.Util.JavaConversionUtil;
-import aor.projetofinal.Util.StringUtils;
+import aor.projetofinal.util.JavaConversionUtil;
+import aor.projetofinal.util.StringUtils;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.ProfileDao;
 import aor.projetofinal.dao.RoleDao;

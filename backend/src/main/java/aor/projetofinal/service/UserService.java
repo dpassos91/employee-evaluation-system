@@ -1,25 +1,25 @@
 package aor.projetofinal.service;
 
-import aor.projetofinal.Util.EmailUtil;
-import aor.projetofinal.Util.ProfileValidator;
+import aor.projetofinal.util.EmailUtil;
+import aor.projetofinal.util.ProfileValidator;
 import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.LoginUserDto;
 import aor.projetofinal.dto.LoginResponseDto;
-import aor.projetofinal.dto.ProfileDto;
+
 import aor.projetofinal.dto.ResetPasswordDto;
 import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.entity.ProfileEntity;
-import aor.projetofinal.entity.SessionTokenEntity;
+
 import aor.projetofinal.entity.UserEntity;
 import java.util.List;
 import jakarta.inject.Inject;
-import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
+
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;

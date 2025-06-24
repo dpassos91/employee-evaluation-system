@@ -11,6 +11,8 @@ import { fieldLabelKeys } from "../utils/fieldLabels"; // Importa os rótulos do
 
 export default function ProfilePage() {
   const { user, profileComplete, missingFields } = userStore();
+  const setProfileComplete = userStore((state) => state.setProfileComplete);
+  const setMissingFields = userStore((state) => state.setMissingFields);
   const { formatMessage } = useIntl();
 
   // 1. Controlar os campos do formulário
@@ -38,6 +40,10 @@ const [firstName, setFirstName] = useState("");
       setBirthDate(profile.birthDate || "");
       setUsualWorkplace(profile.usualWorkplace || "");
       setBio(profile.bio || "");
+
+    setProfileComplete(profile.profileComplete);
+    setMissingFields(profile.missingFields);
+
     } catch (err) {
       toast.error(
         formatMessage({
@@ -51,7 +57,7 @@ const [firstName, setFirstName] = useState("");
   // Chama fetchProfile ao montar e quando o email muda
   useEffect(() => {
     fetchProfile();
-  }, [fetchProfile]);
+  }, [user?.email]);
 
   // Toast do perfil incompleto (igual ao teu)
   useEffect(() => {
@@ -85,7 +91,7 @@ const [firstName, setFirstName] = useState("");
       lastName,
       address,
       phone,
-      birthDate: birthDate ? `${birthDate}T00:00:00` : null,
+      birthDate: birthDate || null,
       usualWorkplace,
       bio,
     };

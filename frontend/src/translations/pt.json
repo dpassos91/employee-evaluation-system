@@ -60,6 +60,7 @@
   "profile.changePassword": "Alterar password",
   "profile.save": "Guardar",
   "profile.incomplete.fields": "Por favor, preencha todos os campos obrigatórios : {fields}.",
+  "profile.update.success": "Perfil atualizado com sucesso!",
 
     "users.list.title": "Listagem de Utilizadores",
   "users.filter.name": "Nome",
