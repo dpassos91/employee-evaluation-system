@@ -5,6 +5,7 @@ import aor.projetofinal.bean.ProfileBean;
 import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
+import aor.projetofinal.dto.PhotographDto;
 import aor.projetofinal.dto.ProfileDto;
 import aor.projetofinal.dto.ResetPasswordDto;
 import aor.projetofinal.dto.SessionStatusDto;
@@ -268,7 +269,7 @@ public class ProfileService {
 
         // Autorização: apenas o próprio pode atualizar a password
         if (!(currentUserLoggedIn.getEmail()).equals(currentProfile.getEmail())) {
-            logger.warn("update user - não autorizado");
+            logger.warn("update user - not authorized");
             return Response.status(403)
                     .entity("{\"message\": \"You are not authorized to updated this user.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -302,6 +303,73 @@ public class ProfileService {
                 .build();
 
     }
+
+    //update user's photograph
+    @PATCH
+    @Path("/update/{email}/password")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUserPhotograph(@HeaderParam("sessionToken") String sessionToken, @PathParam("email") String email,
+                                         PhotographDto photographUpdated) {
+
+        // Valida e renova a sessão
+        SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
+
+        if (sessionStatusDto == null) {
+            logger.warn("Sessão inválida ou expirada - update user");
+            return Response.status(401)
+                    .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+        SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
+
+        UserEntity currentUserLoggedIn = sessionTokenEntity.getUser();
+        UserEntity currentProfile = userDao.findByEmail(email);
+
+        // Autorização: apenas o próprio ou admin pode atualizar
+        if (!(currentUserLoggedIn.getRole().getName()).equalsIgnoreCase("admin") && (!(currentUserLoggedIn.getEmail().equalsIgnoreCase(currentProfile.getEmail())))) {
+            logger.warn("update user - not authorized");
+            return Response.status(403)
+                    .entity("{\"message\": \"You are not authorized to updated this user.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+        String photo = photographUpdated.getPhotograph();
+        if (photo != null && photo.length() > 250) {
+            logger.warn("Invalid info");
+            return Response.status(400)
+                    .entity("{\"message\": \"Please, paste a link to a photograph whose length is under 250 characters.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        boolean success = profileBean.changePhotographOnProfile(currentProfile, photo);
+
+
+        if (!success) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"message\": \"Error while redifining profile's photograph. Please, try agaian.\", \"error\": true}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        return Response.ok()
+                .entity("{\"message\": \"Profile's photograph successfully updated!\", \"error\": false}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+
+    }
+
+
+
+
+
+
 
 
 }
