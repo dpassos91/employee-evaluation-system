@@ -1,9 +1,9 @@
 export const fieldLabelKeys = {
   firstName: "profile.name",
   lastName: "profile.surname",
-  birthDate: "profile.birthdate",     
+  usualWorkplace: "profile.workplace",    
   address: "profile.address",
-  zipCode: "profile.zipcode",
+  birthDate: "profile.birthdate", 
   phone: "profile.phone",
-  usualWorkplace: "profile.workplace",
+  
 };

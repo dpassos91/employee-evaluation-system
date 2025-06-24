@@ -84,8 +84,31 @@ public class ProfileBean implements Serializable {
     return true;
 }
 
+public ProfileDto convertToDto(ProfileEntity entity) {
+    if (entity == null) return null;
 
+    ProfileDto dto = new ProfileDto();
+    dto.setFirstName(entity.getFirstName());
+    dto.setLastName(entity.getLastName());
+    dto.setAddress(entity.getAddress());
+    dto.setPhone(entity.getPhone());
+    dto.setPhotograph(entity.getPhotograph());
+    dto.setBio(entity.getBio());
 
+    // birthDate pode ser null
+    if (entity.getBirthDate() != null) {
+        dto.setBirthDate(entity.getBirthDate()); // YYYY-MM-DD
+    } else {
+        dto.setBirthDate(null);
+    }
 
+    if (entity.getUsualWorkplace() != null) {
+        dto.setUsualWorkplace(entity.getUsualWorkplace().name()); // devolve em maiúsculas
+    } else {
+        dto.setUsualWorkplace(null);
+    }
+
+    return dto;
+}
 
 }

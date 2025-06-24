@@ -70,6 +70,68 @@ public class ProfileService {
 
     }*/
 
+
+    // Consultar perfil de utilizador por email
+    @GET
+@Path("/{email}")
+@Produces(MediaType.APPLICATION_JSON)
+public Response getProfile(@PathParam("email") String email, @HeaderParam("sessionToken") String sessionToken) {
+    // Valida sessão
+    SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
+    if (sessionStatusDto == null) {
+        logger.warn("User: {} | IP: {} - Sessão inválida ou expirada ao tentar consultar perfil de '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return Response.status(401)
+                .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    // Apenas o próprio ou admin podem ver o perfil
+    SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
+    UserEntity currentUser = sessionTokenEntity.getUser();
+    UserEntity profileOwner = userDao.findByEmail(email);
+
+    if (profileOwner == null) {
+        logger.warn("User: {} | IP: {} - Tentativa de consulta a perfil de utilizador inexistente: '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return Response.status(404)
+                .entity("{\"message\": \"Utilizador não encontrado.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    if (!(currentUser.getRole().getName().equalsIgnoreCase("admin") ||
+            currentUser.getEmail().equalsIgnoreCase(profileOwner.getEmail()))) {
+        logger.warn("User: {} | IP: {} - Não autorizado a consultar o perfil de '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return Response.status(403)
+                .entity("{\"message\": \"Não autorizado a consultar este perfil.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    // Obter o ProfileEntity associado
+    var profileEntity = profileOwner.getProfile();
+    if (profileEntity == null) {
+        logger.warn("User: {} | IP: {} - Perfil não encontrado para utilizador '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return Response.status(404)
+                .entity("{\"message\": \"Perfil não encontrado para este utilizador.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    // Converter para DTO (podes já ter um método utilitário para isto)
+    ProfileDto profileDto = profileBean.convertToDto(profileEntity);
+
+    logger.info("User: {} | IP: {} - Perfil de '{}' consultado com sucesso.",
+            RequestContext.getAuthor(), RequestContext.getIp(), email);
+
+    return Response.ok(profileDto).build();
+}
+
+
     // Get usual workplace options
     @GET
     @Path("/usualworkplaces")
