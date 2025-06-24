@@ -7,9 +7,10 @@
  * 
  * Usage:
  * import { profileAPI } from './profileAPI';
- * await profileAPI.updateProfile(email, profileData, sessionToken);
- * await profileAPI.listUsersByFilters({ filters }, sessionToken);
+ * await profileAPI.getProfile(email, sessionToken);
  * await profileAPI.getUsualWorkplaces();
+ * await profileAPI.listUsersByFilters({ filters }, sessionToken);
+ * await profileAPI.updateProfile(email, profileData, sessionToken);
  */
 
 import { apiConfig } from './apiConfig.js';
@@ -17,20 +18,26 @@ import { apiConfig } from './apiConfig.js';
 const { apiCall, API_ENDPOINTS } = apiConfig;
 
 /**
- * Updates the profile for a given user email.
- * @param {string} email - The user's email.
- * @param {Object} profileData - The profile data to update.
- * @param {string} sessionToken - The session token (for authorization).
- * @returns {Promise<Object>} The API response.
+ * Fetches the profile of a user by email.
+ * @param {string} email - The user's email address.
+ * @param {string} sessionToken - The session token for authorization.
+ * @returns {Promise<Object>} The user's profile DTO from the backend.
  */
-const updateProfile = async (email, profileData, sessionToken) => {
-  return apiCall(API_ENDPOINTS.profiles.update(email), {
-    method: 'PUT',
-    headers: {
-      "Content-Type": "application/json",
-      sessionToken: sessionToken
-    },
-    body: JSON.stringify(profileData),
+const getProfile = async (email, sessionToken) => {
+  return apiCall(API_ENDPOINTS.profiles.get(email), {
+    method: 'GET',
+    headers: { sessionToken },
+  });
+};
+
+
+/**
+ * Gets the list of possible usual workplaces (enum values).
+ * @returns {Promise<Array<string>>} List of usual workplace options.
+ */
+const getUsualWorkplaces = async () => {
+  return apiCall(API_ENDPOINTS.profiles.usualWorkplaces, {
+    method: 'GET',
   });
 };
 
@@ -55,17 +62,26 @@ const listUsersByFilters = async (filters, sessionToken) => {
 };
 
 /**
- * Gets the list of possible usual workplaces (enum values).
- * @returns {Promise<Array<string>>} List of usual workplace options.
+ * Updates the profile for a given user email.
+ * @param {string} email - The user's email.
+ * @param {Object} profileData - The profile data to update.
+ * @param {string} sessionToken - The session token (for authorization).
+ * @returns {Promise<Object>} The API response.
  */
-const getUsualWorkplaces = async () => {
-  return apiCall(API_ENDPOINTS.profiles.usualWorkplaces, {
-    method: 'GET',
+const updateProfile = async (email, profileData, sessionToken) => {
+  return apiCall(API_ENDPOINTS.profiles.update(email), {
+    method: 'PUT',
+    headers: {
+      "Content-Type": "application/json",
+      sessionToken: sessionToken
+    },
+    body: JSON.stringify(profileData),
   });
 };
 
 export const profileAPI = {
-  updateProfile,
-  listUsersByFilters,
+  getProfile,
   getUsualWorkplaces,
+  listUsersByFilters,
+  updateProfile,
 };

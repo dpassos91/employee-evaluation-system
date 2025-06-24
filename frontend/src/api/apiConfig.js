@@ -53,12 +53,15 @@ const API_ENDPOINTS = {
     // e.g.: send: `${API_BASE_URL}/messages/send`,
   },
 
+
 /** Profile endpoints */
 profiles: {
-  /** @function Update user profile by email */
-  update: (email) => `${API_BASE_URL}/profiles/update/${encodeURIComponent(email)}`,
+  /** @function Get user profile by email */
+  get: (email) => `${API_BASE_URL}/profiles/${encodeURIComponent(email)}`,
   /** @function List users by filters */
   listUsersByFilters: `${API_BASE_URL}/profiles/list-users-by-filters`,
+    /** @function Update user profile by email */
+  update: (email) => `${API_BASE_URL}/profiles/update/${encodeURIComponent(email)}`,
   /** @type {string} Get list of possible usual workplaces */
   usualWorkplaces: `${API_BASE_URL}/profiles/usualworkplaces`,
 },
