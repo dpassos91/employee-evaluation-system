@@ -1,6 +1,6 @@
 package aor.projetofinal.bean;
 
-import aor.projetofinal.Util.JavaConversionUtil;
+import aor.projetofinal.util.JavaConversionUtil;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
@@ -12,10 +12,10 @@ import aor.projetofinal.dto.ProfileDto;
 import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.UsualWorkPlaceType;
-
+import aor.projetofinal.util.ProfileValidator;
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dao.ProfileDao;
-import aor.projetofinal.Util.PasswordUtil;
+import aor.projetofinal.util.PasswordUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -143,6 +143,8 @@ public class ProfileBean implements Serializable {
         dto.setPhone(entity.getPhone());
         dto.setPhotograph(entity.getPhotograph());
         dto.setBio(entity.getBio());
+        dto.setProfileComplete(ProfileValidator.isProfileComplete(entity));
+        dto.setMissingFields(ProfileValidator.getMissingFields(entity));
 
         // birthDate pode ser null
         if (entity.getBirthDate() != null) {

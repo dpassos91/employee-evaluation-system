@@ -1,7 +1,7 @@
 package aor.projetofinal.dao;
 
 
-import aor.projetofinal.Util.StringUtils;
+import aor.projetofinal.util.StringUtils;
 import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.enums.UsualWorkPlaceType;
 import jakarta.enterprise.context.ApplicationScoped;

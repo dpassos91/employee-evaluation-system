@@ -2,28 +2,31 @@ package aor.projetofinal.dto;
 
 
 import aor.projetofinal.entity.UserEntity;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 
-@XmlRootElement
+
 public class ProfileDto {
     private UserEntity user;
     private String firstName;
     private String lastName;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd") // Ensures the date is formatted correctly when serialized
     private LocalDate birthDate;
+    
     private String address;
     private String phone;
     private String photograph;
     private String bio;
     private String usualWorkplace;
+    private boolean profileComplete;
+    private List<String> missingFields;
 
     public ProfileDto() {
     }
 
 
-    @XmlElement
     public UserEntity getUser() {
         return user;
     }
@@ -33,7 +36,7 @@ public class ProfileDto {
         this.user = user;
     }
 
-    @XmlElement
+    
     public String getFirstName() {
         return firstName;
     }
@@ -41,7 +44,7 @@ public class ProfileDto {
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
-    @XmlElement
+    
     public String getLastName() {
         return lastName;
     }
@@ -49,7 +52,7 @@ public class ProfileDto {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-    @XmlElement
+   
     public LocalDate getBirthDate() {
         return birthDate;
     }
@@ -57,7 +60,7 @@ public class ProfileDto {
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
-    @XmlElement
+  
     public String getAddress() {
         return address;
     }
@@ -66,7 +69,7 @@ public class ProfileDto {
         this.address = address;
     }
 
-    @XmlElement
+    
     public String getPhone() {
         return phone;
     }
@@ -74,7 +77,7 @@ public class ProfileDto {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    @XmlElement
+    
     public String getPhotograph() {
         return photograph;
     }
@@ -82,7 +85,7 @@ public class ProfileDto {
     public void setPhotograph(String photograph) {
         this.photograph = photograph;
     }
-    @XmlElement
+    
     public String getBio() {
         return bio;
     }
@@ -90,7 +93,7 @@ public class ProfileDto {
     public void setBio(String bio) {
         this.bio = bio;
     }
-    @XmlElement
+    
     public String getUsualWorkplace() {
         return usualWorkplace;
     }
@@ -98,4 +101,9 @@ public class ProfileDto {
     public void setUsualWorkplace(String usualWorkplace) {
         this.usualWorkplace = usualWorkplace;
     }
+
+    public boolean isProfileComplete() { return profileComplete; }
+public void setProfileComplete(boolean profileComplete) { this.profileComplete = profileComplete; }
+public List<String> getMissingFields() { return missingFields; }
+public void setMissingFields(List<String> missingFields) { this.missingFields = missingFields; }
 }

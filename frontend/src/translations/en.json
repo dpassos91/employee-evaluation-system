@@ -59,6 +59,7 @@
   "profile.changePassword": "Change Password",
   "profile.save": "Save",
   "profile.incomplete.fields": "Please fill in all required fields: {fields}.",
+  "profile.update.success": "Profile updated successfully!",
 
     "users.list.title": "User List",
   "users.filter.name": "Name",

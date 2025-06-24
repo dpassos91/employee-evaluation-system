@@ -1,4 +1,4 @@
-package aor.projetofinal.Util;
+package aor.projetofinal.util;
 
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.service.ProfileService;
