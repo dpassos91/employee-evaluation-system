@@ -32,6 +32,10 @@ public class ProfileDao {
             StringBuilder jpql = new StringBuilder("SELECT p FROM ProfileEntity p WHERE 1=1");
 //StringBuilder acumula as cláusulas WHERE
 
+            // Apenas utilizadores com conta confirmada
+            jpql.append(" AND p.user.confirmed = true");
+
+
             String normalizedEmployeeName = null;
 
             if (employeeName != null && !employeeName.isBlank()) {
