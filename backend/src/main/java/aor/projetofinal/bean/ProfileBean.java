@@ -52,58 +52,13 @@ public boolean changePhotographOnProfile(UserEntity currentProfile, String photo
     // If the user entity is null, log warning and abort operation
     if (currentProfile == null) {
         logger.warn(
-            "User: {} | IP: {} | Email: {} - Attempted to update photograph for null user. Operation aborted.",
-            RequestContext.getAuthor(),
-            RequestContext.getIp(),
-            email
+                "User: {} | IP: {} | Email: {} - Attempted to update photograph for null user. Operation aborted.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                email
         );
         return false;
     }
-
-
-    public ArrayList<ProfileDto> findProfilesWithFilters(String employeeName, UsualWorkPlaceType workplace, String managerEmail) {
-
-        List<ProfileEntity> profilesDB = profileDao.findProfilesWithFilters(employeeName, workplace, managerEmail);
-
-        return javaConversionUtil.convertProfileEntityListtoProfileDtoList(new ArrayList<>(profilesDB));
-    }
-
-
-    public PaginatedProfilesDto findProfilesWithFiltersPaginated(String employeeName, UsualWorkPlaceType workplace, String managerEmail, int page) {
-
-        List<ProfileEntity> profilesDB = profileDao.findProfilesWithFiltersPaginated(employeeName, workplace, managerEmail, page);
-        //Contar o total de perfis correspondentes aos filtros
-        long totalCount = profileDao.countProfilesWithFilters(employeeName, workplace, managerEmail);
-
-        //Converter os resultados para DTO
-        List<ProfileDto> profileDtos = javaConversionUtil.convertProfileEntityListtoProfileDtoList(new ArrayList<>(profilesDB));
-
-        //Calcular número total de páginas
-        int pageSize = 10; // valor fixo por agora
-        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
-
-        // Construir o DTO de resposta com paginação
-        return new PaginatedProfilesDto(profileDtos, totalCount, totalPages, page);
-    }
-
-
-
-
-    public boolean resetPasswordOnProfile(UserEntity currentProfile, String newPassword) {
-
-        if (currentProfile == null) {
-            return false;
-        }
-
-        // Hash da nova password
-        String hashedPassword = PasswordUtil.hashPassword(newPassword);
-        currentProfile.setPassword(hashedPassword);  // Armazenar a password com hash
-
-        userDao.save(currentProfile);  // Guardar as alterações na base de dados
-        return true;
-    }
-
-
 
     // Update profile photograph and persist changes
     currentProfile.getProfile().setPhotograph(photographUpdated);
@@ -111,18 +66,147 @@ public boolean changePhotographOnProfile(UserEntity currentProfile, String photo
 
     // Log successful update
     logger.info(
-        "User: {} | IP: {} | Email: {} - Successfully updated profile photograph.",
-        RequestContext.getAuthor(),
-        RequestContext.getIp(),
-        email
+            "User: {} | IP: {} | Email: {} - Successfully updated profile photograph.",
+            RequestContext.getAuthor(),
+            RequestContext.getIp(),
+            email
     );
-
     return true;
 }
 
 
+    /**
+     * Finds user profiles based on optional filters: employee name, workplace, and manager email.
+     * Logs the search action including user, IP, and filter parameters for audit purposes.
+     *
+     * @param employeeName     Partial or full name of the employee to filter (can be null).
+     * @param workplace        Usual workplace to filter (can be null).
+     * @param managerEmail     Email of the manager to filter (can be null).
+     * @return A list of ProfileDto objects matching the provided filters.
+     */
+    public ArrayList<ProfileDto> findProfilesWithFilters(String employeeName, UsualWorkPlaceType workplace, String managerEmail) {
+
+        logger.info(
+                "User: {} | IP: {} | Filters -> Employee Name: {}, Workplace: {}, Manager Email: {} - Searching profiles with filters.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                employeeName != null ? employeeName : "none",
+                workplace != null ? workplace.name() : "none",
+                managerEmail != null ? managerEmail : "none"
+        );
+
+
+
+        List<ProfileEntity> profilesDB = profileDao.findProfilesWithFilters(employeeName, workplace, managerEmail);
+
+        return javaConversionUtil.convertProfileEntityListtoProfileDtoList(new ArrayList<>(profilesDB));
+    }
+
+    /**
+     * Retrieves a paginated list of user profiles based on optional filters: employee name, workplace, and manager email.
+     * Logs the search request including user, IP, email, filter values, and requested page for audit purposes.
+     *
+     * @param employeeName  Partial or full name of the employee to filter (can be null).
+     * @param workplace     Usual workplace to filter (can be null).
+     * @param managerEmail  Email of the manager to filter (can be null).
+     * @param page          The page number requested for pagination.
+     * @return A PaginatedProfilesDto containing the filtered profiles, total count, total pages, and current page.
+     */
+    public PaginatedProfilesDto findProfilesWithFiltersPaginated(String employeeName, UsualWorkPlaceType workplace, String managerEmail, int page) {
+
+        logger.info(
+                "User: {} | IP: {} | Filters -> Employee Name: {}, Workplace: {}, Manager Email: {} | Page: {} - Searching paginated profiles with filters.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                employeeName != null ? employeeName : "none",
+                workplace != null ? workplace.name() : "none",
+                managerEmail != null ? managerEmail : "none",
+                page
+        );
+
+        List<ProfileEntity> profilesDB = profileDao.findProfilesWithFiltersPaginated(employeeName, workplace, managerEmail, page);
+        //Count the total number of profiles filtered
+        long totalCount = profileDao.countProfilesWithFilters(employeeName, workplace, managerEmail);
+
+        //Convert results to Dto
+        List<ProfileDto> profileDtos = javaConversionUtil.convertProfileEntityListtoProfileDtoList(new ArrayList<>(profilesDB));
+
+        //Calculate the total number of pages
+        int pageSize = 10; // default number for now
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+        // Building a Dto to send as response already including pagination
+        return new PaginatedProfilesDto(profileDtos, totalCount, totalPages, page);
+    }
+
+
+
+
+
+    /**
+     * Resets the password of the given user profile.
+     * Logs both successful and failed reset attempts, including user and IP, for audit purposes.
+     *
+     * @param currentProfile The UserEntity whose password is to be reset.
+     * @param newPassword    The new plain text password to be hashed and stored.
+     * @return true if the password was reset successfully, false if the user is null.
+     */
+    public boolean resetPasswordOnProfile(UserEntity currentProfile, String newPassword) {
+
+
+
+        if (currentProfile == null) {
+            logger.warn(
+                    "User: {} | IP: {}  - Attempted to reset password for null user. Operation aborted.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp()
+                                );
+
+            return false;
+        }
+
+        // Hash for the new password
+        String hashedPassword = PasswordUtil.hashPassword(newPassword);
+        currentProfile.setPassword(hashedPassword);  // Store hashed password
+
+        userDao.save(currentProfile);  // Save changes on database
+
+        logger.info(
+                "User: {} | IP: {} - Successfully reset password.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp()
+        );
+
+        return true;
+    }
+
+
+
+
+
+    /**
+     * Converts a ProfileEntity object to its corresponding ProfileDto representation.
+     * Logs the conversion attempt and warns if the input entity is null.
+     *
+     * @param entity The ProfileEntity to convert.
+     * @return A ProfileDto representing the given entity, or null if the entity is null.
+     */
     public ProfileDto convertToDto(ProfileEntity entity) {
-        if (entity == null) return null;
+        if (entity == null) {
+            logger.warn(
+                    "User: {} | IP: {} - Attempted to convert a null ProfileEntity to DTO. Operation aborted.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp()
+            );
+        return null;
+    }
+
+        logger.info(
+                "User: {} | IP: {} - Converting ProfileEntity to ProfileDto.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp()
+        );
+
 
         ProfileDto dto = new ProfileDto();
         dto.setFirstName(entity.getFirstName());
@@ -134,15 +218,15 @@ public boolean changePhotographOnProfile(UserEntity currentProfile, String photo
         dto.setProfileComplete(ProfileValidator.isProfileComplete(entity));
         dto.setMissingFields(ProfileValidator.getMissingFields(entity));
 
-        // birthDate pode ser null
+        // birthDate can be declared as null
         if (entity.getBirthDate() != null) {
-            dto.setBirthDate(entity.getBirthDate()); // YYYY-MM-DD
+            dto.setBirthDate(entity.getBirthDate()); // YYYY-MM-DD structure
         } else {
             dto.setBirthDate(null);
         }
 
         if (entity.getUsualWorkplace() != null) {
-            dto.setUsualWorkplace(entity.getUsualWorkplace().name()); // devolve em maiúsculas
+            dto.setUsualWorkplace(entity.getUsualWorkplace().name()); // returns usual worplace in capitals
         } else {
             dto.setUsualWorkplace(null);
         }
