@@ -74,6 +74,58 @@ public boolean changePhotographOnProfile(UserEntity currentProfile, String photo
     return true;
 }
 
+    /**
+     * Converts a ProfileEntity object to its corresponding ProfileDto representation.
+     * Logs the conversion attempt and warns if the input entity is null.
+     *
+     * @param entity The ProfileEntity to convert.
+     * @return A ProfileDto representing the given entity, or null if the entity is null.
+     */
+    public ProfileDto convertToDto(ProfileEntity entity) {
+        if (entity == null) {
+            logger.warn(
+                    "User: {} | IP: {} - Attempted to convert a null ProfileEntity to DTO. Operation aborted.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp()
+            );
+            return null;
+        }
+
+        logger.info(
+                "User: {} | IP: {} - Converting ProfileEntity to ProfileDto.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp()
+        );
+
+
+        ProfileDto dto = new ProfileDto();
+        dto.setFirstName(entity.getFirstName());
+        dto.setLastName(entity.getLastName());
+        dto.setAddress(entity.getAddress());
+        dto.setPhone(entity.getPhone());
+        dto.setPhotograph(entity.getPhotograph());
+        dto.setBio(entity.getBio());
+        dto.setProfileComplete(ProfileValidator.isProfileComplete(entity));
+        dto.setMissingFields(ProfileValidator.getMissingFields(entity));
+
+        // birthDate can be declared as null
+        if (entity.getBirthDate() != null) {
+            dto.setBirthDate(entity.getBirthDate()); // YYYY-MM-DD structure
+        } else {
+            dto.setBirthDate(null);
+        }
+
+        if (entity.getUsualWorkplace() != null) {
+            dto.setUsualWorkplace(entity.getUsualWorkplace().name()); // returns usual worplace in capitals
+        } else {
+            dto.setUsualWorkplace(null);
+        }
+
+        return dto;
+    }
+
+
+
 
     /**
      * Finds user profiles based on optional filters: employee name, workplace, and manager email.
@@ -184,55 +236,7 @@ public boolean changePhotographOnProfile(UserEntity currentProfile, String photo
 
 
 
-    /**
-     * Converts a ProfileEntity object to its corresponding ProfileDto representation.
-     * Logs the conversion attempt and warns if the input entity is null.
-     *
-     * @param entity The ProfileEntity to convert.
-     * @return A ProfileDto representing the given entity, or null if the entity is null.
-     */
-    public ProfileDto convertToDto(ProfileEntity entity) {
-        if (entity == null) {
-            logger.warn(
-                    "User: {} | IP: {} - Attempted to convert a null ProfileEntity to DTO. Operation aborted.",
-                    RequestContext.getAuthor(),
-                    RequestContext.getIp()
-            );
-        return null;
-    }
 
-        logger.info(
-                "User: {} | IP: {} - Converting ProfileEntity to ProfileDto.",
-                RequestContext.getAuthor(),
-                RequestContext.getIp()
-        );
-
-
-        ProfileDto dto = new ProfileDto();
-        dto.setFirstName(entity.getFirstName());
-        dto.setLastName(entity.getLastName());
-        dto.setAddress(entity.getAddress());
-        dto.setPhone(entity.getPhone());
-        dto.setPhotograph(entity.getPhotograph());
-        dto.setBio(entity.getBio());
-        dto.setProfileComplete(ProfileValidator.isProfileComplete(entity));
-        dto.setMissingFields(ProfileValidator.getMissingFields(entity));
-
-        // birthDate can be declared as null
-        if (entity.getBirthDate() != null) {
-            dto.setBirthDate(entity.getBirthDate()); // YYYY-MM-DD structure
-        } else {
-            dto.setBirthDate(null);
-        }
-
-        if (entity.getUsualWorkplace() != null) {
-            dto.setUsualWorkplace(entity.getUsualWorkplace().name()); // returns usual worplace in capitals
-        } else {
-            dto.setUsualWorkplace(null);
-        }
-
-        return dto;
-    }
 
     /**
  * Updates the profile information of a user identified by their email.
