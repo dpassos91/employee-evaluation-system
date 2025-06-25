@@ -6,10 +6,10 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import java.util.Properties;
 
-@Stateless
+
 public class EmailUtil {
 
-    public void sendEmail(String toEmail, String subject, String body) {
+    public static void sendEmail(String toEmail, String subject, String body) {
         final String fromEmail = "grupo7.exemplo@gmail.com"; // o nosso email
         final String password = "cdrjtpkfmzvsbasc";     // usa App Password do Gmail
 

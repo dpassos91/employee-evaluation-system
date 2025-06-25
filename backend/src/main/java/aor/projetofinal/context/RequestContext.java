@@ -10,7 +10,8 @@ public class RequestContext {
     }
 
     public static String getIp() {
-        return ipThreadLocal.get();
+        String ip = ipThreadLocal.get();
+        return ip != null ? ip : "Unknown";
     }
 
     public static void setAuthor(String author) {
@@ -18,7 +19,8 @@ public class RequestContext {
     }
 
     public static String getAuthor() {
-        return authorThreadLocal.get();
+        String author = authorThreadLocal.get();
+        return author != null ? author : "Anonymous";
     }
 
     public static void clear() {

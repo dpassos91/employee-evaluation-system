@@ -574,6 +574,8 @@ public class UserBean implements Serializable {
             return null;
         }
 
+        RequestContext.setAuthor(userEntity.getEmail());
+
         SessionTokenEntity sessionTokenEntity = new SessionTokenEntity();
         String sessionToken = UUID.randomUUID().toString();
 
@@ -620,6 +622,7 @@ public class UserBean implements Serializable {
                     RequestContext.getIp(),
                     sessionTokenEntity.getUser().getEmail()
             );
+            RequestContext.clear();
             return true;
         }
 

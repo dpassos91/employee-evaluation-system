@@ -33,8 +33,8 @@ public class UserService {
     @Inject
     UserBean userBean;
 
-    @Inject
-    EmailUtil emailUtil;
+   // @Inject
+   // EmailUtil emailUtil;
     @Inject
     private SessionTokenDao sessionTokenDao;
     @Inject
@@ -131,7 +131,7 @@ public Response loginUser(LoginUserDto userLog) {
         String confirmToken = userBean.getConfirmToken(userLog.getEmail());
         String confirmationLink = "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=" + confirmToken;
 
-        emailUtil.sendEmail(
+        EmailUtil.sendEmail(
                 userEntity.getEmail(),
                 "Account Confirmation",
                 "Click this link to confirm your account: " + confirmationLink
@@ -264,7 +264,7 @@ public Response logoutUser(@HeaderParam("Authorization") String authorization) {
         String recoveryLink = "https://127.0.0.1:8443/grupo7/rest/users/reset-password?recoveryToken=" + recoveryToken;
 
 
-        emailUtil.sendEmail(
+        EmailUtil.sendEmail(
                 user.getEmail(),
                 "Pedido de recuperação de password",
                 "Clique neste link para escolher nova password: " + recoveryLink
