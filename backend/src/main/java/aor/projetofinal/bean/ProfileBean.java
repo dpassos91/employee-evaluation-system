@@ -2,6 +2,7 @@ package aor.projetofinal.bean;
 
 import aor.projetofinal.util.JavaConversionUtil;
 import aor.projetofinal.dto.PaginatedProfilesDto;
+import aor.projetofinal.util.StringUtils;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
@@ -271,6 +272,10 @@ public boolean changePhotographOnProfile(UserEntity currentProfile, String photo
         // Required fields
         profileToUpdate.setFirstName(profileDto.getFirstName());
         profileToUpdate.setLastName(profileDto.getLastName());
+
+        profileToUpdate.setNormalizedFirstName(StringUtils.normalize(profileDto.getFirstName()));
+        profileToUpdate.setNormalizedLastName(StringUtils.normalize(profileDto.getLastName()));
+
         profileToUpdate.setBirthDate(profileDto.getBirthDate());
         profileToUpdate.setAddress(profileDto.getAddress());
         profileToUpdate.setPhone(profileDto.getPhone());

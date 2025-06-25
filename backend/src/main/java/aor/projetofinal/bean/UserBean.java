@@ -415,64 +415,168 @@ public class UserBean implements Serializable {
     }
 
 
-    // Gerar um hash da password
+    /**
+     * Hashes the given plain text password using the BCrypt algorithm.
+     * Logs the operation for traceability. The default BCrypt strength is 10 (2^10 = 1024 iterations).
+     *
+     * @param password The raw password to be hashed.
+     * @return The hashed password string.
+     */
     public String hashPassword(String password) {
-        logger.info("User: {} | IP: {} - Hashing password.", RequestContext.getAuthor(), RequestContext.getIp());
+        logger.info(
+                "User: {} | IP: {} - Hashing password.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp()
+        );
         return BCrypt.hashpw(password, BCrypt.gensalt());
-        // o valor default em gensalt será 10: significa que o algoritmo de criptografia bcrypt vai iterar 2^10 = 1024 vezes para criar hash
+        // default value at gensalt will be 10: it means the cryptography algorithm bcrypt is gonna iterate 2^10 = 1024 times in order to hash
     }
 
+
+
+    /**
+     * Checks whether the user account associated with the given email is confirmed.
+     * Logs the check request and relevant outcomes for audit and debugging purposes.
+     *
+     * @param email The email address of the user to check.
+     * @return true if the account exists and is confirmed; false otherwise.
+     */
     public boolean isAccountConfirmed(String email) {
+
+        logger.info(
+                "User: {} | IP: {} - Checking if account is confirmed for email: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                email
+        );
+
         if (email == null || email.trim().isEmpty()) {
+            logger.warn(
+                    "User: {} | IP: {} - Cannot check confirmation status: email is null or empty.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp()
+            );
             return false;
         }
 
         UserEntity user = userDao.findByEmail(email);
 
         if (user == null) {
+            logger.warn(
+                    "User: {} | IP: {} - Cannot check confirmation status: user not found for email: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    email
+            );
             return false;
         }
+
+
+        logger.info(
+                "User: {} | IP: {} - Account confirmation status for {}: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                email,
+                user.isConfirmed()
+        );
+
 
         return user.isConfirmed();
     }
 
-// Method que quando o frontend chama o endpoint para redefinir a password, com token no URL,
-// verifica se o token ainda é válido antes de aceitar nova password
-
+    /**
+     * Validates whether the given password recovery token is still active.
+     * Logs the validation attempt and outcome for audit purposes.
+     *
+     * @param recoveryToken The password recovery token to validate.
+     * @return true if the token exists and is not expired; false otherwise.
+     */
     public boolean isRecoveryTokenValid(String recoveryToken) {
+
+        logger.info(
+                "User: {} | IP: {} - Checking validity of recovery token: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                recoveryToken
+        );
+
         UserEntity user = userDao.findUserByRecoveryToken(recoveryToken);
 
         if (user == null || user.getRecoveryTokenExpiry() == null) {
+            logger.warn(
+                    "User: {} | IP: {} - Invalid or unknown recovery token: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    recoveryToken
+            );
             return false;
         }
 
-        return user.getRecoveryTokenExpiry().isAfter(LocalDateTime.now());
+        boolean valid = user.getRecoveryTokenExpiry().isAfter(LocalDateTime.now());
+
+        logger.info(
+                "User: {} | IP: {} - Recovery token {} is {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                recoveryToken,
+                valid ? "valid" : "expired"
+        );
+
+        return valid;
     }
 
-
+    /**
+     * Authenticates a user based on provided login credentials and generates a new session token if successful.
+     * Logs every authentication step and outcome for audit and security purposes.
+     *
+     * @param logUser A LoginUserDto containing the email and raw password entered by the user.
+     * @return A session token string if login is successful; null otherwise.
+     */
     public String login(LoginUserDto logUser) {
-        logger.info("Inicio de logIn para utilizador:{}", logUser.getEmail());
+        logger.info(
+                "User: {} | IP: {} - Login attempt received for email: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                logUser.getEmail()
+        );
+
         UserEntity userEntity = userDao.findByEmail(logUser.getEmail());
 
         if (userEntity == null) {
-            logger.warn("Utilizador não encontrado para o email:{}", logUser.getEmail());
+            logger.warn(
+                    "User: {} | IP: {} - Login failed: no user found for email: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    logUser.getEmail()
+            );
             return null;
         }
 
         if (!userEntity.isActive()) {
-            logger.warn("Utilizador com email {} está desativado", logUser.getEmail());
+            logger.warn(
+                    "User: {} | IP: {} - Login failed: user with email {} is deactivated.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    logUser.getEmail()
+            );
             return null;
         }
 
 
-        // Verificar a password com hash
+        // Verifies hashed password
         if (!checkPassword(logUser.getPassword(), userEntity.getPassword())) {
-            logger.warn("Utilizador com email {} inseriu a password incorreta", logUser.getEmail());
+            logger.warn(
+                    "User: {} | IP: {} - Login failed: incorrect password for user with email {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    logUser.getEmail()
+            );
             return null;
         }
 
         SessionTokenEntity sessionTokenEntity = new SessionTokenEntity();
         String sessionToken = UUID.randomUUID().toString();
+
         sessionTokenEntity.setTokenValue(sessionToken);
         sessionTokenEntity.setUser(userEntity);
         sessionTokenEntity.setCreatedAt(LocalDateTime.now());
@@ -480,47 +584,94 @@ public class UserBean implements Serializable {
 
         sessionTokenDao.persist(sessionTokenEntity);
 
-        logger.info("Login realizado com sucesso para o utilizador com email {}", userEntity.getEmail());
+        logger.info(
+                "User: {} | IP: {} - Login successful. Session token generated for user: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                userEntity.getEmail()
+        );
+
         return sessionToken;
     }
 
+    /**
+     * Logs out a user by invalidating the session associated with the provided token.
+     * Logs both successful and failed logout attempts for audit purposes.
+     *
+     * @param sessionTokenValue The session token identifying the user's session.
+     * @return true if the session was found and removed; false if the token was invalid or not found.
+     */
     public boolean logout(String sessionTokenValue) {
-        logger.info("Início de logout");
+
+        logger.info(
+                "User: {} | IP: {} - Logout attempt received for session token.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp()
+        );
 
         SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionTokenValue);
 
         if (sessionTokenEntity != null) {
             sessionTokenDao.delete(sessionTokenEntity);
 
-            logger.info("Logout efetuado com sucesso para o utilizador: {}", sessionTokenEntity.getUser().getEmail());
+            logger.info(
+                    "User: {} | IP: {} - Logout successful for user: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    sessionTokenEntity.getUser().getEmail()
+            );
             return true;
         }
 
-        logger.warn("Token de sessão não encontrado. Logout não realizado.");
+        logger.warn(
+                "User: {} | IP: {} - Logout failed: session token not found.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp()
+        );
         return false;
     }
 
-
+    /**
+     * Registers a new user using the provided login credentials.
+     * Performs validation against existing emails, assigns the default role, creates a user profile,
+     * and generates a confirmation token. Logs all steps and handles registration errors.
+     *
+     * @param loginUserDto The user's registration credentials (email and raw password).
+     * @return A UserDto representing the newly created user.
+     * @throws EmailAlreadyExistsException if the provided email is already associated with an existing user.
+     * @throws IllegalStateException if the default "USER" role is not configured in the system.
+     */
     public UserDto registerUser(LoginUserDto loginUserDto) throws EmailAlreadyExistsException {
-        logger.info("User: {} | IP: {} - Checking if email {} is already in use.",
-                RequestContext.getAuthor(), RequestContext.getIp(), loginUserDto.getEmail());
+        logger.info(
+                "User: {} | IP: {} - Checking if email {} is already in use.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                loginUserDto.getEmail()
+        );
 
-        // Verificar se email já existe
+        // Verify if this email already exists
         if (userDao.findByEmail(loginUserDto.getEmail()) != null) {
-            logger.warn("User: {} | IP: {} - Registration failed: email {} already in use.",
-                    RequestContext.getAuthor(), RequestContext.getIp(), loginUserDto.getEmail());
+            logger.warn(
+                    "User: {} | IP: {} - Registration failed: email {} already in use.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    loginUserDto.getEmail()
+            );
             throw new EmailAlreadyExistsException("Email already in use.");
         }
 
-        // Obter role "USER" e garantir que está configurada
+        // Get role "USER" and make sure it is configured correctly
         RoleEntity userRole = roleDao.findByName("USER");
         if (userRole == null) {
-            logger.error("User: {} | IP: {} - Default role 'USER' not found. Registration aborted.",
-                    RequestContext.getAuthor(), RequestContext.getIp());
+            logger.error(
+                    "User: {} | IP: {} - Default role 'USER' not found. Registration aborted.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp()
+            );
             throw new IllegalStateException("Default role 'USER' not configured.");
         }
 
-        // Criar novo utilizador com os dados apropriados
+        // Create new user
         UserEntity user = new UserEntity();
         user.setEmail(loginUserDto.getEmail());
         user.setPassword(hashPassword(loginUserDto.getPassword()));
@@ -530,145 +681,180 @@ public class UserBean implements Serializable {
 
         int lifetimeMinutes = settingsBean.getConfirmationTokenTimeout();
         user.setConfirmationTokenExpiry(LocalDateTime.now().plusMinutes(lifetimeMinutes));
-        user.setRole(userRole); // atribuir a role USER
+        user.setRole(userRole); // name with the role "User"
 
 
-        // Persistir
+        // Persist at database
         try {
             userDao.create(user);
 
-            // Criar perfil e associar ao utilizador
+            // Create profile and associate to user
             ProfileEntity profile = new ProfileEntity();
             profile.setUser(user);
             user.setProfile(profile);
 
 
             profileDao.create(profile);
-            logger.info("User: {} | IP: {} - User successfully registered with email: {}",
-                    RequestContext.getAuthor(), RequestContext.getIp(), user.getEmail());
+            logger.info(
+                    "User: {} | IP: {} - User successfully registered with email: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    user.getEmail()
+            );
         } catch (Exception e) {
-            logger.error("User: {} | IP: {} - Error while registering user: {}",
-                    RequestContext.getAuthor(), RequestContext.getIp(), user.getEmail(), e);
+            logger.error(
+                    "User: {} | IP: {} - Error while registering user: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    loginUserDto.getEmail(),
+                    e
+            );
             throw e;
         }
-        // Converter para DTO e devolver
+        // Convert to userDto and return
         return new UserDto(user);
     }
 
-
+    /**
+     * Resets a user's password using a valid recovery token.
+     * Verifies the token's validity and expiration, hashes the new password,
+     * and clears the recovery token upon success. Logs all outcomes for audit and security.
+     *
+     * @param forgottenPassToken The password recovery token provided by the user.
+     * @param newPassword The new plain text password to be securely hashed and saved.
+     * @return true if the password was successfully reset; false otherwise.
+     */
     public boolean resetPasswordWithToken(String forgottenPassToken, String newPassword) {
-        // Verificar se o token é válido
+
+        logger.info(
+                "User: {} | IP: {} - Password reset attempt using recovery token: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                forgottenPassToken
+        );
+
+        // Verifies if recoverytoken is valid
         UserEntity user = userDao.findUserByRecoveryToken(forgottenPassToken);
 
         if (user == null) {
-            logger.warn("Token inválido: {}", forgottenPassToken);
+            logger.warn(
+                    "User: {} | IP: {} - Password reset failed: invalid recovery token: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    forgottenPassToken
+            );
             return false;
         }
 
-        // Verificar se o token está expirado
+        // Verifies if recoverytoken is expired
         if (user.getRecoveryTokenExpiry() == null || user.getRecoveryTokenExpiry().isBefore(LocalDateTime.now())) {
-            logger.warn("Token expirado para utilizador {}", user.getEmail());
+            logger.warn(
+                    "User: {} | IP: {} - Password reset failed: token expired for user: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    user.getEmail()
+            );
             return false;
         }
 
-        // Hash da nova password
+        // Hashing new password
         String hashedPassword = hashPassword(newPassword);
-        user.setPassword(hashedPassword);  // Armazenar a password com hash
-        user.setRecoveryToken(null);  // Eliminar o token após redefinir a password
-        user.setRecoveryTokenExpiry(null);  // Limpar a expiry date do token
-        userDao.save(user);  // Guardar as alterações na base de dados
+        user.setPassword(hashedPassword);  // Persist hashed password on DB
+        user.setRecoveryToken(null);  // Eliminates token after resetting passwword
+        user.setRecoveryTokenExpiry(null);  // Deletes token expiration date
+        userDao.save(user);  // Persist every change on database
 
-        logger.info("Password redefinida e atualizada com sucesso para o utilizador {}", user.getEmail());
-        return true;
-    }
-
-    public boolean updateInfo(ProfileDto profileDto, String email) {
-
-        UserEntity user = userDao.findByEmail(email);
-
-        if (user == null) {
-            logger.warn("User: {} | IP: {} | Email: {} - Could not find user to update.",
-                    RequestContext.getAuthor(), RequestContext.getIp(), email);
-            return false;
-        }
-
-        ProfileEntity profileToUpdate = user.getProfile();
-
-        if (profileToUpdate == null) {
-            profileToUpdate = new ProfileEntity();
-            profileToUpdate.setUser(user);
-            user.setProfile(profileToUpdate);
-            logger.info("User: {} | IP: {} | Email: {} - Created new profile for user.",
-                    RequestContext.getAuthor(), RequestContext.getIp(), email);
-        }
-
-        // Required fields
-        profileToUpdate.setFirstName(profileDto.getFirstName());
-        profileToUpdate.setLastName(profileDto.getLastName());
-
-
-        profileToUpdate.setNormalizedFirstName(StringUtils.normalize(profileDto.getFirstName()));
-        profileToUpdate.setNormalizedLastName(StringUtils.normalize(profileDto.getLastName()));
-
-
-        profileToUpdate.setBirthDate(profileDto.getBirthDate());
-        profileToUpdate.setAddress(profileDto.getAddress());
-        profileToUpdate.setPhone(profileDto.getPhone());
-
-        // Optional fields
-        profileToUpdate.setPhotograph(profileDto.getPhotograph());
-        profileToUpdate.setBio(profileDto.getBio());
-
-        // Conversion and validation for usualWorkplace (Enum)
-        String usualWorkplaceString = profileDto.getUsualWorkplace();
-        if (usualWorkplaceString != null && !usualWorkplaceString.isBlank()) {
-            try {
-                UsualWorkPlaceType type = UsualWorkPlaceType.valueOf(usualWorkplaceString.toUpperCase());
-                profileToUpdate.setUsualWorkplace(type);
-            } catch (IllegalArgumentException e) {
-                logger.warn("User: {} | IP: {} | Email: {} | Value: {} - Invalid usualWorkplace value received.",
-                        RequestContext.getAuthor(), RequestContext.getIp(), email, usualWorkplaceString);
-                return false;
-            }
-        } else {
-            logger.warn("User: {} | IP: {} | Email: {} - Missing required usualWorkplace field.",
-                    RequestContext.getAuthor(), RequestContext.getIp(), email);
-            return false;
-        }
-
-        profileDao.save(profileToUpdate);
-
-        logger.info("User: {} | IP: {} | Email: {} - Successfully updated profile for user.",
-                RequestContext.getAuthor(), RequestContext.getIp(), email);
-
+        logger.info(
+                "User: {} | IP: {} - Password successfully reset for user: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                user.getEmail()
+        );
         return true;
     }
 
 
+
+    /**
+     * Validates the provided session token and refreshes its expiration if it is still valid.
+     * Logs the session validation, expiration checks, and any token refresh activity for auditing purposes.
+     *
+     * @param sessionToken The session token to validate and potentially refresh.
+     * @return A SessionStatusDto representing the current session status, or null if the session is invalid or expired.
+     */
     public SessionStatusDto validateAndRefreshSessionToken(String sessionToken) {
+
+        logger.info(
+                "User: {} | IP: {} - Validating session token: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                sessionToken
+        );
+
+
         if (sessionToken == null || sessionToken.isEmpty()) {
+            logger.warn(
+                    "User: {} | IP: {} - Session token is null or empty. Validation aborted.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp()
+            );
             return null;
         }
 
         SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
 
+        if (sessionTokenEntity == null) {
+            logger.warn(
+                    "User: {} | IP: {} - Session token not found: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    sessionToken
+            );
+            return null;
+        }
+
+
+
         UserEntity user = sessionTokenEntity.getUser();
         if (user == null || sessionTokenEntity.getExpiryDate() == null || sessionTokenEntity.getExpiryDate().isBefore(LocalDateTime.now()) || !user.isActive()) {
             if (user != null) {
                 sessionTokenDao.delete(sessionTokenEntity);
+
+                logger.warn(
+                        "User: {} | IP: {} - Session token expired or invalid. Cleaning up token for user: {}.",
+                        RequestContext.getAuthor(),
+                        RequestContext.getIp(),
+                        user != null ? user.getEmail() : "unknown"
+                );
+
             }
             return null;
         }
 
-        // Verificar a diferença entre a data de expiração e a data atual
+        // Assesses the difference between current date and sessionToken's expiration date
         int minutesDifference = (int) Duration.between(LocalDateTime.now(), sessionTokenEntity.getExpiryDate()).toMinutes();
 
-
-        // Renovar tempo de sessão se for igual ou superior ao tempo configurado
+        // Renew's session expiration date if it's equal or greater than the configured time
 
         if (minutesDifference <= settingsBean.getSessionTimeoutMinutes()) {
             sessionTokenEntity.setExpiryDate(LocalDateTime.now().plusMinutes(settingsBean.getSessionTimeoutMinutes()));
             sessionTokenDao.save(sessionTokenEntity);
+
+            logger.info(
+                    "User: {} | IP: {} - Session token refreshed for user: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    user.getEmail()
+            );
+        }
+
+        else {
+            logger.info(
+                    "User: {} | IP: {} - Session token is still valid for user: {}. No refresh needed.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    user.getEmail()
+            );
         }
 
         return javaConversionUtil.convertSessionTokenEntityToSessionStatusDto(sessionTokenEntity);
