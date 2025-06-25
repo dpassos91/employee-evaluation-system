@@ -55,149 +55,355 @@ public class UserBean implements Serializable {
     @EJB
     SettingsBean settingsBean;
 
-
+    /**
+     * Validates a session token to determine whether access should be authorized.
+     * Logs the request and all authorization outcomes for audit and security purposes.
+     *
+     * @param sessionTokenValue The value of the session token to validate.
+     * @return true if the session token is valid, not expired, and associated with an active user; false otherwise.
+     */
     public boolean authorization(String sessionTokenValue) {
-        logger.info("Pedido de autorização recebido");
+        logger.info(
+                "User: {} | IP: {} - Authorization request received.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp()
+        );
 
         SessionTokenEntity sessionToken = sessionTokenDao.findBySessionToken(sessionTokenValue);
         if (sessionToken == null) {
-            logger.warn("Autorização recusada: token inexistente ou inválido.");
+            logger.warn(
+                    "User: {} | IP: {} - Authorization denied: session token does not exist or is invalid.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp()
+            );
             return false;
         }
-
-        // Verifica se o sessionToken está expirado
+        // Verifies whether sessionToken has expired
         if (sessionToken.getExpiryDate() != null && sessionToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            logger.warn("Autorização recusada: token expirado.");
+            logger.warn(
+                    "User: {} | IP: {} - Authorization denied: session token has expired.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp()
+            );
             return false;
         }
 
         UserEntity user = sessionToken.getUser();
 
         if (user == null || !user.isActive()) {
-            logger.warn("Autorização recusada: utilizador inexistente ou inativo.");
+            logger.warn(
+                    "User: {} | IP: {} - Authorization denied: user is null or inactive.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp()
+            );
             return false;
         }
 
-        logger.info("Autorização concedida com sucesso para o utilizador: {}", user.getEmail());
+        logger.info(
+                "User: {} | IP: {} - Authorization granted for user: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                user.getEmail()
+        );
         return true;
     }
 
-    // Verificar se a password inserida corresponde ao hash armazenado
+
+    /**
+     * Verifies whether a raw (plain text) password matches the stored hashed password using BCrypt.
+     * Logs the verification attempt and whether the passwords matched.
+     *
+     * @param rawPassword    The plain text password entered by the user.
+     * @param hashedPassword The BCrypt-hashed password stored in the database.
+     * @return true if the raw password matches the hashed password; false otherwise.
+     */
     public static boolean checkPassword(String rawPassword, String hashedPassword) {
-        logger.info("User: {} | IP: {} - Checking password.", RequestContext.getAuthor(), RequestContext.getIp());
+        logger.info(
+                "User: {} | IP: {} - Checking password.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp()
+        );
+
         boolean match = BCrypt.checkpw(rawPassword, hashedPassword);
-        logger.info("User: {} | IP: {} - Password match: {}", RequestContext.getAuthor(), RequestContext.getIp(), match);
+
+        logger.info(
+                "User: {} | IP: {} - Password match: {}",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                match
+        );
         return match;
     }
 
+
+    /**
+     * Confirms a user account using a provided confirmation token.
+     * If the token is invalid, already used, or expired, confirmation is denied.
+     * If expired, a new token is generated and stored. Logs all key actions for audit tracking.
+     *
+     * @param confirmToken The token provided to confirm an account.
+     * @return true if the account was successfully confirmed; false if the token is invalid, already used, or expired.
+     */
     public boolean confirmAccount(String confirmToken) {
+
+        logger.info(
+                "User: {} | IP: {} - Account confirmation attempt received.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp()
+        );
+
         UserEntity user = userDao.findUserByConfirmToken(confirmToken);
 
         if (user == null || user.isConfirmed()) {
-            return false; // conta do user já foi autenticada ou user ou token é inválido
+            logger.warn(
+                    "User: {} | IP: {} - Account confirmation failed. Token invalid or account already confirmed.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp()
+            );
+            return false;
         }
 
-        // Verificar se o token de confirmação expirou , e se sim gerar um novo
+        //verifies if confirmation token has expired, and it generates a new one if it has
         if (user.getConfirmationTokenExpiry() != null && user.getConfirmationTokenExpiry().isBefore(LocalDateTime.now())) {
-            String newAccountConfirmToken  = generateConfirmToken(user.getEmail());
+            String newAccountConfirmToken = generateConfirmToken(user.getEmail());
             user.setConfirmationToken(newAccountConfirmToken);
 
             int lifetimeMinutes = settingsBean.getConfirmationTokenTimeout();
             user.setConfirmationTokenExpiry(LocalDateTime.now().plusMinutes(lifetimeMinutes));
             userDao.save(user);
 
-            logger.info("Token expirado. A gerar novo token de confirmação para {}", user.getEmail());
-            return false; // Token expirado
+            logger.warn(
+                    "User: {} | IP: {} - Confirmation token expired. Generated new token for user: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    user.getEmail()
+            );
+            return false; // token expired
         }
 
 
+        user.setConfirmed(true); // confirm/activate account
 
-        user.setConfirmed(true); // verificar/ativar conta
-
-        user.setConfirmationToken(null); // descartar token após confirmacao de conta
+        user.setConfirmationToken(null); // delete token after successfull account confirmation
         user.setConfirmationTokenExpiry(null);
         userDao.save(user);
 
-        logger.info("Conta confirmada com sucesso para user: {}", user.getEmail());
+        logger.info(
+                "User: {} | IP: {} - Account successfully confirmed for user: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                user.getEmail()
+        );
+
         return true;
     }
 
-    public UserDto findUserByEmail(String email){
-        logger.info("Inicio findByEmail email : {}", email);
+    /**
+     * Finds a user by their email address and converts the result to a UserDto.
+     * Logs the lookup attempt and result for audit and debugging purposes.
+     *
+     * @param email The email address of the user to look up.
+     * @return A UserDto if a user with the given email exists; null otherwise.
+     */
+    public UserDto findUserByEmail(String email) {
+        logger.info(
+                "User: {} | IP: {} - Attempting to find user by email: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                email
+        );
 
         UserEntity userEntity = userDao.findByEmail(email);
         if (userEntity == null) {
-            logger.warn("Utilizador não encotrado");
+            logger.warn(
+                    "User: {} | IP: {} - No user found for email: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    email
+            );
             return null;
         }
 
-        logger.info("Utilizador com email {} encontrado", userEntity.getEmail());
+        logger.info(
+                "User: {} | IP: {} - User found for email: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                userEntity.getEmail()
+        );
         return javaConversionUtil.convertUserEntityToUserDto(userEntity);
     }
 
+    /**
+     * Retrieves the UserEntity associated with the given email address.
+     * Logs the lookup attempt for audit and traceability purposes.
+     *
+     * @param email The email address of the user to retrieve.
+     * @return The UserEntity if found; null if no user exists with the given email.
+     */
     public UserEntity findUserEntityByEmail(String email) {
-        return userDao.findByEmail(email);
-    }
-
-    public String generateConfirmToken(String email) {
+        logger.info(
+                "User: {} | IP: {} - Attempting to find UserEntity by email: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                email
+        );
         UserEntity user = userDao.findByEmail(email);
 
         if (user == null) {
-            logger.warn("Utilizador {} não encontrado para gerar token", email);
+            logger.warn(
+                    "User: {} | IP: {} - No UserEntity found for email: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    email
+            );
+        } else {
+            logger.info(
+                    "User: {} | IP: {} - UserEntity found for email: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    email
+            );
+        }
+
+        return user;
+    }
+
+
+    /**
+     * Generates a new confirmation token for the user with the given email address.
+     * If the user is not found or already confirmed, no token is generated.
+     * Logs the process and results for auditing purposes.
+     *
+     * @param email The email address of the user for whom to generate a confirmation token.
+     * @return The newly generated token as a String, or null if the user does not exist or is already confirmed.
+     */
+    public String generateConfirmToken(String email) {
+
+        logger.info(
+                "User: {} | IP: {} - Request to generate confirmation token for email: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                email
+        );
+
+
+        UserEntity user = userDao.findByEmail(email);
+
+        if (user == null) {
+            logger.warn(
+                    "User: {} | IP: {} - Cannot generate confirmation token: user not found for email: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    email
+            );
             return null;
         }
 
-        // Se a conta já estiver verificada, não precisa de token
+        // If account has been confirmed before, no token will be generated
         if (user.isConfirmed()) {
-            logger.info("Utilizador {} já está verificado. Não é necessário token.", email);
+            logger.info(
+                    "User: {} | IP: {} - No token generated: user with email {} is already confirmed.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    email
+            );
             return null;
         }
 
 
-        // Gerar novo token
+        // Generated a new token for account confirmatiomn
         String newConfirmationToken = UUID.randomUUID().toString();
         user.setConfirmationToken(newConfirmationToken);
 
-        logger.info("Novo token de confirmação de conta gerado para {}", email);
+        logger.info(
+                "User: {} | IP: {} - New confirmation token generated for user with email: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                email
+        );
         return newConfirmationToken;
     }
 
+
+    /**
+     * Generates a new recovery token for password reset, associated with the user identified by the given email.
+     * If a valid token already exists, it is replaced for security issues. Logs all steps and decisions for audit and traceability.
+     *
+     * @param email The email address of the user for whom to generate a recovery token.
+     * @return The newly generated recovery token, or null if the user does not exist.
+     */
     public String generateRecoveryToken(String email) {
+
+        logger.info(
+                "User: {} | IP: {} - Request to generate password recovery token for email: {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                email
+        );
+
+
         UserEntity user = userDao.findByEmail(email);
 
         if (user == null) {
-            logger.warn("Utilizador {} não encontrado para gerar token de recuperação", user.getEmail());
+            logger.warn(
+                    "User: {} | IP: {} - Cannot generate recovery token: user not found for email: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    email
+            );
             return null;
         }
 
-        // Se já existir um token válido, substituir por um novo
+        // If there already is a valid token, replace by a new one for security reasons
         LocalDateTime expiry = user.getRecoveryTokenExpiry();
         if (user.getRecoveryToken() != null && expiry != null && expiry.isAfter(LocalDateTime.now())) {
-            logger.info("Token de recuperação de pass ainda válido para {}, mas por motivos de segurança a gerar novo token.", user.getEmail());
+            logger.info(
+                    "User: {} | IP: {} - A valid recovery token already exists for user: {}. Generating new one for security reasons.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    email
+            );
 
             String newRecoveryToken = UUID.randomUUID().toString();
 
-            // Define a nova data de expiração
+            // Sets the new expiration date
             int lifetimeMinutes = settingsBean.getRecoveryTokenTimeout();
             user.setRecoveryToken(newRecoveryToken);
             user.setRecoveryTokenExpiry(LocalDateTime.now().plusMinutes(lifetimeMinutes));
             userDao.save(user);
 
-            logger.info("Novo token de recuperação gerado para {}", user.getEmail());
+            logger.info(
+                    "User: {} | IP: {} - New recovery token generated and saved for user: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    email
+            );
             return newRecoveryToken;
+
+        } else {
+            // Generate new token for password recovery
+            logger.info(
+                    "User: {} | IP: {} - No valid recovery token found. Generating a new one for user: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    email
+            );
+            String recoveryToken = UUID.randomUUID().toString();
+            int lifetimeMinutes = settingsBean.getRecoveryTokenTimeout(); // configurable by admin
+
+            user.setRecoveryToken(recoveryToken);
+            user.setRecoveryTokenExpiry(LocalDateTime.now().plusMinutes(lifetimeMinutes));
+            userDao.save(user);
+
+            logger.info(
+                    "User: {} | IP: {} - New recovery token created and saved for user: {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    email
+            );
+
+            return recoveryToken;
         }
-
-        // Gerar novo token
-        logger.info("A gerar token de recuperação de password para {}", user.getEmail());
-        String recoveryToken = UUID.randomUUID().toString();
-        int lifetimeMinutes = settingsBean.getRecoveryTokenTimeout(); // configurable pelo admin
-
-        user.setRecoveryToken(recoveryToken);
-        user.setRecoveryTokenExpiry(LocalDateTime.now().plusMinutes(lifetimeMinutes));
-        userDao.save(user);
-
-        logger.info("Novo token de recuperação de password gerado para {}", user.getEmail());
-        return recoveryToken;
     }
 
     public String getConfirmToken(String email) {
@@ -242,7 +448,6 @@ public class UserBean implements Serializable {
 
         return user.getRecoveryTokenExpiry().isAfter(LocalDateTime.now());
     }
-
 
 
     public String login(LoginUserDto logUser) {
@@ -294,7 +499,6 @@ public class UserBean implements Serializable {
         logger.warn("Token de sessão não encontrado. Logout não realizado.");
         return false;
     }
-
 
 
     public UserDto registerUser(LoginUserDto loginUserDto) throws EmailAlreadyExistsException {
@@ -352,10 +556,6 @@ public class UserBean implements Serializable {
     }
 
 
-
-
-
-
     public boolean resetPasswordWithToken(String forgottenPassToken, String newPassword) {
         // Verificar se o token é válido
         UserEntity user = userDao.findUserByRecoveryToken(forgottenPassToken);
@@ -384,65 +584,65 @@ public class UserBean implements Serializable {
 
     public boolean updateInfo(ProfileDto profileDto, String email) {
 
-    UserEntity user = userDao.findByEmail(email);
+        UserEntity user = userDao.findByEmail(email);
 
-    if (user == null) {
-        logger.warn("User: {} | IP: {} | Email: {} - Could not find user to update.",
-                RequestContext.getAuthor(), RequestContext.getIp(), email);
-        return false;
-    }
-
-    ProfileEntity profileToUpdate = user.getProfile();
-
-    if (profileToUpdate == null) {
-        profileToUpdate = new ProfileEntity();
-        profileToUpdate.setUser(user);
-        user.setProfile(profileToUpdate);
-        logger.info("User: {} | IP: {} | Email: {} - Created new profile for user.",
-                RequestContext.getAuthor(), RequestContext.getIp(), email);
-    }
-
-    // Required fields
-    profileToUpdate.setFirstName(profileDto.getFirstName());
-    profileToUpdate.setLastName(profileDto.getLastName());
-
-
-    profileToUpdate.setNormalizedFirstName(StringUtils.normalize(profileDto.getFirstName()));
-    profileToUpdate.setNormalizedLastName(StringUtils.normalize(profileDto.getLastName()));
-
-
-    profileToUpdate.setBirthDate(profileDto.getBirthDate());
-    profileToUpdate.setAddress(profileDto.getAddress());
-    profileToUpdate.setPhone(profileDto.getPhone());
-
-    // Optional fields
-    profileToUpdate.setPhotograph(profileDto.getPhotograph());
-    profileToUpdate.setBio(profileDto.getBio());
-
-    // Conversion and validation for usualWorkplace (Enum)
-    String usualWorkplaceString = profileDto.getUsualWorkplace();
-    if (usualWorkplaceString != null && !usualWorkplaceString.isBlank()) {
-        try {
-            UsualWorkPlaceType type = UsualWorkPlaceType.valueOf(usualWorkplaceString.toUpperCase());
-            profileToUpdate.setUsualWorkplace(type);
-        } catch (IllegalArgumentException e) {
-            logger.warn("User: {} | IP: {} | Email: {} | Value: {} - Invalid usualWorkplace value received.",
-                    RequestContext.getAuthor(), RequestContext.getIp(), email, usualWorkplaceString);
+        if (user == null) {
+            logger.warn("User: {} | IP: {} | Email: {} - Could not find user to update.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), email);
             return false;
         }
-    } else {
-        logger.warn("User: {} | IP: {} | Email: {} - Missing required usualWorkplace field.",
+
+        ProfileEntity profileToUpdate = user.getProfile();
+
+        if (profileToUpdate == null) {
+            profileToUpdate = new ProfileEntity();
+            profileToUpdate.setUser(user);
+            user.setProfile(profileToUpdate);
+            logger.info("User: {} | IP: {} | Email: {} - Created new profile for user.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), email);
+        }
+
+        // Required fields
+        profileToUpdate.setFirstName(profileDto.getFirstName());
+        profileToUpdate.setLastName(profileDto.getLastName());
+
+
+        profileToUpdate.setNormalizedFirstName(StringUtils.normalize(profileDto.getFirstName()));
+        profileToUpdate.setNormalizedLastName(StringUtils.normalize(profileDto.getLastName()));
+
+
+        profileToUpdate.setBirthDate(profileDto.getBirthDate());
+        profileToUpdate.setAddress(profileDto.getAddress());
+        profileToUpdate.setPhone(profileDto.getPhone());
+
+        // Optional fields
+        profileToUpdate.setPhotograph(profileDto.getPhotograph());
+        profileToUpdate.setBio(profileDto.getBio());
+
+        // Conversion and validation for usualWorkplace (Enum)
+        String usualWorkplaceString = profileDto.getUsualWorkplace();
+        if (usualWorkplaceString != null && !usualWorkplaceString.isBlank()) {
+            try {
+                UsualWorkPlaceType type = UsualWorkPlaceType.valueOf(usualWorkplaceString.toUpperCase());
+                profileToUpdate.setUsualWorkplace(type);
+            } catch (IllegalArgumentException e) {
+                logger.warn("User: {} | IP: {} | Email: {} | Value: {} - Invalid usualWorkplace value received.",
+                        RequestContext.getAuthor(), RequestContext.getIp(), email, usualWorkplaceString);
+                return false;
+            }
+        } else {
+            logger.warn("User: {} | IP: {} | Email: {} - Missing required usualWorkplace field.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), email);
+            return false;
+        }
+
+        profileDao.save(profileToUpdate);
+
+        logger.info("User: {} | IP: {} | Email: {} - Successfully updated profile for user.",
                 RequestContext.getAuthor(), RequestContext.getIp(), email);
-        return false;
+
+        return true;
     }
-
-    profileDao.save(profileToUpdate);
-
-    logger.info("User: {} | IP: {} | Email: {} - Successfully updated profile for user.",
-            RequestContext.getAuthor(), RequestContext.getIp(), email);
-
-    return true;
-}
 
 
     public SessionStatusDto validateAndRefreshSessionToken(String sessionToken) {
@@ -464,12 +664,12 @@ public class UserBean implements Serializable {
         int minutesDifference = (int) Duration.between(LocalDateTime.now(), sessionTokenEntity.getExpiryDate()).toMinutes();
 
 
-
         // Renovar tempo de sessão se for igual ou superior ao tempo configurado
 
         if (minutesDifference <= settingsBean.getSessionTimeoutMinutes()) {
             sessionTokenEntity.setExpiryDate(LocalDateTime.now().plusMinutes(settingsBean.getSessionTimeoutMinutes()));
-            sessionTokenDao.save(sessionTokenEntity);}
+            sessionTokenDao.save(sessionTokenEntity);
+        }
 
         return javaConversionUtil.convertSessionTokenEntityToSessionStatusDto(sessionTokenEntity);
     }
