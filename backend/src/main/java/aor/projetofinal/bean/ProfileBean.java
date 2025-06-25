@@ -124,9 +124,6 @@ public boolean changePhotographOnProfile(UserEntity currentProfile, String photo
         return dto;
     }
 
-
-
-
     /**
      * Finds user profiles based on optional filters: employee name, workplace, and manager email.
      * Logs the search action including user, IP, and filter parameters for audit purposes.
@@ -191,10 +188,6 @@ public boolean changePhotographOnProfile(UserEntity currentProfile, String photo
         return new PaginatedProfilesDto(profileDtos, totalCount, totalPages, page);
     }
 
-
-
-
-
     /**
      * Resets the password of the given user profile.
      * Logs both successful and failed reset attempts, including user and IP, for audit purposes.
@@ -204,14 +197,15 @@ public boolean changePhotographOnProfile(UserEntity currentProfile, String photo
      * @return true if the password was reset successfully, false if the user is null.
      */
     public boolean resetPasswordOnProfile(UserEntity currentProfile, String newPassword) {
-
-
+        // Extract email for logging; default to "unknown" if user is null
+        String email = currentProfile != null ? currentProfile.getEmail() : "unknown";
 
         if (currentProfile == null) {
             logger.warn(
-                    "User: {} | IP: {}  - Attempted to reset password for null user. Operation aborted.",
+                    "User: {} | IP: {} | Email: {} - Attempted to reset password for null user. Operation aborted.",
                     RequestContext.getAuthor(),
-                    RequestContext.getIp()
+                    RequestContext.getIp(),
+                    email
                                 );
 
             return false;
@@ -224,19 +218,14 @@ public boolean changePhotographOnProfile(UserEntity currentProfile, String photo
         userDao.save(currentProfile);  // Save changes on database
 
         logger.info(
-                "User: {} | IP: {} - Successfully reset password.",
+                "User: {} | IP: {} | Email: {} - Successfully reset password.",
                 RequestContext.getAuthor(),
-                RequestContext.getIp()
+                RequestContext.getIp(),
+                email
         );
 
         return true;
     }
-
-
-
-
-
-
 
     /**
  * Updates the profile information of a user identified by their email.
