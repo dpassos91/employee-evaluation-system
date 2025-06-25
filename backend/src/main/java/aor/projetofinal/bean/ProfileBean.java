@@ -1,6 +1,7 @@
 package aor.projetofinal.bean;
 
 import aor.projetofinal.util.JavaConversionUtil;
+import aor.projetofinal.dto.PaginatedProfilesDto;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
