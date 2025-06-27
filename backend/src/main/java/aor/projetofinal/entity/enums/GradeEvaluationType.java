@@ -32,4 +32,28 @@ public enum GradeEvaluationType {
     }
 
 
+    public static GradeEvaluationType getEnumfromGrade(int grade) {
+        //values is a method that returns an array of all enum constants, that will be cycled through
+        for (GradeEvaluationType option : GradeEvaluationType.values()) {
+            if (option.getGrade() == grade) {
+                return option;
+            }
+        }
+        throw new IllegalArgumentException("Invalid grade received: " + grade);
+    }
+
+
+    public static GradeEvaluationType getEnumFromDescription(String description) {
+        for (GradeEvaluationType option : GradeEvaluationType.values()) {
+            if (option.description.equalsIgnoreCase(description)) {
+                return option;
+            }
+        }
+        throw new IllegalArgumentException("DInvalid description received: " + description);
+    }
+
+
+
+
+
 }
