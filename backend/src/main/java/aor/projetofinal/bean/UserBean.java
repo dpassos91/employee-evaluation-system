@@ -863,5 +863,41 @@ public class UserBean implements Serializable {
         return javaConversionUtil.convertSessionTokenEntityToSessionStatusDto(sessionTokenEntity);
     }
 
+    /**
+ * Finds the user associated with a valid session token.
+ * Returns null if token is invalid or user not found.
+ */
+public UserEntity findUserBySessionToken(String sessionToken) {
+    if (sessionToken == null || sessionToken.isBlank()) {
+        logger.warn("User: {} | IP: {} - Attempted to find user by null or blank session token.",
+                RequestContext.getAuthor(), RequestContext.getIp());
+        return null;
+    }
+    UserEntity user = userDao.findBySessionToken(sessionToken);
+    if (user == null) {
+        logger.warn("User: {} | IP: {} - No user found for session token: {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), sessionToken);
+    } else {
+        logger.info("User: {} | IP: {} - User found for session token.",
+                RequestContext.getAuthor(), RequestContext.getIp());
+    }
+    return user;
+}
+
+/**
+ * Finds the user ID associated with a valid session token.
+ * Returns null if token is invalid or user not found.
+ */
+public Integer findUserIdBySessionToken(String sessionToken) {
+    UserEntity user = findUserBySessionToken(sessionToken);
+    if (user != null) {
+        logger.info("User: {} | IP: {} - UserId {} found for session token.", RequestContext.getAuthor(), RequestContext.getIp(), user.getId());
+        return user.getId();
+    } else {
+        logger.warn("User: {} | IP: {} - No UserId found for session token: {}.", RequestContext.getAuthor(), RequestContext.getIp(), sessionToken);
+        return null;
+    }
+}
+
 }
 

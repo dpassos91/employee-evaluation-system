@@ -3,7 +3,9 @@ package aor.projetofinal.websocket;
 import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.entity.UserEntity;
 import jakarta.enterprise.inject.spi.CDI;
-import jakarta.websocket.HandshakeRequest;
+import jakarta.websocket.server.HandshakeRequest;
+
+import jakarta.websocket.server.ServerEndpoint;
 import jakarta.websocket.server.ServerEndpointConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,11 +21,11 @@ public class ChatEndpointConfigurator extends ServerEndpointConfig.Configurator 
 
     private static final Logger logger = LogManager.getLogger(ChatEndpointConfigurator.class);
 
-    @Override
+    
     public void modifyHandshake(
             ServerEndpointConfig sec,
             HandshakeRequest request,
-            jakarta.websocket.server.HandshakeResponse response) {
+            Object response) {
 
         String token = null;
         List<String> tokenParams = request.getParameterMap().get("token");
@@ -60,8 +62,8 @@ public class ChatEndpointConfigurator extends ServerEndpointConfig.Configurator 
                 clientIp = xff.get(0);
             } else if (request.getHeaders().get("X-Real-IP") != null) {
                 clientIp = request.getHeaders().get("X-Real-IP").get(0);
-            } else if (request.getHttpSession() != null) {
-                clientIp = (String) request.getHttpSession().getAttribute("javax.servlet.request.remote_addr");
+            //} else if (request.getHttpSession() != null) {
+              //  clientIp = (String) request.getHttpSession().getAttribute("javax.servlet.request.remote_addr");
             }
         }
 
