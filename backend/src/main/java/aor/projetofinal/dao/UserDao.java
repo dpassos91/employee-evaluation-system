@@ -60,6 +60,14 @@ public class UserDao {
         }
     }
 
+    public UserEntity findById(int id) {
+    try {
+        return em.find(UserEntity.class, id);
+    } catch (Exception e) {
+        return null;
+    }
+}
+
     public void save(UserEntity user) {
         em.merge(user);
     }

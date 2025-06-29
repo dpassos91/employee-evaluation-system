@@ -10,7 +10,7 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import aor.projetofinal.bean.ProfileBean;
+import aor.projetofinal.bean.MessageBean;
 import aor.projetofinal.context.RequestContext;
 
 import java.util.List;
