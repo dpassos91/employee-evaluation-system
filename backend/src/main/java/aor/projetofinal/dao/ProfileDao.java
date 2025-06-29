@@ -58,10 +58,6 @@ public class ProfileDao {
     }
 
 
-
-
-
-
     public void create(ProfileEntity profile) {
         em.persist(profile);
     }
