@@ -26,6 +26,25 @@ public class UserDao {
         em.persist(user);
     }
 
+    public UserEntity findByConfirmToken(String confirmToken) {
+        try {
+            TypedQuery<UserEntity> query = em.createQuery(
+                    "SELECT u FROM UserEntity u WHERE u.confirmationToken = :token", UserEntity.class);
+            query.setParameter("token", confirmToken);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }    
+    
+    public UserEntity findById(int id) {
+    try {
+        return em.find(UserEntity.class, id);
+    } catch (Exception e) {
+        return null;
+    }
+}
+
     public UserEntity findByEmail(String email) {
         try {
             TypedQuery<UserEntity> query = em.createQuery(
@@ -37,19 +56,7 @@ public class UserDao {
         }
     }
 
-    public UserEntity findUserByConfirmToken(String confirmToken) {
-        try {
-            TypedQuery<UserEntity> query = em.createQuery(
-                    "SELECT u FROM UserEntity u WHERE u.confirmationToken = :token", UserEntity.class);
-            query.setParameter("token", confirmToken);
-            return query.getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-
-    public UserEntity findUserByRecoveryToken(String recoveryToken) {
+    public UserEntity findByRecoveryToken(String recoveryToken) {
         try {
             TypedQuery<UserEntity> query = em.createQuery(
                     "SELECT u FROM UserEntity u WHERE u.recoveryToken = :token", UserEntity.class);
@@ -60,10 +67,13 @@ public class UserDao {
         }
     }
 
-    public UserEntity findById(int id) {
+public UserEntity findBySessionToken(String token) {
     try {
-        return em.find(UserEntity.class, id);
-    } catch (Exception e) {
+        TypedQuery<UserEntity> query = em.createQuery(
+            "SELECT st.user FROM SessionTokenEntity st WHERE st.token = :token", UserEntity.class);
+        query.setParameter("token", token);
+        return query.getSingleResult();
+    } catch (NoResultException e) {
         return null;
     }
 }
