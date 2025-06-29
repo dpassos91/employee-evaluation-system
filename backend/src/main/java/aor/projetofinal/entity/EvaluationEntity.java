@@ -1,5 +1,6 @@
 package aor.projetofinal.entity;
 
+import aor.projetofinal.entity.enums.EvaluationStateType;
 import aor.projetofinal.entity.enums.GradeEvaluationType;
 import jakarta.persistence.*;
 
@@ -7,7 +8,15 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "evaluations")
+//the unique constraint ensures that a user can only be evaluated once per cycle, so that
+// tehre cannot exist two lines at this table with the same combination of cycle_id and evaluated_user_id
+//cosntrains works as a validation at the database level
+@Table(
+        name = "evaluations",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"cycle_id", "evaluated_user_id"})
+        }
+)
 public class EvaluationEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -25,6 +34,11 @@ public class EvaluationEntity implements Serializable {
 
     @Column(name = "evaluation_date", nullable = false)
     private LocalDateTime date;
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state", nullable = false)
+    private EvaluationStateType state;
 
     // Relação Many to One com ciclos
     @ManyToOne
@@ -76,6 +90,14 @@ public class EvaluationEntity implements Serializable {
 
     public void setDate(LocalDateTime date) {
         this.date = date;
+    }
+
+    public EvaluationStateType getState() {
+        return state;
+    }
+
+    public void setState(EvaluationStateType state) {
+        this.state = state;
     }
 
     public EvaluationCycleEntity getCycle() {
