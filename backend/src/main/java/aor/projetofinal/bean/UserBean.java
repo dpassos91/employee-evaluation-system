@@ -152,7 +152,7 @@ public class UserBean implements Serializable {
                 RequestContext.getIp()
         );
 
-        UserEntity user = userDao.findUserByConfirmToken(confirmToken);
+        UserEntity user = userDao.findByConfirmToken(confirmToken);
 
         if (user == null || user.isConfirmed()) {
             logger.warn(
@@ -500,7 +500,7 @@ public class UserBean implements Serializable {
                 recoveryToken
         );
 
-        UserEntity user = userDao.findUserByRecoveryToken(recoveryToken);
+        UserEntity user = userDao.findByRecoveryToken(recoveryToken);
 
         if (user == null || user.getRecoveryTokenExpiry() == null) {
             logger.warn(
@@ -737,7 +737,7 @@ public class UserBean implements Serializable {
         );
 
         // Verifies if recoverytoken is valid
-        UserEntity user = userDao.findUserByRecoveryToken(forgottenPassToken);
+        UserEntity user = userDao.findByRecoveryToken(forgottenPassToken);
 
         if (user == null) {
             logger.warn(

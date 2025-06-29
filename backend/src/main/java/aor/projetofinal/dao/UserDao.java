@@ -70,7 +70,7 @@ public class UserDao {
 public UserEntity findBySessionToken(String token) {
     try {
         TypedQuery<UserEntity> query = em.createQuery(
-            "SELECT st.user FROM SessionTokenEntity st WHERE st.token = :token", UserEntity.class);
+            "SELECT st.user FROM SessionTokenEntity st WHERE st.tokenValue = :token", UserEntity.class);
         query.setParameter("token", token);
         return query.getSingleResult();
     } catch (NoResultException e) {

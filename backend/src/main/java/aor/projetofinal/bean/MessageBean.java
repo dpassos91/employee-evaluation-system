@@ -26,7 +26,7 @@ public class MessageBean {
     private MessageDao messageDao;
 
     @Inject
-    private UserDao userDao; // Assumes you have UserDao to fetch UserEntity by id
+    private UserDao userDao; 
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
