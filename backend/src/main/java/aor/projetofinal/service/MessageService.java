@@ -1,7 +1,6 @@
 package aor.projetofinal.service;
 
 import aor.projetofinal.bean.MessageBean;
-import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.MessageDto;
 import aor.projetofinal.entity.UserEntity;
 import org.apache.logging.log4j.LogManager;
@@ -10,9 +9,7 @@ import aor.projetofinal.context.RequestContext;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 
@@ -26,112 +23,72 @@ public class MessageService {
     @Inject
     private MessageBean messageBean;
 
-    @Inject
-    private UserDao userDao;
-
     /**
      * Gets all messages in a conversation between the authenticated user and another user.
      * @param otherUserId The ID of the other user
-     * @param token       The authentication token (from header)
-     * @return List of MessageDto or error
+     * @return List of MessageDto
      */
     @GET
     @Path("/with/{otherUserId}")
-    public Response getConversation(
-            @PathParam("otherUserId") int otherUserId,
-            @HeaderParam("token") String token,
-            @Context Request request
-    ) {
-        // Example: get author/IP from RequestContext
-        String author = RequestContext.getAuthor();
-        String ip = RequestContext.getIp();
-
-        UserEntity currentUser = authenticateUserByToken(token);
-        if (currentUser == null) {
-            logger.warn("User: {} | IP: {} - Unauthorized access to conversation.", author, ip);
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("Invalid or expired token.").build();
-        }
+    public Response getConversation(@PathParam("otherUserId") int otherUserId) {
+        UserEntity currentUser = RequestContext.getCurrentUser();
 
         List<MessageDto> conversation = messageBean.getConversation(currentUser.getId(), otherUserId);
 
-        logger.info("User: {} | IP: {} - Fetched conversation with userId {}", author, ip, otherUserId);
+        logger.info("User: {} | IP: {} - Fetched conversation with userId {}.",
+                currentUser.getEmail(),
+                RequestContext.getIp(),
+                otherUserId);
+
         return Response.ok(conversation).build();
     }
 
     /**
      * Sends a new message.
      * @param messageDto The message to be sent
-     * @param token      The authentication token (from header)
      * @return Status code
      */
     @POST
-    public Response sendMessage(
-            MessageDto messageDto,
-            @HeaderParam("token") String token,
-            @Context Request request
-    ) {
-        String author = RequestContext.getAuthor();
-        String ip = RequestContext.getIp();
-
-        UserEntity currentUser = authenticateUserByToken(token);
-        if (currentUser == null) {
-            logger.warn("User: {} | IP: {} - Unauthorized message send attempt.", author, ip);
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("Invalid or expired token.").build();
-        }
+    public Response sendMessage(MessageDto messageDto) {
+        UserEntity currentUser = RequestContext.getCurrentUser();
 
         // For security, override senderId with the current user
         messageDto.setSenderId(currentUser.getId());
 
         boolean saved = messageBean.saveMessage(messageDto);
         if (!saved) {
-            logger.warn("User: {} | IP: {} - Failed to save message.", author, ip);
+            logger.warn("User: {} | IP: {} - Failed to save message.",
+                    currentUser.getEmail(),
+                    RequestContext.getIp());
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Message could not be saved.").build();
         }
-        logger.info("User: {} | IP: {} - Sent message to userId {}", author, ip, messageDto.getReceiverId());
+        logger.info("User: {} | IP: {} - Sent message to userId {}.",
+                currentUser.getEmail(),
+                RequestContext.getIp(),
+                messageDto.getReceiverId());
         return Response.status(Response.Status.CREATED).build();
     }
 
     /**
      * Marks all messages as read from a specific user to the authenticated user.
      * @param otherUserId The sender's user ID (the other party)
-     * @param token       The authentication token (from header)
      * @return Number of messages updated
      */
     @PUT
     @Path("/read-from/{otherUserId}")
-    public Response markMessagesAsRead(
-            @PathParam("otherUserId") int otherUserId,
-            @HeaderParam("token") String token,
-            @Context Request request
-    ) {
-        String author = RequestContext.getAuthor();
-        String ip = RequestContext.getIp();
-
-        UserEntity currentUser = authenticateUserByToken(token);
-        if (currentUser == null) {
-            logger.warn("User: {} | IP: {} - Unauthorized attempt to mark messages as read.", author, ip);
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("Invalid or expired token.").build();
-        }
+    public Response markMessagesAsRead(@PathParam("otherUserId") int otherUserId) {
+        UserEntity currentUser = RequestContext.getCurrentUser();
 
         int updated = messageBean.markMessagesAsRead(otherUserId, currentUser.getId());
-        logger.info("User: {} | IP: {} - Marked {} messages as read from userId {}", author, ip, updated, otherUserId);
+        logger.info("User: {} | IP: {} - Marked {} messages as read from userId {}.",
+                currentUser.getEmail(),
+                RequestContext.getIp(),
+                updated,
+                otherUserId);
+
         return Response.ok("Messages marked as read: " + updated).build();
     }
+}
 
-    /**
-     * Helper method to get the user from the token.
-     * @param token Auth token
-     * @return UserEntity if valid, null otherwise
-     */
-private UserEntity authenticateUserByToken(String token) {
-    if (token == null || token.isBlank()) {
-        return null;
-    }
-    return userDao.findBySessionToken(token);
-}
-}
 

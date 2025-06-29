@@ -15,7 +15,7 @@ public class RequestContextFilter implements Filter {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
-        // Capturar IP
+        // Capture IP address (supporting proxies/load balancers)
         String ip = request.getHeader("X-Forwarded-For");
         if (ip != null && ip.contains(",")) {
             ip = ip.split(",")[0];
@@ -24,19 +24,14 @@ public class RequestContextFilter implements Filter {
             ip = request.getRemoteAddr();
         }
 
-        // Capturar utilizador autenticado
-        String author = (request.getUserPrincipal() != null)
-                ? request.getUserPrincipal().getName()
-                : "Anonymous";
-
-        // Guardar no contexto
+        // Only set the IP in the context; do not set author here.
         RequestContext.setIp(ip.trim());
-        RequestContext.setAuthor(author);
 
         try {
             chain.doFilter(servletRequest, servletResponse);
         } finally {
-            RequestContext.clear(); // evitar memory leaks
+            // Always clear the context at the end of each request to prevent memory leaks.
+            RequestContext.clear();
         }
     }
 }
