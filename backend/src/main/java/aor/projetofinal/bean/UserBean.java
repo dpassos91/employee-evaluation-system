@@ -1,5 +1,6 @@
 package aor.projetofinal.bean;
 
+import aor.projetofinal.dto.*;
 import aor.projetofinal.util.JavaConversionUtil;
 import aor.projetofinal.util.StringUtils;
 import aor.projetofinal.context.RequestContext;
@@ -7,13 +8,9 @@ import aor.projetofinal.dao.ProfileDao;
 import aor.projetofinal.dao.RoleDao;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
-import aor.projetofinal.dto.LoginUserDto;
-import aor.projetofinal.dto.ProfileDto;
-import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.RoleEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
-import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.UsualWorkPlaceType;
 import aor.projetofinal.exception.EmailAlreadyExistsException;
@@ -27,6 +24,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Stateless
@@ -524,6 +523,76 @@ public class UserBean implements Serializable {
 
         return valid;
     }
+
+
+    /**
+     * Retrieves a list of confirmed users who do not have a manager assigned.
+     * Converts them into DTOs and returns them in a wrapper object that includes the count.
+     *
+     * @return UsersWithoutManagerDto containing the list and count of users without a manager.
+     */
+    public UsersWithoutManagerDto listConfirmedUsersWithoutManager() {
+        logger.info(
+                "User: {} | IP: {} - Attempting to retrieve confirmed users without assigned managers.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp()
+        );
+
+        List<UserEntity> users = userDao.findConfirmedUsersWithoutManager();
+
+        if (users == null) {
+            users = new ArrayList<>();
+            logger.warn(
+                    "User: {} | IP: {} - UserDao returned null while retrieving confirmed users without managers.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp()
+            );
+        }
+
+        List<UserDto> userDtos = new ArrayList<>();
+        for (UserEntity user : users) {
+            UserDto dto = javaConversionUtil.convertUserEntityToUserDto(user);
+            if (dto != null) {
+                userDtos.add(dto);
+            } else {
+                logger.warn(
+                        "User: {} | IP: {} - Failed to convert UserEntity to UserDto. User ID: {}.",
+                        RequestContext.getAuthor(),
+                        RequestContext.getIp(),
+                        user.getId()
+                );
+            }
+        }
+
+        if (userDtos.isEmpty()) {
+            logger.info(
+                    "User: {} | IP: {} - No confirmed users found without a manager.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp()
+            );
+        } else {
+            logger.info(
+                    "User: {} | IP: {} - Found {} confirmed users without assigned managers.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    userDtos.size()
+            );
+        }
+
+        UsersWithoutManagerDto result = new UsersWithoutManagerDto();
+        result.setUsersWithoutManager(userDtos);
+        result.setNumberOfUsersWithoutManager(userDtos.size());
+
+        return result;
+    }
+
+
+
+
+
+
+
+
 
     /**
      * Authenticates a user based on provided login credentials and generates a new session token if successful.
