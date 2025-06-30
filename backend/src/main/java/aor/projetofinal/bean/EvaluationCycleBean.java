@@ -8,6 +8,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @ApplicationScoped
 public class EvaluationCycleBean implements Serializable {
@@ -24,6 +27,21 @@ public class EvaluationCycleBean implements Serializable {
         }
         return cycle;
     }
+
+    public void createCycle(LocalDate endDate) {
+        EvaluationCycleEntity newCycle = new EvaluationCycleEntity();
+        newCycle.setStartDate(LocalDateTime.now());
+        //we get a localdate from frontend, which we need to convert to LocalDateTime to store at the DB
+        newCycle.setEndDate(endDate.atTime(LocalTime.MAX));
+        newCycle.setActive(true);
+
+        evaluationCycleDao.create(newCycle);
+    }
+
+
+
+
+
 
 
 

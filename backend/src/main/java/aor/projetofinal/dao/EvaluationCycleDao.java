@@ -1,6 +1,7 @@
 package aor.projetofinal.dao;
 
 import aor.projetofinal.entity.EvaluationCycleEntity;
+import aor.projetofinal.entity.EvaluationEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -36,7 +37,9 @@ public class EvaluationCycleDao {
         return count > 0;
     }
 
-
+    public void create(EvaluationCycleEntity evaluationCycle) {
+        em.persist(evaluationCycle);
+    }
 
 
 }

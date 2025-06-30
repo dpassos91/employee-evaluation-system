@@ -8,6 +8,8 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 
+import java.util.List;
+
 @ApplicationScoped
 public class UserDao {
 
@@ -77,6 +79,18 @@ public UserEntity findBySessionToken(String token) {
         return null;
     }
 }
+
+
+    public List<UserEntity> findConfirmedUsersWithoutManager() {
+        TypedQuery<UserEntity> query = em.createQuery(
+                "SELECT u FROM UserEntity u WHERE u.confirmed = true AND u.manager IS NULL",
+                UserEntity.class
+        );
+        return query.getResultList();
+    }
+
+
+
 
     public void save(UserEntity user) {
         em.merge(user);
