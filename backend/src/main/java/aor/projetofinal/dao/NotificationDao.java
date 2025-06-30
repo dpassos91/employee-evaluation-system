@@ -21,7 +21,7 @@ public class NotificationDao {
 
     private static final Logger logger = LogManager.getLogger(NotificationDao.class);
 
-    @PersistenceContext(unitName = "yourPersistenceUnit")
+    @PersistenceContext(unitName = "grupo7")
     private EntityManager em;
 
     /**
