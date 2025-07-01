@@ -587,6 +587,20 @@ public class UserBean implements Serializable {
     }
 
 
+    public UsersManagingThemselvesDto listUsersManagingThemselves() {
+        List<UserEntity> selfManagedUsers = userDao.findUsersManagingThemselves();
+
+        List<UserDto> userDtos = new ArrayList<>();
+        for (UserEntity user : selfManagedUsers) {
+            userDtos.add(JavaConversionUtil.convertUserEntityToUserDto(user));
+        }
+
+        UsersManagingThemselvesDto dto = new UsersManagingThemselvesDto();
+        dto.setUsers(userDtos);
+        dto.setNumberOfUsers(userDtos.size());
+
+        return dto;
+    }
 
 
 

@@ -102,6 +102,19 @@ public UserEntity findBySessionToken(String token) {
     }
 
 
+    public List<UserEntity> findUsersManagingThemselves() {
+        TypedQuery<UserEntity> query = em.createQuery(
+                "SELECT u FROM UserEntity u " +
+                        "WHERE u.confirmed = true AND u.active = true " +
+                        "AND u.manager IS NOT NULL " +
+                        "AND u = u.manager",
+                UserEntity.class
+        );
+        return query.getResultList();
+    }
+
+
+
     public void save(UserEntity user) {
         em.merge(user);
     }

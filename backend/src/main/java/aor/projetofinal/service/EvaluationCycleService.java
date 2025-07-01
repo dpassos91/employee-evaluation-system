@@ -7,6 +7,7 @@ import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dto.CreateCycleDto;
+import aor.projetofinal.dto.UsersManagingThemselvesDto;
 import aor.projetofinal.dto.UsersWithIncompleteEvaluationsDto;
 import aor.projetofinal.dto.UsersWithoutManagerDto;
 import aor.projetofinal.entity.SessionTokenEntity;
@@ -94,10 +95,28 @@ public class EvaluationCycleService {
                     usersWithoutManagerDto.getNumberOfUsersWithoutManager());
 
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(usersWithoutManagerDto)  // responde com o DTO completo
+                    .entity(usersWithoutManagerDto)  // replies with the respective and complete DTO
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
+
+
+        // verify if any user is managing themselves
+        UsersManagingThemselvesDto selfManagingDto = userBean.listUsersManagingThemselves();
+
+        if (selfManagingDto.getNumberOfUsers() > 0) {
+            logger.warn("User: {} | IP: {} - Found {} users managing themselves.",
+                    RequestContext.getAuthor(), RequestContext.getIp(),
+                    selfManagingDto.getNumberOfUsers());
+
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(selfManagingDto)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+
 
 
         // verify if there are evaluations yet to be completed from the previous cycle
