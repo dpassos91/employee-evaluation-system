@@ -89,7 +89,17 @@ public UserEntity findBySessionToken(String token) {
         return query.getResultList();
     }
 
-
+    public List<UserEntity> findUsersByRole(String roleName) {
+        TypedQuery<UserEntity> query = em.createQuery(
+                "SELECT u FROM UserEntity u " +
+                        "WHERE LOWER(u.role.name) = LOWER(:roleName) " +
+                        "AND u.active = true " +
+                        "AND u.confirmed = true",
+                UserEntity.class
+        );
+        query.setParameter("roleName", roleName);
+        return query.getResultList();
+    }
 
 
     public void save(UserEntity user) {
