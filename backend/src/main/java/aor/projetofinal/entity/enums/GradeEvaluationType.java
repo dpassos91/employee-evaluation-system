@@ -6,10 +6,10 @@ public enum GradeEvaluationType {
 //applying class/enum constructors and
 // private fields for being able to add a description and a grade for each enum object
 
-    CONTRIBUICAO_BAIXA(1, "Contribuição Baixa"),
-    CONTRIBUICAO_PARCIAL(2, "Contribuição Parcial"),
-    CONFORME_ESPERADO(3, "Contribuição conforme o Esperado"),
-    CONTRIBUICAO_EXCEDIDA(4, "Contribuição Excedida");
+    LOW_CONTRIBUTION(1, "Low Contribution"),
+    PARTIAL_CONTRIBUTION(2, "Partial Contribution"),
+    AS_EXPECTED(3, "Contribution as Expected"),
+    EXCEEDED_CONTRIBUTION(4, "Exceeded Contribution");
 
 
     //private fields

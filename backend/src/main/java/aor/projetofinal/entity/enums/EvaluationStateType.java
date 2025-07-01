@@ -1,7 +1,7 @@
 package aor.projetofinal.entity.enums;
 
 public enum EvaluationStateType {
-    EM_AVALIACAO,
-    CONCLUIDO,
-    FECHADO
+    IN_EVALUATION,
+    EVALUATED,
+    CLOSED
 }

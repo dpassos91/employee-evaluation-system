@@ -35,7 +35,7 @@ public class JavaConversionUtil {
     }
 
 
-    public UserDto convertUserEntityToUserDto(UserEntity userEntity) {
+    public static UserDto convertUserEntityToUserDto(UserEntity userEntity) {
         UserDto userDto = new UserDto();
         userDto.setEmail(userEntity.getEmail());
         userDto.setActive(userEntity.isActive());

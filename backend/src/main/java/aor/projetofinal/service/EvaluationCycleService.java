@@ -1,7 +1,14 @@
 package aor.projetofinal.service;
 
 
+import aor.projetofinal.bean.EvaluationBean;
+import aor.projetofinal.bean.EvaluationCycleBean;
+import aor.projetofinal.bean.UserBean;
+import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.SessionTokenDao;
+import aor.projetofinal.dto.CreateCycleDto;
+import aor.projetofinal.dto.UsersWithIncompleteEvaluationsDto;
+import aor.projetofinal.dto.UsersWithoutManagerDto;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.util.DateValidator;
@@ -21,7 +28,14 @@ public class EvaluationCycleService {
     @Inject
     private SessionTokenDao sessionTokenDao;
 
+    @Inject
+    UserBean userBean;
 
+    @Inject
+    private EvaluationBean evaluationBean;
+
+    @Inject
+    private EvaluationCycleBean evaluationCycleBean;
 
 
 
@@ -63,7 +77,7 @@ public class EvaluationCycleService {
         }
 
 
-        if (evaluationCycleBean.isThereAnActiveCycle()) {
+        if (evaluationCycleBean.findActiveCycle() != null) {
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"message\": \"There currently is an active cycle.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -72,21 +86,34 @@ public class EvaluationCycleService {
 
 
         // verify if there are users whose accounts are confrimed but don't have a manager assigned
-        if (userBean.countConfirmedUsersWithoutManager() > 0) {
+        UsersWithoutManagerDto usersWithoutManagerDto = userBean.listConfirmedUsersWithoutManager();
+
+        if (usersWithoutManagerDto.getNumberOfUsersWithoutManager() > 0) {
+            logger.warn("User: {} | IP: {} - Found {} confirmed users without assigned managers.",
+                    RequestContext.getAuthor(), RequestContext.getIp(),
+                    usersWithoutManagerDto.getNumberOfUsersWithoutManager());
+
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"message\": \"There are users without an assigned manager.\"}")
+                    .entity(usersWithoutManagerDto)  // responde com o DTO completo
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
 
         // verify if there are evaluations yet to be completed from the previous cycle
-        if (evaluationBean.hasOpenEvaluationsFromPreviousCycle()) {
+        UsersWithIncompleteEvaluationsDto incompleteDto = evaluationBean.listUsersWithIncompleteEvaluationsFromLastCycle();
+
+        if (incompleteDto.getTotalUsersWithIncompleteEvaluations() > 0) {
+            logger.warn("User: {} | IP: {} - Found {} users with incomplete evaluations.",
+                    RequestContext.getAuthor(), RequestContext.getIp(),
+                    incompleteDto.getTotalUsersWithIncompleteEvaluations());
+
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"message\": \"There are evaluations yet to be completed from the previous cycle.\"}")
+                    .entity(incompleteDto)
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
+
 
         //create a new evaluation cycle
         evaluationCycleBean.createCycle(dto.getEndDate());
