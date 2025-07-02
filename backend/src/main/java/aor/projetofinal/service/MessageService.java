@@ -24,6 +24,34 @@ public class MessageService {
     private MessageBean messageBean;
 
     /**
+ * Gets the list of conversations for the authenticated user.
+ * Each conversation contains information about the other user,
+ * the last message exchanged, its timestamp, and the number of unread messages.
+ *
+ * Example response:
+ * [
+ *   {
+ *     "otherUserId": 2,
+ *     "otherUserName": "João Silva",
+ *     "otherUserAvatar": "https://randomuser.me/api/portraits/men/32.jpg",
+ *     "lastMessage": "Até já!",
+ *     "lastMessageTime": "2025-07-03T10:31:00Z",
+ *     "unreadCount": 1
+ *   },
+ *   ...
+ * ]
+ *
+ * @return 200 OK with a list of ConversationDto objects (one for each conversation)
+ */
+@GET
+@Path("/conversations")
+public Response getConversations() {
+    UserEntity currentUser = RequestContext.getCurrentUser();
+    List<ConversationDto> conversations = messageBean.getUserConversations(currentUser.getId());
+    return Response.ok(conversations).build();
+}
+
+    /**
      * Gets all messages in a conversation between the authenticated user and another user.
      * @param otherUserId The ID of the other user
      * @return List of MessageDto
