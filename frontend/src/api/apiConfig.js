@@ -48,10 +48,15 @@ const API_ENDPOINTS = {
     // e.g.: list: `${API_BASE_URL}/evaluations`,
   },
 
-  /** Message endpoints (to be filled in) */
-  messages: {
-    // e.g.: send: `${API_BASE_URL}/messages/send`,
-  },
+  /** Message endpoints*/
+ messages: {
+  /** @function Gets the conversation (all messages) with another user by their user ID */
+  getConversation: (otherUserId) => `${API_BASE_URL}/messages/with/${otherUserId}`,
+  /** @type {string} Endpoint to send a new message */
+  send: `${API_BASE_URL}/messages`,
+  /** @function Marks all messages as read from the given user */
+  markAsRead: (otherUserId) => `${API_BASE_URL}/messages/read-from/${otherUserId}`,
+},
 
 
 /** Profile endpoints */
