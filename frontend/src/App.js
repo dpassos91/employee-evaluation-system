@@ -13,6 +13,7 @@ import RedefinePasswordPage from "./pages/RedefinePasswordPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import UsersListPage from "./pages/UsersListPage";
+import ChatPage from "./pages/ChatPage";
 
 export default function App() {
   const {
@@ -61,6 +62,14 @@ export default function App() {
     element={
       <PrivateRoute>
         <UsersListPage />
+      </PrivateRoute>
+    }
+    />
+              <Route
+    path="/chat"
+    element={
+      <PrivateRoute>
+        <ChatPage />
       </PrivateRoute>
     }
     />

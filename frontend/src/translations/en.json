@@ -60,6 +60,8 @@
   "profile.save": "Save",
   "profile.incomplete.fields": "Please fill in all required fields: {fields}.",
   "profile.update.success": "Profile updated successfully!",
+  "profile.update.error": "Error updating profile.",
+  "profile.fetch.error": "Error fetching profile data.",
 
     "users.list.title": "User List",
   "users.filter.name": "Name",
@@ -75,6 +77,9 @@
   "auth.login.failed": "There was a problem logging in. Please try again.",
   "auth.login.unconfirmed": "Your account has not yet been confirmed! Please check your email.",
   "auth.logout.success": "Logout successful!",
-  "auth.logout.failed": "There was a problem logging out. Please try again."  
+  "auth.logout.failed": "There was a problem logging out. Please try again.",
+
+  "chat.title": "Messages",
+  "chat.subtitle": "Your conversation history"
   
 }

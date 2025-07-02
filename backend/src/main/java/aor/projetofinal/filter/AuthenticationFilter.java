@@ -34,6 +34,13 @@ public class AuthenticationFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
+        // Allow preflight requests (CORS)
+        // This is necessary for CORS requests, especially for REST APIs
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+        chain.doFilter(servletRequest, servletResponse);
+        return;
+    }
+
         String path = request.getRequestURI();
         logger.info("User: {} | IP: {} - Incoming request path: {}", RequestContext.getAuthor(), RequestContext.getIp(), path);
 

@@ -98,7 +98,7 @@ export const authInterceptor = (options = {}) => {
       ...options,
       headers: {
         ...options.headers,
-        Authorization: `Bearer ${token}`,
+        token,
       },
     };
   }

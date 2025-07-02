@@ -61,6 +61,8 @@
   "profile.save": "Guardar",
   "profile.incomplete.fields": "Por favor, preencha todos os campos obrigatórios : {fields}.",
   "profile.update.success": "Perfil atualizado com sucesso!",
+  "profile.update.error": "Erro ao atualizar o perfil.",
+  "profile.fetch.error": "Erro ao obter os dados do perfil.",
 
     "users.list.title": "Listagem de Utilizadores",
   "users.filter.name": "Nome",
@@ -76,6 +78,9 @@
   "auth.login.failed": "Falha no login. Por favor, verifique as suas credenciais.",
   "auth.login.unconfirmed": "A sua conta ainda não foi confirmada! Por favor, verifique o seu email.",
   "auth.logout.success": "Logout efetuado com sucesso!",
-  "auth.logout.failed": "Houve um problema ao fazer logout. Por favor tente novamente."
+  "auth.logout.failed": "Houve um problema ao fazer logout. Por favor tente novamente.",
+
+  "chat.title": "Mensagens",
+  "chat.subtitle": "O teu histórico de conversas"
 
 }
