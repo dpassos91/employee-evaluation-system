@@ -80,6 +80,8 @@
   "auth.logout.failed": "There was a problem logging out. Please try again.",
 
   "chat.title": "Messages",
-  "chat.subtitle": "Your conversation history"
+  "chat.subtitle": "Your conversation history",
+  "chat.placeholder": "Type a message...",
+  "chat.conversations": "Conversations"
   
 }

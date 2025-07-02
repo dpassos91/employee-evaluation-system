@@ -81,6 +81,8 @@
   "auth.logout.failed": "Houve um problema ao fazer logout. Por favor tente novamente.",
 
   "chat.title": "Mensagens",
-  "chat.subtitle": "O teu histórico de conversas"
+  "chat.subtitle": "O teu histórico de conversas",
+  "chat.placeholder": "Escreve uma mensagem...",
+   "chat.conversations": "Conversas"
 
 }

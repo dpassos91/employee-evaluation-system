@@ -1,6 +1,7 @@
 import PageLayout from "../components/PageLayout";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { useIntl } from "react-intl";
 
 const mockConversations = [
   {
@@ -33,6 +34,7 @@ const mockConversations = [
 export default function ChatPage() {
   const [selectedConvId, setSelectedConvId] = useState(mockConversations[0].id);
   const conversation = mockConversations.find(c => c.id === selectedConvId);
+  const intl = useIntl();
 
   return (
     <PageLayout       
@@ -41,7 +43,6 @@ export default function ChatPage() {
       <div className="flex w-full max-w-6xl h-[500px] mx-auto bg-white rounded-2xl shadow overflow-hidden">
         {/* Sidebar */}
         <aside className="w-64 bg-gray-100 border-r flex flex-col">
-          <div className="p-3 border-b font-semibold text-lg">Conversas</div>
           <div className="flex-1 overflow-y-auto">
             {mockConversations.map(conv => (
               <button
@@ -103,7 +104,7 @@ export default function ChatPage() {
           <div className="flex items-center gap-2 p-4 border-t bg-white">
             <input
               className="flex-1 rounded-2xl border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#D41C1C] transition"
-              placeholder="Escreve uma mensagem..."
+              placeholder={intl.formatMessage({ id: "chat.placeholder", defaultMessage: "Escreve uma mensagem..." })}
             />
             <button
               className="bg-[#D41C1C] text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-red-700 transition"

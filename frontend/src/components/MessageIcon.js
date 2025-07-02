@@ -1,9 +1,12 @@
-import messageIcon from "../images/message_icon.png"; // substitui pela tua imagem real
+import messageIcon from "../images/message_icon.png"; 
+import { useNavigate } from "react-router-dom";
 
 export default function MessageIcon() {
+  const navigate = useNavigate();
   return (
     <button
-      aria-label="Mensagens"
+      type="button"
+      onClick={() => navigate("/chat")} 
       className="focus:outline-none"
     >
       <img
