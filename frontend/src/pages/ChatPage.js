@@ -1,61 +1,96 @@
 import PageLayout from "../components/PageLayout";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { messageAPI } from "../api/messageAPI";
-
-// Simulação de contactos disponíveis (até teres endpoint real)
-const contacts = [
-  { id: 2, name: "João Silva", avatar: "https://randomuser.me/api/portraits/men/32.jpg" },
-  { id: 3, name: "Maria Santos", avatar: "https://randomuser.me/api/portraits/women/44.jpg" }
-];
+import { userStore } from "../stores/userStore";
+import useWebSocket from "../hooks/useWebSocket";
 
 export default function ChatPage() {
-  const [selectedConvId, setSelectedConvId] = useState(contacts[0].id);
+  const [sidebarConversations, setSidebarConversations] = useState([]);
+  const [selectedConvId, setSelectedConvId] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [loadingSidebar, setLoadingSidebar] = useState(true);
   const [input, setInput] = useState("");
   const [error, setError] = useState(null);
   const intl = useIntl();
+  const { user } = userStore();
+  const token = sessionStorage.getItem("authToken");
 
-  // Sempre que muda a conversa selecionada, faz fetch ao backend
+  // Refs para manter selectedConvId e user.id atualizados dentro do callback do WebSocket
+  const selectedConvIdRef = useRef(selectedConvId);
+  const userIdRef = useRef(user?.id);
+
   useEffect(() => {
-    setLoading(true);
+    selectedConvIdRef.current = selectedConvId;
+  }, [selectedConvId]);
+
+  useEffect(() => {
+    userIdRef.current = user?.id;
+  }, [user]);
+
+  // Buscar conversas da sidebar ao carregar a página
+  useEffect(() => {
+    setLoadingSidebar(true);
+    messageAPI.chatSidebarConversations()
+      .then(convs => {
+        setSidebarConversations(convs || []);
+        if (convs && convs.length > 0) {
+          setSelectedConvId(convs[0].otherUserId);
+        }
+      })
+      .catch(() => setError("Erro ao carregar conversas"))
+      .finally(() => setLoadingSidebar(false));
+  }, []);
+
+  // Buscar mensagens da conversa selecionada
+  useEffect(() => {
+    if (!selectedConvId) return;
+    setLoadingMessages(true);
     setMessages([]);
     setError(null);
     messageAPI.getConversation(selectedConvId)
       .then((msgs) => setMessages(msgs || []))
       .catch(() => setError("Erro ao carregar mensagens"))
-      .finally(() => setLoading(false));
+      .finally(() => setLoadingMessages(false));
   }, [selectedConvId]);
 
-  // Enviar mensagem usando messageAPI
-  const handleSend = async () => {
-    if (!input.trim()) return;
-    try {
-      await messageAPI.sendMessage({
-        receiverId: selectedConvId,
-        content: input
-      });
-      // Podes adicionar imediatamente ao state (optimistic UI)
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now(), // id temporário
-          senderId: null, // current user (o backend sabe)
-          receiverId: selectedConvId,
-          content: input,
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          sentByMe: true
+  // WebSocket para mensagens em tempo real
+  const { sendMessage, isConnected } = useWebSocket(
+    "wss://localhost:8443/grupo7/websocket/chat",
+    token,
+    (data) => {
+      if (data.type === "chat_message") {
+        // Só mostrar se for para a conversa aberta!
+        if (
+          (data.senderId === selectedConvIdRef.current && data.receiverId === userIdRef.current) ||
+          (data.senderId === userIdRef.current && data.receiverId === selectedConvIdRef.current)
+        ) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              ...data,
+              sentByMe: data.senderId === userIdRef.current
+            }
+          ]);
         }
-      ]);
-      setInput("");
-    } catch {
-      setError("Erro ao enviar mensagem");
+      }
     }
+  );
+
+  // Enviar mensagem
+  const handleSend = () => {
+    if (!input.trim()) return;
+    sendMessage({
+      senderId: user.id,
+      receiverId: selectedConvId,
+      content: input
+    });
+    setInput("");
   };
 
-  // Encontras o contacto atualmente selecionado
-  const selectedContact = contacts.find((c) => c.id === selectedConvId);
+  // Contacto selecionado na sidebar
+  const selectedContact = sidebarConversations.find(c => c.otherUserId === selectedConvId);
 
   return (
     <PageLayout
@@ -65,19 +100,35 @@ export default function ChatPage() {
       <div className="flex w-full max-w-6xl h-[500px] mx-auto bg-white rounded-2xl shadow overflow-hidden">
         {/* Sidebar */}
         <aside className="w-64 bg-gray-100 border-r flex flex-col">
+          <div className="p-3 border-b font-semibold text-lg">
+            <FormattedMessage id="chat.conversations" defaultMessage="Conversas" />
+          </div>
           <div className="flex-1 overflow-y-auto">
-            {contacts.map(conv => (
+            {loadingSidebar && (
+              <div className="text-center text-gray-400 py-4">A carregar conversas...</div>
+            )}
+            {sidebarConversations.map(conv => (
               <button
-                key={conv.id}
+                key={conv.otherUserId}
                 className={`
                   flex items-center w-full px-4 py-3 gap-3 hover:bg-gray-200
-                  ${selectedConvId === conv.id ? "bg-gray-300" : ""}
+                  ${selectedConvId === conv.otherUserId ? "bg-gray-300" : ""}
                 `}
-                onClick={() => setSelectedConvId(conv.id)}
+                onClick={() => setSelectedConvId(conv.otherUserId)}
               >
-                <img src={conv.avatar} alt="" className="w-10 h-10 rounded-full object-cover border" />
+                <img src={conv.otherUserAvatar} alt="" className="w-10 h-10 rounded-full object-cover border" />
                 <div className="flex-1 text-left">
-                  <div className="font-medium">{conv.name}</div>
+                  <div className="font-medium">{conv.otherUserName}</div>
+                  <div className="text-xs text-gray-500 truncate">{conv.lastMessage}</div>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <div className="text-[10px] text-gray-400">{conv.lastMessageTime && conv.lastMessageTime.substring(11, 16)}</div>
+                  {conv.unreadCount > 0 && (
+                    <span className="bg-[#D41C1C] text-white rounded-full text-xs px-2">{conv.unreadCount}</span>
+                  )}
+                  {conv.online && (
+                    <span className="inline-block w-2 h-2 rounded-full bg-green-500" title="Online"></span>
+                  )}
                 </div>
               </button>
             ))}
@@ -88,34 +139,46 @@ export default function ChatPage() {
         <section className="flex-1 flex flex-col">
           {/* Header */}
           <div className="flex items-center gap-3 px-6 py-4 border-b">
-            <img src={selectedContact.avatar} alt="" className="w-10 h-10 rounded-full border" />
-            <div>
-              <div className="font-semibold">{selectedContact.name}</div>
-              <div className="text-xs text-gray-400">Online</div>
-            </div>
+            {selectedContact && (
+              <>
+                <img src={selectedContact.otherUserAvatar} alt="" className="w-10 h-10 rounded-full border" />
+                <div>
+                  <div className="font-semibold">{selectedContact.otherUserName}</div>
+                  <div className="text-xs text-gray-400">
+                    {selectedContact.online
+                      ? <FormattedMessage id="chat.online" defaultMessage="Online" />
+                      : selectedContact.role
+                        ? selectedContact.role.charAt(0).toUpperCase() + selectedContact.role.slice(1).toLowerCase()
+                        : ""}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           {/* Mensagens */}
           <div className="flex-1 px-6 py-4 overflow-y-auto bg-gray-50 space-y-2">
-            {loading && <div className="text-center text-gray-400">A carregar...</div>}
+            {loadingMessages && <div className="text-center text-gray-400">A carregar...</div>}
             {error && <div className="text-center text-red-500">{error}</div>}
-            {messages.map((msg, idx) => (
-              <div
-                key={msg.id || idx}
-                className={`flex ${msg.sentByMe || (msg.senderId === undefined) ? "justify-end" : "justify-start"}`}
-              >
-                <div className={`
-                  px-4 py-2 rounded-2xl shadow
-                  ${msg.sentByMe || (msg.senderId === undefined) || (msg.senderId === null)
-                    ? "bg-[#D41C1C] text-white rounded-br-sm"
-                    : "bg-white text-gray-800 rounded-bl-sm border"}
-                  max-w-[70%]
-                  `}
+            {messages.map((msg, idx) => {
+              const isMine = msg.senderId === user?.id || msg.sentByMe;
+              return (
+                <div
+                  key={msg.id || idx}
+                  className={`flex ${isMine ? "justify-end" : "justify-start"}`}
                 >
-                  <div className="text-sm">{msg.content}</div>
-                  <div className="text-[10px] text-right opacity-70 mt-1">{msg.timestamp}</div>
+                  <div className={`
+                    px-4 py-2 rounded-2xl shadow
+                    ${isMine
+                      ? "bg-[#D41C1C] text-white rounded-br-sm"
+                      : "bg-white text-gray-800 rounded-bl-sm border"}
+                    max-w-[70%]
+                  `}>
+                    <div className="text-sm">{msg.content}</div>
+                    <div className="text-[10px] text-right opacity-70 mt-1">{msg.timestamp || msg.createdAt}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           {/* Input */}
           <div className="flex items-center gap-2 p-4 border-t bg-white">
@@ -140,6 +203,8 @@ export default function ChatPage() {
     </PageLayout>
   );
 }
+
+
 
 
 

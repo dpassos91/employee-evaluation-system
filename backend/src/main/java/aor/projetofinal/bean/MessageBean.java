@@ -214,37 +214,55 @@ if (lastMessage != null) {
     }
 
     /**
-     * Converts a MessageEntity to MessageDto, optionally enriching with user names.
-     * @param entity The MessageEntity
-     * @return MessageDto
-     */
-    public MessageDto toDto(MessageEntity entity) {
-        if (entity == null) {
-            logger.warn("User: {} | IP: {} - Attempted to convert null MessageEntity to DTO.",
-                RequestContext.getAuthor(),
-                RequestContext.getIp()
-            );
-            return null;
-        }
-        MessageDto dto = new MessageDto();
-        dto.setId(entity.getId());
-        dto.setSenderId(entity.getSender().getId());
-        dto.setReceiverId(entity.getReceiver().getId());
-        dto.setContent(entity.getContent());
-        dto.setRead(entity.isRead());
-        if (entity.getCreatedAt() != null) {
-            dto.setCreatedAt(entity.getCreatedAt().format(FORMATTER));
-        }
-        // Optionally, enrich with names from ProfileEntity
-        if (entity.getSender().getProfile() != null) {
-            dto.setSenderName(entity.getSender().getProfile().getFirstName()
-                    + " " + entity.getSender().getProfile().getLastName());
-        }
-        if (entity.getReceiver().getProfile() != null) {
-            dto.setReceiverName(entity.getReceiver().getProfile().getFirstName()
-                    + " " + entity.getReceiver().getProfile().getLastName());
-        }
-        return dto;
+ * Converts a MessageEntity to MessageDto, enriching with user names if available.
+ * If profile or names are missing, falls back to empty string.
+ * @param entity The MessageEntity
+ * @return MessageDto
+ */
+public MessageDto toDto(MessageEntity entity) {
+    if (entity == null) {
+        logger.warn("User: {} | IP: {} - Attempted to convert null MessageEntity to DTO.",
+            RequestContext.getAuthor(),
+            RequestContext.getIp()
+        );
+        return null;
     }
+    MessageDto dto = new MessageDto();
+    dto.setId(entity.getId());
+    dto.setSenderId(entity.getSender().getId());
+    dto.setReceiverId(entity.getReceiver().getId());
+    dto.setContent(entity.getContent());
+    dto.setRead(entity.isRead());
+    if (entity.getCreatedAt() != null) {
+        dto.setCreatedAt(entity.getCreatedAt().format(FORMATTER));
+    }
+
+    // Sender name
+    String senderFirst = "";
+    String senderLast = "";
+    if (entity.getSender() != null && entity.getSender().getProfile() != null) {
+        senderFirst = entity.getSender().getProfile().getFirstName();
+        senderLast = entity.getSender().getProfile().getLastName();
+    }
+    dto.setSenderName(
+        (senderFirst != null ? senderFirst : "") +
+        (senderLast != null && !senderLast.isBlank() ? " " + senderLast : "")
+    );
+
+    // Receiver name
+    String receiverFirst = "";
+    String receiverLast = "";
+    if (entity.getReceiver() != null && entity.getReceiver().getProfile() != null) {
+        receiverFirst = entity.getReceiver().getProfile().getFirstName();
+        receiverLast = entity.getReceiver().getProfile().getLastName();
+    }
+    dto.setReceiverName(
+        (receiverFirst != null ? receiverFirst : "") +
+        (receiverLast != null && !receiverLast.isBlank() ? " " + receiverLast : "")
+    );
+
+    return dto;
+}
+
 }
 

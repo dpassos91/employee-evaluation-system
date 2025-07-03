@@ -53,6 +53,7 @@ public class ChatEndpoint {
      */
     @OnClose
     public void onClose(Session session) {
+        logger.info("[ONCLOSE] Antes de remover, sessions.keySet: {}", sessions.keySet());
         try {
             sessions.entrySet().removeIf(entry -> entry.getValue().equals(session));
             Integer userId = (Integer) session.getUserProperties().get("userId");
@@ -94,7 +95,7 @@ public void onError(Session session, Throwable throwable) {
             "User: {} | IP: {} - WebSocket error occurred: {}",
             RequestContext.getAuthor(),
             RequestContext.getIp(),
-            throwable.getMessage()
+            throwable
         );
     } finally {
         RequestContext.clear();
@@ -112,6 +113,11 @@ public void onError(Session session, Throwable throwable) {
      */
     @OnMessage
 public void onMessage(Session session, String messageText) {
+
+        if (messageText.contains("\"type\":\"ping\"") || "ping".equalsIgnoreCase(messageText.trim())) {
+        return;
+        }
+
     // Set context for this thread/message
     String author = (String) session.getUserProperties().getOrDefault("author", "Anonymous");
     String ip = (String) session.getUserProperties().getOrDefault("ip", "Unknown");
@@ -166,14 +172,23 @@ public void onMessage(Session session, String messageText) {
 
         // If receiver is online, send them the message instantly
         Session receiverSession = sessions.get(receiverId);
+        logger.info("[ONMESSAGE] receiverSession == null? {}", receiverSession == null);
+        logger.info("[ONMESSAGE] receiverSession != null && isOpen? {}", receiverSession != null && receiverSession.isOpen());
         if (receiverSession != null && receiverSession.isOpen()) {
             String jsonMsg = mapper.writeValueAsString(Map.of(
                 "type", "chat_message",
                 "senderId", enrichedDto.getSenderId(),
                 "senderName", enrichedDto.getSenderName(),
                 "content", enrichedDto.getContent(),
-                "createdAt", enrichedDto.getCreatedAt()
+                "createdAt", enrichedDto.getCreatedAt(),
+                "receiverId", enrichedDto.getReceiverId(),
+                "id", enrichedDto.getId()
             ));
+
+        // Always send the message back to the sender
+        session.getBasicRemote().sendText(jsonMsg);
+        
+            logger.info("Tentar enviar mensagem para receiverId = " + receiverId + ", sessions: " + sessions.keySet());
             receiverSession.getBasicRemote().sendText(jsonMsg);
             logger.info("User: {} | IP: {} - Message delivered in real time to userId: {}.", RequestContext.getAuthor(), RequestContext.getIp(), receiverId);
         } else {
@@ -181,6 +196,8 @@ public void onMessage(Session session, String messageText) {
         }
 
         // Confirm delivery to the sender 
+        logger.info("[DEBUG] Vou enviar para receiverId {}, sessions atuais: {}", receiverId, sessions.keySet());
+        logger.info("[DEBUG] Session receiverId aberta? {}", receiverSession.isOpen());
         session.getBasicRemote().sendText("✔️ Message sent to userId: " + receiverId);
 
     } catch (Exception e) {
@@ -191,6 +208,7 @@ public void onMessage(Session session, String messageText) {
     } finally {
         RequestContext.clear();
     }
+
 }
 
 
@@ -206,6 +224,7 @@ public void onMessage(Session session, String messageText) {
 public void onOpen(Session session, EndpointConfig config) {
     logger.info("DEBUG: session.getUserProperties() = {}", session.getUserProperties());
     logger.info("DEBUG: config.getUserProperties() = {}", config.getUserProperties());
+
     try {
         Integer userId = (Integer) session.getUserProperties().get("userId");
         String author = (String) session.getUserProperties().getOrDefault("author", "Anonymous");
@@ -216,6 +235,9 @@ public void onOpen(Session session, EndpointConfig config) {
         RequestContext.setAuthor(author);
         RequestContext.setIp(ip);
 
+    logger.info("[ONOPEN] userId: {}", userId);
+    logger.info("[ONOPEN] sessions.keySet antes: {}", sessions.keySet());
+
         if (userId == null) {
             logger.warn("User: {} | IP: {} - WebSocket connection rejected: Invalid or missing session token.", RequestContext.getAuthor(), RequestContext.getIp());
             try {
@@ -224,6 +246,8 @@ public void onOpen(Session session, EndpointConfig config) {
             return;
         }
         sessions.put(userId, session);
+        logger.info("Sessões WebSocket ativas: " + sessions.keySet());
+        logger.info("[ONOPEN] sessions.keySet depois: {}", sessions.keySet());
         logger.info("User: {} | IP: {} - WebSocket connection established.", RequestContext.getAuthor(), RequestContext.getIp());
     } finally {
         RequestContext.clear();
