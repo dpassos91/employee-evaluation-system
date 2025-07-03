@@ -180,6 +180,57 @@ public class UserService {
     }
 
 
+    /**
+     * Returns a list of active, confirmed non-admin users for the manager assignment dropdown menu.
+     * Only accessible by users with ADMIN role.
+     *
+     * @param token The session token passed via the request header.
+     * @return HTTP 200 with list of users or an appropriate error status.
+     */
+    @GET
+    @Path("/manager-dropdown")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsersForManagerDropdown(@HeaderParam("sessionToken") String token) {
+
+        logger.info("User: {} | IP: {} - Requesting users for manager dropdown.",
+                RequestContext.getAuthor(), RequestContext.getIp());
+
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("User: {} | IP: {} - Invalid or expired session token.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
+
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity requester = tokenEntity.getUser();
+
+        if (!requester.getRole().getName().equalsIgnoreCase("admin")) {
+            logger.warn("User: {} | IP: {} - Forbidden access to manager dropdown (not admin).",
+                    requester.getEmail(), RequestContext.getIp());
+
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Only admins can access this resource.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        List<UsersDropdownMenuDto> dropdownMenuList = userBean.getUsersForManagerDropdownMenu();
+
+        logger.info("User: {} | IP: {} - Successfully retrieved {} users for manager dropdown.",
+                requester.getEmail(), RequestContext.getIp(), dropdownMenuList.size());
+
+        return Response.ok(dropdownMenuList, MediaType.APPLICATION_JSON).build();
+    }
+
+
+
+
+
+
     // User login
     @POST
 @Path("/login")

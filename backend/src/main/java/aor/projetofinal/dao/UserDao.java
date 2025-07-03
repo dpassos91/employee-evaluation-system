@@ -1,5 +1,7 @@
 package aor.projetofinal.dao;
 
+import aor.projetofinal.bean.UserBean;
+import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.entity.SettingsEntity;
 import aor.projetofinal.entity.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -7,6 +9,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
@@ -16,6 +20,8 @@ public class UserDao {
     @PersistenceContext
     private EntityManager em;
 
+
+    private static final Logger logger = LogManager.getLogger(UserDao.class);
 
     public long countAdmins() {
         return em.createQuery(
@@ -88,6 +94,34 @@ public UserEntity findBySessionToken(String token) {
         );
         return query.getResultList();
     }
+
+    /**
+     * Retrieves all users who are active, confirmed, and not assigned the ADMIN role.
+     * This is used to populate the manager assignment dropdown in the UI.
+     *
+     * @return A list of UserEntity objects representing eligible non-admin users.
+     */
+    public List<UserEntity> findNonAdminActiveConfirmedUsersForDropDownMenu() {
+        logger.info("User: {} | IP: {} - Fetching non-admin, active, confirmed users for dropdown menu.",
+                RequestContext.getAuthor(), RequestContext.getIp());
+
+        TypedQuery<UserEntity> query = em.createQuery(
+                "SELECT u FROM UserEntity u WHERE " +
+                        "u.active = true AND u.confirmed = true AND LOWER(u.role.name) <> 'admin'",
+                UserEntity.class
+        );
+
+        List<UserEntity> resultList = query.getResultList();
+
+        logger.info("User: {} | IP: {} - Retrieved {} users for dropdown menu.",
+                RequestContext.getAuthor(), RequestContext.getIp(), resultList.size());
+
+        return resultList;
+    }
+
+
+
+
 
     public List<UserEntity> findUsersByRole(String roleName) {
         TypedQuery<UserEntity> query = em.createQuery(

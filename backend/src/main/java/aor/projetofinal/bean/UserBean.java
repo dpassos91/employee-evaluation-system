@@ -486,6 +486,47 @@ public class UserBean implements Serializable {
 
 
     /**
+     * Retrieves a list of non-admin, active and confirmed users to populate the manager assignment dropdown menu.
+     * This is intended for admin use when assigning managers to users.
+     * Only users who have a valid profile are included in the response.
+     *
+     * @return A list of UsersDropdownMenuDto containing email, first name, and last name for each eligible user.
+     */
+    public List<UsersDropdownMenuDto> getUsersForManagerDropdownMenu() {
+        logger.info("User: {} | IP: {} - Fetching users for manager dropdown menu.",
+                RequestContext.getAuthor(), RequestContext.getIp());
+
+        List<UserEntity> users = userDao.findNonAdminActiveConfirmedUsersForDropDownMenu();
+        List<UsersDropdownMenuDto> dropdownMenuList = new ArrayList<>();
+
+        for (UserEntity user : users) {
+            if (user.getProfile() != null) {
+                dropdownMenuList.add(new UsersDropdownMenuDto(
+                        user.getEmail(),
+                        user.getProfile().getFirstName(),
+                        user.getProfile().getLastName()
+                ));
+            } else {
+                logger.warn("User: {} | IP: {} - Skipped user {} due to missing profile.",
+                        RequestContext.getAuthor(), RequestContext.getIp(), user.getEmail());
+            }
+        }
+
+        logger.info("User: {} | IP: {} - Found {} eligible users for dropdown menu.",
+                RequestContext.getAuthor(), RequestContext.getIp(), dropdownMenuList.size());
+
+        return dropdownMenuList;
+    }
+
+
+
+
+
+
+
+
+
+    /**
      * Hashes the given plain text password using the BCrypt algorithm.
      * Logs the operation for traceability. The default BCrypt strength is 10 (2^10 = 1024 iterations).
      *
