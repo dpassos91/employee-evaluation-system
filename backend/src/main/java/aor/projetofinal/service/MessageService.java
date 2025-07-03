@@ -6,6 +6,7 @@ import aor.projetofinal.entity.UserEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import aor.projetofinal.context.RequestContext;
+import aor.projetofinal.dto.ConversationDto;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;

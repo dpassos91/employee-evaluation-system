@@ -13,6 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.List;
 
+import aor.projetofinal.util.OnlineUserTracker;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,42 +44,7 @@ public class ChatEndpoint {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    /**
-     * Called when a new WebSocket connection is established.
-     * Authenticates the user and associates their userId with the session.
-     * Sets RequestContext for logging.
-     *
-     * @param session the WebSocket session
-     * @param config the endpoint configuration, used to obtain userId, author and IP
-     */
-    @OnOpen
-public void onOpen(Session session, EndpointConfig config) {
-    logger.info("DEBUG: session.getUserProperties() = {}", session.getUserProperties());
-    logger.info("DEBUG: config.getUserProperties() = {}", config.getUserProperties());
-    try {
-        Integer userId = (Integer) session.getUserProperties().get("userId");
-        String author = (String) session.getUserProperties().getOrDefault("author", "Anonymous");
-        String ip = (String) session.getUserProperties().getOrDefault("ip", "Unknown");
-
-        RequestContext.setAuthor(author);
-        RequestContext.setIp(ip);
-
-        if (userId == null) {
-            logger.warn("User: {} | IP: {} - WebSocket connection rejected: Invalid or missing session token.", RequestContext.getAuthor(), RequestContext.getIp());
-            try {
-                session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Authentication failed"));
-            } catch (IOException ignored) {}
-            return;
-        }
-        sessions.put(userId, session);
-        logger.info("User: {} | IP: {} - WebSocket connection established.", RequestContext.getAuthor(), RequestContext.getIp());
-    } finally {
-        RequestContext.clear();
-    }
-}
-
-
-    /**
+        /**
      * Called when a WebSocket connection is closed.
      * Removes the session from the active sessions map.
      * Sets RequestContext for logging.
@@ -88,6 +55,10 @@ public void onOpen(Session session, EndpointConfig config) {
     public void onClose(Session session) {
         try {
             sessions.entrySet().removeIf(entry -> entry.getValue().equals(session));
+            Integer userId = (Integer) session.getUserProperties().get("userId");
+            if (userId != null) {
+                OnlineUserTracker.markOffline(userId);
+            }
             String author = (String) session.getUserProperties().getOrDefault("author", "Anonymous");
             String ip = (String) session.getUserProperties().getOrDefault("ip", "Unknown");
             RequestContext.setAuthor(author);
@@ -98,6 +69,37 @@ public void onOpen(Session session, EndpointConfig config) {
             RequestContext.clear();
         }
     }
+
+    /**
+ * Called when a WebSocket error occurs.
+ * Removes the user from the online tracker and logs the error.
+ * Sets the RequestContext for logging consistency.
+ *
+ * @param session   the WebSocket session where the error occurred
+ * @param throwable the exception that was thrown
+ */
+@OnError
+public void onError(Session session, Throwable throwable) {
+    try {
+        Integer userId = (Integer) session.getUserProperties().get("userId");
+        if (userId != null) {
+            OnlineUserTracker.markOffline(userId);
+        }
+        String author = (String) session.getUserProperties().getOrDefault("author", "Anonymous");
+        String ip = (String) session.getUserProperties().getOrDefault("ip", "Unknown");
+        RequestContext.setAuthor(author);
+        RequestContext.setIp(ip);
+
+        logger.error(
+            "User: {} | IP: {} - WebSocket error occurred: {}",
+            RequestContext.getAuthor(),
+            RequestContext.getIp(),
+            throwable.getMessage()
+        );
+    } finally {
+        RequestContext.clear();
+    }
+}
 
     /**
      * Handles incoming messages from the client.
@@ -140,11 +142,11 @@ public void onMessage(Session session, String messageText) {
             return;
         }
 
-        // Buscar a mensagem acabada de criar (a última trocada entre sender e receiver)
+        // Seeks a message just created (the last one exchanged between sender and receiver)
         MessageDto enrichedDto = null;
         try {
-            // Garante que getConversation devolve por ordem cronológica
-            // Última mensagem é a que acabámos de gravar
+            // Assures that getConversation returns messages in chronological order
+            // Last message is the most recent one exchanged
             List<MessageDto> conversation = messageBean.getConversation(senderId, receiverId);
             if (conversation != null && !conversation.isEmpty()) {
                 enrichedDto = conversation.get(conversation.size() - 1);
@@ -162,7 +164,7 @@ public void onMessage(Session session, String messageText) {
         String notificationText = "New message from " + enrichedDto.getSenderName();
         notificationBean.createNotification(receiverId, "MESSAGE", notificationText);
 
-        // If receiver is online, send them the message instantly (com todos os dados!)
+        // If receiver is online, send them the message instantly
         Session receiverSession = sessions.get(receiverId);
         if (receiverSession != null && receiverSession.isOpen()) {
             String jsonMsg = mapper.writeValueAsString(Map.of(
@@ -178,7 +180,7 @@ public void onMessage(Session session, String messageText) {
             logger.info("User: {} | IP: {} - Receiver userId {} is offline. Message will be shown when they come online.", RequestContext.getAuthor(), RequestContext.getIp(), receiverId);
         }
 
-        // Confirm delivery to the sender (também podes devolver enrichedDto se quiseres)
+        // Confirm delivery to the sender 
         session.getBasicRemote().sendText("✔️ Message sent to userId: " + receiverId);
 
     } catch (Exception e) {
@@ -190,4 +192,42 @@ public void onMessage(Session session, String messageText) {
         RequestContext.clear();
     }
 }
+
+
+    /**
+     * Called when a new WebSocket connection is established.
+     * Authenticates the user and associates their userId with the session.
+     * Sets RequestContext for logging.
+     *
+     * @param session the WebSocket session
+     * @param config the endpoint configuration, used to obtain userId, author and IP
+     */
+    @OnOpen
+public void onOpen(Session session, EndpointConfig config) {
+    logger.info("DEBUG: session.getUserProperties() = {}", session.getUserProperties());
+    logger.info("DEBUG: config.getUserProperties() = {}", config.getUserProperties());
+    try {
+        Integer userId = (Integer) session.getUserProperties().get("userId");
+        String author = (String) session.getUserProperties().getOrDefault("author", "Anonymous");
+        String ip = (String) session.getUserProperties().getOrDefault("ip", "Unknown");
+
+        OnlineUserTracker.markOnline(userId);
+
+        RequestContext.setAuthor(author);
+        RequestContext.setIp(ip);
+
+        if (userId == null) {
+            logger.warn("User: {} | IP: {} - WebSocket connection rejected: Invalid or missing session token.", RequestContext.getAuthor(), RequestContext.getIp());
+            try {
+                session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Authentication failed"));
+            } catch (IOException ignored) {}
+            return;
+        }
+        sessions.put(userId, session);
+        logger.info("User: {} | IP: {} - WebSocket connection established.", RequestContext.getAuthor(), RequestContext.getIp());
+    } finally {
+        RequestContext.clear();
+    }
+}
+
 }

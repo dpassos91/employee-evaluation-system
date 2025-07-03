@@ -56,6 +56,8 @@ const API_ENDPOINTS = {
   send: `${API_BASE_URL}/messages`,
   /** @function Marks all messages as read from the given user */
   markAsRead: (otherUserId) => `${API_BASE_URL}/messages/read-from/${otherUserId}`,
+  /** @type {string} Gets all sidebar conversations for the authenticated user */
+  chatSidebarConversations: `${API_BASE_URL}/messages/conversations`,
 },
 
 

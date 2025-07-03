@@ -3,6 +3,16 @@ import { apiConfig } from './apiConfig.js';
 const { apiCall, API_ENDPOINTS } = apiConfig;
 
 /**
+ * Fetches the list of sidebar conversations (summaries) for the authenticated user.
+ * @returns {Promise<Array>} List of ConversationDto
+ */
+const chatSidebarConversations = async () => {
+  return apiCall(API_ENDPOINTS.messages.chatSidebarConversations, { 
+    method: "GET" 
+  });
+};
+
+/**
  * Fetches the conversation (message history) between the authenticated user and another user.
  * @async
  * @function getConversation
@@ -62,5 +72,6 @@ const markMessagesAsRead = async (otherUserId) => {
 export const messageAPI = {
   getConversation,
   sendMessage,
-  markMessagesAsRead
+  markMessagesAsRead,
+  chatSidebarConversations
 };

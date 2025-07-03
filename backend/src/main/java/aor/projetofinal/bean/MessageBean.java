@@ -10,6 +10,7 @@ import aor.projetofinal.entity.UserEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import aor.projetofinal.dto.ConversationDto;
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -56,10 +57,10 @@ public class MessageBean {
         return dtos;
     }
 
-    /**
+/**
  * Retrieves the list of conversations for a given user.
- * Each conversation includes the other user's info, the last message exchanged,
- * its timestamp, and the number of unread messages.
+ * Each conversation includes the other user's info, last message, its timestamp,
+ * the number of unread messages, online status, and role.
  *
  * @param userId The ID of the authenticated user.
  * @return List of ConversationDto representing each conversation/contact.
@@ -90,22 +91,39 @@ public List<ConversationDto> getUserConversations(int userId) {
         );
         dto.setOtherUserAvatar(
             contact.getProfile() != null
-                ? contact.getProfile().getAvatarUrl()
+                ? contact.getProfile().getPhotograph()
                 : null
         );
-        if (lastMessage != null) {
-            dto.setLastMessage(lastMessage.getContent());
-            dto.setLastMessageTime(lastMessage.getCreatedAt()); // Adjust formatting as needed
-        }
+if (lastMessage != null) {
+    dto.setLastMessage(lastMessage.getContent());
+    dto.setLastMessageTime(
+        lastMessage.getCreatedAt() != null
+            ? lastMessage.getCreatedAt().format(FORMATTER)
+            : null
+    );
+}
         dto.setUnreadCount(unreadCount);
 
+        // --- New: Set role ---
+        dto.setRole(
+            contact.getRole() != null
+                ? contact.getRole().getName()
+                : null
+        );
+
+        // --- Set online status (all false for now, unless you implement tracking) ---
+        dto.setOnline(false);
+
         conversations.add(dto);
+
         logger.info(
-            "User: {} | IP: {} - Added conversation with userId {} (unread: {}).",
+            "User: {} | IP: {} - Added conversation with userId {} (unread: {}, role: {}, online: {}).",
             RequestContext.getAuthor(),
             RequestContext.getIp(),
             contact.getId(),
-            unreadCount
+            unreadCount,
+            dto.getRole(),
+            dto.isOnline()
         );
     }
 
@@ -119,6 +137,7 @@ public List<ConversationDto> getUserConversations(int userId) {
 
     return conversations;
 }
+
 
     /**
      * Marks all messages as read from one user to another.
