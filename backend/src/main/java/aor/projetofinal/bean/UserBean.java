@@ -1,17 +1,11 @@
 package aor.projetofinal.bean;
 
+import aor.projetofinal.dao.*;
 import aor.projetofinal.dto.*;
+import aor.projetofinal.entity.*;
 import aor.projetofinal.util.JavaConversionUtil;
 import aor.projetofinal.util.StringUtils;
 import aor.projetofinal.context.RequestContext;
-import aor.projetofinal.dao.ProfileDao;
-import aor.projetofinal.dao.RoleDao;
-import aor.projetofinal.dao.SessionTokenDao;
-import aor.projetofinal.dao.UserDao;
-import aor.projetofinal.entity.ProfileEntity;
-import aor.projetofinal.entity.RoleEntity;
-import aor.projetofinal.entity.SessionTokenEntity;
-import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.UsualWorkPlaceType;
 import aor.projetofinal.exception.EmailAlreadyExistsException;
 import jakarta.ejb.EJB;
@@ -50,9 +44,86 @@ public class UserBean implements Serializable {
     @Inject
     private ProfileDao profileDao;
 
+    @Inject
+    private EvaluationDao evaluationDao;
+
+    @Inject
+    private EvaluationCycleDao evaluationCycleDao;
+
+
 
     @EJB
     SettingsBean settingsBean;
+
+
+    /**
+     * Assigns a manager to a specified user. If the manager has a "USER" role,
+     * it promotes them to "MANAGER". If an active evaluation cycle exists, it also
+     * updates the evaluator in the corresponding evaluation record.
+     *
+     * @param userEmail    the email of the user to assign the manager to
+     * @param managerEmail the email of the manager to be assigned
+     * @return true if the assignment is successful, false otherwise
+     */
+    public boolean assignManagerToUser(String userEmail, String managerEmail) {
+        UserEntity user = userDao.findByEmail(userEmail);
+        UserEntity manager = userDao.findByEmail(managerEmail);
+
+        if (user == null || manager == null) {
+            logger.warn("User: {} | IP: {} - User or manager not found. Assignment skipped.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
+            return false;
+        }
+
+        if (user.getEmail().equalsIgnoreCase(manager.getEmail())) {
+            logger.warn("User: {} | IP: {} - User {} attempted to assign themselves as manager. Operation aborted.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), user.getEmail());
+            return false;
+        }
+
+        // Ensure manager has the 'MANAGER' role; if not, promote them
+        if (manager.getRole().getName().equalsIgnoreCase("user")) {
+            RoleEntity managerRole = roleDao.findByName("MANAGER");
+            if (managerRole != null) {
+                manager.setRole(managerRole);
+                userDao.save(manager); // persist role change
+                logger.info("User: {} | IP: {} - User {} promoted to MANAGER role.",
+                        RequestContext.getAuthor(), RequestContext.getIp(), manager.getEmail());
+            } else {
+                logger.error("User: {} | IP: {} - MANAGER role not found in database. Cannot assign manager.",
+                        RequestContext.getAuthor(), RequestContext.getIp());
+                return false;
+            }
+        }
+
+        user.setManager(manager);
+        userDao.save(user);
+
+        logger.info("User: {} | IP: {} - Manager {} assigned to user {} successfully.",
+                RequestContext.getAuthor(), RequestContext.getIp(), manager.getEmail(), user.getEmail());
+
+        EvaluationCycleEntity activeCycle = evaluationCycleDao.findActiveCycle();
+        if (activeCycle != null) {
+            EvaluationEntity evaluation = evaluationDao.findEvaluationByCycleAndUser(activeCycle, user);
+            if (evaluation != null) {
+                evaluation.setEvaluator(manager);
+                evaluationDao.save(evaluation);
+                logger.info("User: {} | IP: {} - Evaluator updated in active cycle for user {}.",
+                        RequestContext.getAuthor(), RequestContext.getIp(), user.getEmail());
+            }
+        }
+
+        return true;
+    }
+
+
+
+
+
+
+
+
+
 
     /**
      * Validates a session token to determine whether access should be authorized.
@@ -412,6 +483,47 @@ public class UserBean implements Serializable {
         }
         return null;
     }
+
+
+    /**
+     * Retrieves a list of non-admin, active and confirmed users to populate the manager assignment dropdown menu.
+     * This is intended for admin use when assigning managers to users.
+     * Only users who have a valid profile are included in the response.
+     *
+     * @return A list of UsersDropdownMenuDto containing email, first name, and last name for each eligible user.
+     */
+    public List<UsersDropdownMenuDto> getUsersForManagerDropdownMenu() {
+        logger.info("User: {} | IP: {} - Fetching users for manager dropdown menu.",
+                RequestContext.getAuthor(), RequestContext.getIp());
+
+        List<UserEntity> users = userDao.findNonAdminActiveConfirmedUsersForDropDownMenu();
+        List<UsersDropdownMenuDto> dropdownMenuList = new ArrayList<>();
+
+        for (UserEntity user : users) {
+            if (user.getProfile() != null) {
+                dropdownMenuList.add(new UsersDropdownMenuDto(
+                        user.getEmail(),
+                        user.getProfile().getFirstName(),
+                        user.getProfile().getLastName()
+                ));
+            } else {
+                logger.warn("User: {} | IP: {} - Skipped user {} due to missing profile.",
+                        RequestContext.getAuthor(), RequestContext.getIp(), user.getEmail());
+            }
+        }
+
+        logger.info("User: {} | IP: {} - Found {} eligible users for dropdown menu.",
+                RequestContext.getAuthor(), RequestContext.getIp(), dropdownMenuList.size());
+
+        return dropdownMenuList;
+    }
+
+
+
+
+
+
+
 
 
     /**

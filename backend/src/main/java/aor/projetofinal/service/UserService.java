@@ -1,17 +1,14 @@
 package aor.projetofinal.service;
 
+import aor.projetofinal.dto.*;
+import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.util.EmailUtil;
 import aor.projetofinal.util.ProfileValidator;
 import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
-import aor.projetofinal.dto.LoginUserDto;
-import aor.projetofinal.dto.LoginResponseDto;
 
-import aor.projetofinal.dto.ResetPasswordDto;
-import aor.projetofinal.dto.SessionStatusDto;
-import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.entity.ProfileEntity;
 
 import aor.projetofinal.entity.UserEntity;
@@ -43,6 +40,96 @@ public class UserService {
 
     //@Inject
     //Notifier notifier;
+
+
+    /**
+     * Assigns a manager to a given user.
+     * This action is restricted to admins only. If an evaluation cycle is active,
+     * the evaluation for the user (if exists) is updated with the new manager as evaluator.
+     *
+     * @param dto   The DTO containing the user's email and the manager's email.
+     * @param token The session token for authentication and authorization.
+     * @return HTTP response with success or failure message.
+     */
+    @POST
+    @Path("/assign-manager")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response assignManager(AssignManagerDto dto,
+                                  @HeaderParam("sessionToken") String token) {
+
+        logger.info("User: {} | IP: {} - Attempting to assign manager.",
+                RequestContext.getAuthor(), RequestContext.getIp());
+
+        //  Validate session token
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("User: {} | IP: {} - Unauthorized attempt to assign manager (invalid token).",
+                    RequestContext.getAuthor(), RequestContext.getIp());
+
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity requester = tokenEntity.getUser();
+
+        //  Check admin role
+        if (!requester.getRole().getName().equalsIgnoreCase("admin")) {
+            logger.warn("User: {} | IP: {} - Forbidden: non-admin tried to assign manager.",
+                    requester.getEmail(), RequestContext.getIp());
+
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Only admins can assign managers.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        //  Prevent self-assignment
+        if (dto.getUserEmail().equalsIgnoreCase(dto.getManagerEmail())) {
+            logger.warn("User: {} | IP: {} - Attempted to assign user {} as their own manager.",
+                    requester.getEmail(), RequestContext.getIp(), dto.getUserEmail());
+
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"message\": \"A user cannot be their own manager.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+
+
+
+        //  Assign the manager
+        boolean success = userBean.assignManagerToUser(dto.getUserEmail(), dto.getManagerEmail());
+
+        if (!success) {
+            logger.warn("User: {} | IP: {} - Failed to assign manager {} to user {}.",
+                    requester.getEmail(), RequestContext.getIp(),
+                    dto.getManagerEmail(), dto.getUserEmail());
+
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"message\": \"Could not assign manager. Please check the provided emails or rules.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        logger.info("User: {} | IP: {} - Successfully assigned manager {} to user {}.",
+                requester.getEmail(), RequestContext.getIp(),
+                dto.getManagerEmail(), dto.getUserEmail());
+
+        return Response.status(Response.Status.OK)
+                .entity("{\"message\": \"Manager successfully assigned.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+
+
+
+
+
 
     @GET
     @Path("/confirmAccount")
@@ -91,6 +178,57 @@ public class UserService {
 
         return Response.ok(createdUser).build();
     }
+
+
+    /**
+     * Returns a list of active, confirmed non-admin users for the manager assignment dropdown menu.
+     * Only accessible by users with ADMIN role.
+     *
+     * @param token The session token passed via the request header.
+     * @return HTTP 200 with list of users or an appropriate error status.
+     */
+    @GET
+    @Path("/manager-dropdown")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsersForManagerDropdown(@HeaderParam("sessionToken") String token) {
+
+        logger.info("User: {} | IP: {} - Requesting users for manager dropdown.",
+                RequestContext.getAuthor(), RequestContext.getIp());
+
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("User: {} | IP: {} - Invalid or expired session token.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
+
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity requester = tokenEntity.getUser();
+
+        if (!requester.getRole().getName().equalsIgnoreCase("admin")) {
+            logger.warn("User: {} | IP: {} - Forbidden access to manager dropdown (not admin).",
+                    requester.getEmail(), RequestContext.getIp());
+
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Only admins can access this resource.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        List<UsersDropdownMenuDto> dropdownMenuList = userBean.getUsersForManagerDropdownMenu();
+
+        logger.info("User: {} | IP: {} - Successfully retrieved {} users for manager dropdown.",
+                requester.getEmail(), RequestContext.getIp(), dropdownMenuList.size());
+
+        return Response.ok(dropdownMenuList, MediaType.APPLICATION_JSON).build();
+    }
+
+
+
+
 
 
     // User login
