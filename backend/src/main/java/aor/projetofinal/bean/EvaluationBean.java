@@ -58,6 +58,23 @@ public class EvaluationBean implements Serializable {
     }
 
 
+    public EvaluationEntity findEvaluationByCycleAndUser(EvaluationCycleEntity cycle, UserEntity evaluated) {
+        EvaluationEntity evaluation = evaluationDao.findEvaluationByCycleAndUser(cycle, evaluated);
+
+        if (evaluation == null) {
+            logger.warn("No evaluation found for user {} in cycle ID {}.",
+                    evaluated.getEmail(), cycle.getId());
+            return null;
+        }
+
+        logger.info("Evaluation found for user {} in cycle ID {}.",
+                evaluated.getEmail(), cycle.getId());
+
+        return evaluation;
+    }
+
+
+
 
 
 

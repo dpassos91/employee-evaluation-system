@@ -6,6 +6,7 @@ import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.EvaluationStateType;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 
@@ -36,6 +37,25 @@ public class EvaluationDao {
         return count > 0;
     }
 
+    public EvaluationEntity findEvaluationByCycleAndUser(EvaluationCycleEntity cycle, UserEntity evaluated) {
+        try {
+            TypedQuery<EvaluationEntity> query = em.createQuery(
+                    "SELECT e FROM EvaluationEntity e WHERE e.cycle = :cycle AND e.evaluated = :evaluated",
+                    EvaluationEntity.class
+            );
+            query.setParameter("cycle", cycle);
+            query.setParameter("evaluated", evaluated);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+
+
+
+
+
     public List<EvaluationEntity> findIncompleteEvaluationsByCycle(EvaluationCycleEntity cycle) {
         TypedQuery<EvaluationEntity> query = em.createQuery(
                 "SELECT e FROM EvaluationEntity e WHERE e.cycle = :cycle AND e.state <> :excludedState",
@@ -45,6 +65,12 @@ public class EvaluationDao {
         query.setParameter("excludedState", EvaluationStateType.CLOSED);
         return query.getResultList();
     }
+
+
+    public void save(EvaluationEntity evaluation) {
+        em.merge(evaluation);
+    }
+
 
 
 
