@@ -49,6 +49,20 @@ export default function ChatPage() {
     setLoadingMessages(true);
     setMessages([]);
     setError(null);
+
+    // Mark messages as read
+    // This will update the unread count in the sidebar
+    messageAPI.markMessagesAsRead(selectedConvId)
+    .then(() => {
+      // Depois de marcar como lidas, refresca sidebar
+      return messageAPI.chatSidebarConversations();
+    })
+    .then((convs) => {
+      setSidebarConversations(convs || []);
+    })
+    .catch(() => setError("Erro ao atualizar estado das mensagens"));  
+
+    // Always seeks the conversation messages regardless of read status
     messageAPI.getConversation(selectedConvId)
       .then((msgs) => setMessages(msgs || []))
       .catch(() => setError("Erro ao carregar mensagens"))
@@ -74,11 +88,13 @@ export default function ChatPage() {
             }
           ]);
         }
+          //    messageAPI.chatSidebarConversations()
+        //.then((convs) => setSidebarConversations(convs || []));
       }
     }
   );
 
-  // Enviar mensagem
+  // Send message handler
   const handleSend = () => {
     if (!input.trim()) return;
     sendMessage({
@@ -88,9 +104,20 @@ export default function ChatPage() {
     });
     setInput("");
   };
+  
+  // Scroll down to the latest message
+  useEffect(() => {
+  // Sempre que as mensagens mudam, faz scroll para baixo
+  if (messagesEndRef.current) {
+    messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+  }
+}, [messages]);
 
-  // Contacto selecionado na sidebar
+  //Selected contact on the sidebar
   const selectedContact = sidebarConversations.find(c => c.otherUserId === selectedConvId);
+
+  // Ref to scroll to bottom of messages
+  const messagesEndRef = useRef(null);
 
   return (
     <PageLayout
@@ -156,7 +183,9 @@ export default function ChatPage() {
             )}
           </div>
           {/* Mensagens */}
-          <div className="flex-1 px-6 py-4 overflow-y-auto bg-gray-50 space-y-2">
+          <div 
+          ref={messagesEndRef}
+          className="flex-1 px-6 py-4 overflow-y-auto bg-gray-50 space-y-2">
             {loadingMessages && <div className="text-center text-gray-400">A carregar...</div>}
             {error && <div className="text-center text-red-500">{error}</div>}
             {messages.map((msg, idx) => {
