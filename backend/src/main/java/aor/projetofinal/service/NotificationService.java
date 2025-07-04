@@ -11,6 +11,8 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.NotificationType;
 import java.util.Map;
 
@@ -131,5 +133,20 @@ public class NotificationService {
             RequestContext.clear();
         }
     }
+
+    /**
+ * Marks all MESSAGE-type notifications as read for the current user.
+ * This endpoint should be called when the user enters the chat/messages section,
+ * ensuring that the message notification badge/count is reset.
+ *
+ * @return a JSON object indicating the number of notifications updated
+ */
+@PUT
+@Path("/read/message")
+public Response markAllMessageNotificationsAsRead() {
+    UserEntity user = RequestContext.getCurrentUser();
+    int updated = notificationBean.markAllMessageNotificationsAsRead(user.getId());
+    return Response.ok("{\"updated\":" + updated + "}").build();
+}
 
 }

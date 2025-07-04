@@ -4,6 +4,7 @@ import { userStore } from "../stores/userStore";
 import { useIntl } from "react-intl";
 import { toast } from "react-toastify";
 import { fieldLabelKeys } from "../utils/fieldLabels";
+import { useNotificationStore } from "../stores/notificationStore";
 
 /**
  * Custom hook to manage authentication logic (login, logout).
@@ -19,6 +20,8 @@ export function useAuth() {
   const updateName = userStore((state) => state.updateName);
 
   const { setUser, setProfileComplete, setMissingFields } = userStore.getState();
+
+  const fetchCounts = useNotificationStore.getState().fetchCounts;
 
   /**
    * Attempts to log in a user using provided credentials.
@@ -50,6 +53,8 @@ const login = async (credentials) => {
     // NOVO: Guarda estado do perfil e campos em falta
     setProfileComplete(data.profileComplete);
     setMissingFields(data.missingFields || []);
+
+    await fetchCounts();
 
     console.log("Profile complete?", data.profileComplete);
     console.log("Missing fields:", data.missingFields);
@@ -98,9 +103,12 @@ const login = async (credentials) => {
    * Logs out the user: invalidates session server-side and clears storage/state.
    * Shows a toast notification on success or error.
    */
+
+const clearCounts = useNotificationStore.getState().markAllAsRead;
 const logout = async () => {
   try {
     await authAPI.logoutUser();
+    await clearCounts();
     toast.success(
   formatMessage({
     id: "auth.logout.success",

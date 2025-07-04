@@ -45,6 +45,17 @@ const markAllAsRead = async () => {
 };
 
 /**
+ * Marks all MESSAGE-type notifications as read for the authenticated user.
+ * Should be called when the user enters the chat/messages section.
+ * @returns {Promise<Object>} API response, usually with number of notifications updated.
+ */
+const markAllMessageNotificationsAsRead = async () => {
+  return apiCall(API_ENDPOINTS.notifications.markMessageNotificationsAsRead, {
+    method: 'PUT',
+  });
+};
+
+/**
  * Gets a map of unread notification counts, grouped by notification type.
  * 
  * Example response:
@@ -67,5 +78,6 @@ export const notificationAPI = {
   getNotifications,
   getUnreadNotifications,
   markAllAsRead,
+  markAllMessageNotificationsAsRead,
   getUnreadNotificationCountsByType,
 };

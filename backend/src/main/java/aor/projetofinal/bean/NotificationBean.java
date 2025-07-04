@@ -133,6 +133,22 @@ public class NotificationBean {
     }
 
     /**
+ * Marks all MESSAGE-type notifications as read for a given user ID.
+ * Delegates the operation to the NotificationDao.
+ *
+ * @param userId the ID of the user whose message notifications should be marked as read
+ * @return the number of notifications updated in the database
+ */
+public int markAllMessageNotificationsAsRead(Integer userId) {
+    UserEntity user = userDao.findById(userId);
+    if (user == null) {
+        return 0;
+    }
+    // Call the DAO to perform the bulk update
+    return notificationDao.markAllMessageNotificationsAsRead(user);
+}
+
+    /**
      * Marks all notifications as read for a given user.
      *
      * @param userId recipient user ID

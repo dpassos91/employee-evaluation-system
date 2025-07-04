@@ -1,3 +1,13 @@
+/**
+ * Main App component.
+ * Sets up routing, internationalization, and provides a global WebSocket connection
+ * for handling live notifications and chat events throughout the application.
+ * 
+ * The WebSocket connection is established once (when user is authenticated)
+ * and dispatches all received events to the appropriate stores (e.g., notificationStore, chatStore).
+ */
+
+import { useEffect, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { IntlProvider } from "react-intl";
 
@@ -5,7 +15,11 @@ import { PrivateRoute } from "./components/PrivateRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import useWebSocket from "./hooks/useWebSocket";
+import { setWebSocketRef } from "./stores/chatStore"; // Import the setter for the global WebSocket reference
+import { useNotificationStore } from "./stores/notificationStore";
 import { userStore } from "./stores/userStore";
+
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -15,12 +29,63 @@ import ProfilePage from "./pages/ProfilePage";
 import UsersListPage from "./pages/UsersListPage";
 import ChatPage from "./pages/ChatPage";
 
+/**
+ * Main App component.
+ * Sets up routing, internationalization, and provides a global WebSocket connection
+ * for handling live notifications and chat events throughout the application.
+ */
 export default function App() {
-  const {
-    user,
-    locale,
-    translations
-  } = userStore();
+  // Get user and locale info from userStore
+  const { user, locale, translations } = userStore();
+  const incrementNotificationCount = useNotificationStore((s) => s.incrementCount);
+
+  // WebSocket endpoint for your backend
+  const WS_ENDPOINT = "wss://localhost:8443/grupo7/websocket/chat";
+
+  /**
+   * Global handler for all WebSocket messages.
+   * Dispatches notification and chat events to their respective stores.
+   * @param {Object} data - The message payload from the WebSocket server.
+   */
+const handleWebSocketMessage = useCallback((data) => {
+  // Notificações não-message (ALERT, SYSTEM, WARNING)
+  if (data?.type && ["ALERT", "SYSTEM", "WARNING"].includes(data.type)) {
+    incrementNotificationCount(data.type);
+  }
+
+  // Chat message
+  if (data.type === "chat_message") {
+    import("./stores/chatStore").then(({ useChatStore }) => {
+      useChatStore.getState().addMessage(data);
+    });
+    // Só incrementa badge se o chat não estiver aberto!
+    if (!window.location.pathname.startsWith("/chat")) {
+      import("./stores/notificationStore").then(({ useNotificationStore }) => {
+        useNotificationStore.getState().incrementCount("MESSAGE");
+      });
+    }
+  }
+
+  // (Se para além do chat_message tiveres outros tipos, mete-os aqui)
+}, [incrementNotificationCount]);
+
+  /**
+   * Establishes the global WebSocket connection once user is authenticated.
+   * Makes the WebSocket instance available globally for sending chat messages via the chat store.
+   */
+  const { isConnected, sendMessage } = useWebSocket(
+    WS_ENDPOINT,
+    typeof window !== "undefined" ? sessionStorage.getItem("authToken") : null,
+    user ? handleWebSocketMessage : null
+  );
+
+  // Save the sendMessage function in the chatStore for use by ChatPage and other components
+  useEffect(() => {
+    // setWebSocketRef will actually expect a WebSocket instance,
+    // but since your hook only exposes sendMessage, you can store sendMessage instead.
+    // If you want to send the actual instance, you can adapt the hook to expose it.
+    setWebSocketRef({ sendMessage });
+  }, [sendMessage]);
 
   return (
     <IntlProvider
@@ -28,52 +93,51 @@ export default function App() {
       messages={translations}
       onError={(err) => {
         if (err.code === "MISSING_TRANSLATION") {
-          console.warn("Erro de tradução:", err.message);
+          // You can log or report missing translations here
+          console.warn("Translation missing:", err.message);
         }
       }}
     >
       <Router>
-        
-
-        {/* Rotas da aplicação */}
+        {/* Application routes */}
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
           <Route path="/redefinepassword" element={<RedefinePasswordPage />} />
           <Route
-    path="/dashboard"
-    element={
-      <PrivateRoute>
-        <DashboardPage />
-      </PrivateRoute>
-    }
-    />
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <DashboardPage />
+              </PrivateRoute>
+            }
+          />
           <Route
-    path="/profile"
-    element={
-      <PrivateRoute>
-        <ProfilePage />
-      </PrivateRoute>
-    }
-    />
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <ProfilePage />
+              </PrivateRoute>
+            }
+          />
           <Route
-    path="/userslist"
-    element={
-      <PrivateRoute>
-        <UsersListPage />
-      </PrivateRoute>
-    }
-    />
-              <Route
-    path="/chat"
-    element={
-      <PrivateRoute>
-        <ChatPage />
-      </PrivateRoute>
-    }
-    />
-          {/* Redireciona para /login se não estiver autenticado */}
+            path="/userslist"
+            element={
+              <PrivateRoute>
+                <UsersListPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <PrivateRoute>
+                <ChatPage />
+              </PrivateRoute>
+            }
+          />
+          {/* Redirect all unknown routes to login */}
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
         <ToastContainer position="top-center" />

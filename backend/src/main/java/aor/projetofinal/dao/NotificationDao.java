@@ -144,6 +144,26 @@ public class NotificationDao {
         return updated;
     }
 
+/**
+ * Marks all MESSAGE-type notifications as read for a given user.
+ * This method is typically used when the user opens the chat/messages section,
+ * ensuring that the badge/count for message notifications is reset to zero.
+ *
+ * @param user the user whose MESSAGE notifications should be marked as read
+ * @return the number of notifications updated in the database
+ */
+public int markAllMessageNotificationsAsRead(UserEntity user) {
+    // Perform a bulk update for all unread MESSAGE-type notifications for this user
+    int updated = em.createQuery(
+        "UPDATE NotificationEntity n SET n.read = true " +
+        "WHERE n.user = :user AND n.read = false AND n.type = :type"
+    )
+    .setParameter("user", user)
+    .setParameter("type", NotificationType.MESSAGE)
+    .executeUpdate();
+    return updated;
+}
+    
     /**
      * Finds a notification by its id.
      *

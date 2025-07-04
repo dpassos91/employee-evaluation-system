@@ -3,33 +3,50 @@ import { useState, useEffect, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { messageAPI } from "../api/messageAPI";
 import { userStore } from "../stores/userStore";
-import useWebSocket from "../hooks/useWebSocket";
+import { useChatStore } from "../stores/chatStore"; // Import global chat store
 
+/**
+ * ChatPage component.
+ * Handles the sidebar conversations, main chat thread, and message input UI.
+ * Messages are always read from the global chatStore, which is kept in sync with backend and WebSocket events.
+ */
 export default function ChatPage() {
+  /** Sidebar state: list of conversations (not messages) */
   const [sidebarConversations, setSidebarConversations] = useState([]);
+  /** Currently selected conversation ID */
   const [selectedConvId, setSelectedConvId] = useState(null);
-  const [messages, setMessages] = useState([]);
+  /** Loading flags for sidebar and messages */
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [loadingSidebar, setLoadingSidebar] = useState(true);
+  /** Input and error state */
   const [input, setInput] = useState("");
   const [error, setError] = useState(null);
+  /** i18n */
   const intl = useIntl();
+  /** Current authenticated user */
   const { user } = userStore();
-  const token = sessionStorage.getItem("authToken");
 
-  // Refs to keep selectedConvId and user.id updated inside the WebSocket callback
+  /** --------- Chat store integration --------- */
+  /**
+   * Read messages from the global chatStore.
+   * All chat updates (live or via API) should flow through this store.
+   */
+  const messages = useChatStore((s) => s.messages);
+  const clearMessages = useChatStore((s) => s.clearMessages);
+  const addMessage = useChatStore((s) => s.addMessage);
+  const sendMessage = useChatStore((s) => s.sendMessage);
+
+  /** Refs to keep selectedConvId and user.id updated inside async callbacks */
   const selectedConvIdRef = useRef(selectedConvId);
   const userIdRef = useRef(user?.id);
 
-  useEffect(() => {
-    selectedConvIdRef.current = selectedConvId;
-  }, [selectedConvId]);
+  useEffect(() => { selectedConvIdRef.current = selectedConvId; }, [selectedConvId]);
+  useEffect(() => { userIdRef.current = user?.id; }, [user]);
 
-  useEffect(() => {
-    userIdRef.current = user?.id;
-  }, [user]);
-
-  // Seeks conversations for the sidebar when the page loads
+  /**
+   * Fetch sidebar conversations on mount.
+   * Sets the initial selected conversation.
+   */
   useEffect(() => {
     setLoadingSidebar(true);
     messageAPI.chatSidebarConversations()
@@ -39,85 +56,67 @@ export default function ChatPage() {
           setSelectedConvId(convs[0].otherUserId);
         }
       })
-      .catch(() => setError("Erro ao carregar conversas"))
+      .catch(() => setError("Failed to load conversations"))
       .finally(() => setLoadingSidebar(false));
   }, []);
 
-  // Seeks messages for the selected conversation
+  /**
+   * Fetch messages for the selected conversation.
+   * Populates the global chatStore (not local state!).
+   * Also marks messages as read and refreshes sidebar.
+   */
   useEffect(() => {
     if (!selectedConvId) return;
     setLoadingMessages(true);
-    setMessages([]);
+    clearMessages(); // Reset messages in the store
     setError(null);
 
-    // Mark messages as read
-    // This will update the unread count in the sidebar
+    // Mark messages as read and refresh sidebar
     messageAPI.markMessagesAsRead(selectedConvId)
-    .then(() => {
-      // After marking messages as read, refresh the sidebar
-      return messageAPI.chatSidebarConversations();
-    })
-    .then((convs) => {
-      setSidebarConversations(convs || []);
-    })
-    .catch(() => setError("Erro ao atualizar estado das mensagens"));  
+      .then(() => messageAPI.chatSidebarConversations())
+      .then(convs => setSidebarConversations(convs || []))
+      .catch(() => setError("Failed to update read state"));
 
-    // Always seeks the conversation messages regardless of read status
+    // Fetch messages and add to store
     messageAPI.getConversation(selectedConvId)
-      .then((msgs) => setMessages(msgs || []))
-      .catch(() => setError("Erro ao carregar mensagens"))
+      .then((msgs) => {
+        (msgs || []).forEach(m => addMessage(m));
+      })
+      .catch(() => setError("Failed to load messages"))
       .finally(() => setLoadingMessages(false));
-  }, [selectedConvId]);
+  }, [selectedConvId, clearMessages, addMessage]);
 
-  // WebSocket for real-time messages
-  const { sendMessage, isConnected } = useWebSocket(
-    "wss://localhost:8443/grupo7/websocket/chat",
-    token,
-    (data) => {
-      if (data.type === "chat_message") {
-        // Only shows if conversation is open
-        if (
-          (data.senderId === selectedConvIdRef.current && data.receiverId === userIdRef.current) ||
-          (data.senderId === userIdRef.current && data.receiverId === selectedConvIdRef.current)
-        ) {
-          setMessages((prev) => [
-            ...prev,
-            {
-              ...data,
-              sentByMe: data.senderId === userIdRef.current
-            }
-          ]);
-        }
-          //    messageAPI.chatSidebarConversations()
-        //.then((convs) => setSidebarConversations(convs || []));
-      }
-    }
-  );
-
-  // Send message handler
-  const handleSend = () => {
-    if (!input.trim()) return;
-    sendMessage({
-      senderId: user.id,
-      receiverId: selectedConvId,
-      content: input
-    });
-    setInput("");
-  };
-  
-  // Scroll down to the latest message
+  /** 
+   * Ref to scroll to the bottom of the messages list.
+   * Keeps scroll always at the latest message.
+   */
+  const messagesEndRef = useRef(null);
   useEffect(() => {
-  // Sempre que as mensagens mudam, faz scroll para baixo
-  if (messagesEndRef.current) {
-    messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
-  }
-}, [messages]);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+    }
+  }, [messages]);
 
-  //Selected contact on the sidebar
+  /**
+   * Finds the selected contact details (avatar, name) for the chat header.
+   */
   const selectedContact = sidebarConversations.find(c => c.otherUserId === selectedConvId);
 
-  // Ref to scroll to bottom of messages
-  const messagesEndRef = useRef(null);
+  /**
+ * Handles sending a chat message.
+ * Validates input, then sends the message to the backend via the global WebSocket,
+ * using the sendMessage function from the chat store.
+ * After sending, clears the input field.
+ */
+const handleSend = () => {
+  if (!input.trim()) return;
+  sendMessage({
+    senderId: user.id,
+    receiverId: selectedConvId,
+    content: input
+  });
+  setInput("");
+};
 
   return (
     <PageLayout
@@ -232,6 +231,7 @@ export default function ChatPage() {
     </PageLayout>
   );
 }
+
 
 
 
