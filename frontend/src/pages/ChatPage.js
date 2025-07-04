@@ -17,7 +17,7 @@ export default function ChatPage() {
   const { user } = userStore();
   const token = sessionStorage.getItem("authToken");
 
-  // Refs para manter selectedConvId e user.id atualizados dentro do callback do WebSocket
+  // Refs to keep selectedConvId and user.id updated inside the WebSocket callback
   const selectedConvIdRef = useRef(selectedConvId);
   const userIdRef = useRef(user?.id);
 
@@ -29,7 +29,7 @@ export default function ChatPage() {
     userIdRef.current = user?.id;
   }, [user]);
 
-  // Buscar conversas da sidebar ao carregar a página
+  // Seeks conversations for the sidebar when the page loads
   useEffect(() => {
     setLoadingSidebar(true);
     messageAPI.chatSidebarConversations()
@@ -43,7 +43,7 @@ export default function ChatPage() {
       .finally(() => setLoadingSidebar(false));
   }, []);
 
-  // Buscar mensagens da conversa selecionada
+  // Seeks messages for the selected conversation
   useEffect(() => {
     if (!selectedConvId) return;
     setLoadingMessages(true);
@@ -54,7 +54,7 @@ export default function ChatPage() {
     // This will update the unread count in the sidebar
     messageAPI.markMessagesAsRead(selectedConvId)
     .then(() => {
-      // Depois de marcar como lidas, refresca sidebar
+      // After marking messages as read, refresh the sidebar
       return messageAPI.chatSidebarConversations();
     })
     .then((convs) => {
@@ -69,13 +69,13 @@ export default function ChatPage() {
       .finally(() => setLoadingMessages(false));
   }, [selectedConvId]);
 
-  // WebSocket para mensagens em tempo real
+  // WebSocket for real-time messages
   const { sendMessage, isConnected } = useWebSocket(
     "wss://localhost:8443/grupo7/websocket/chat",
     token,
     (data) => {
       if (data.type === "chat_message") {
-        // Só mostrar se for para a conversa aberta!
+        // Only shows if conversation is open
         if (
           (data.senderId === selectedConvIdRef.current && data.receiverId === userIdRef.current) ||
           (data.senderId === userIdRef.current && data.receiverId === selectedConvIdRef.current)

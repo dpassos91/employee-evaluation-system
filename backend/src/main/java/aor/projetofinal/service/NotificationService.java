@@ -11,6 +11,8 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import aor.projetofinal.entity.enums.NotificationType;
+import java.util.Map;
 
 import java.util.List;
 
@@ -34,16 +36,16 @@ public class NotificationService {
      * @return list of NotificationDto
      */
     @GET
-    public Response getMyNotifications(@Context SecurityContext securityContext) {
+    public Response getMyNotifications() {
         try {
-            Integer userId = getCurrentUserId(securityContext);
-            if (userId == null) {
+            if (RequestContext.getCurrentUser() == null) {
                 logger.warn("User: {} | IP: {} - Attempted to get notifications while not authenticated.",
                         RequestContext.getAuthor(), RequestContext.getIp());
                 return Response.status(Response.Status.UNAUTHORIZED)
                         .entity("{\"message\": \"User not authenticated.\"}")
                         .build();
             }
+            Integer userId = RequestContext.getCurrentUser().getId();
             List<NotificationDto> notifications = notificationBean.getNotificationsForUser(userId);
             logger.info("User: {} | IP: {} - Fetched {} notifications.",
                     RequestContext.getAuthor(), RequestContext.getIp(), notifications.size());
@@ -60,20 +62,45 @@ public class NotificationService {
      */
     @GET
     @Path("/unread")
-    public Response getMyUnreadNotifications(@Context SecurityContext securityContext) {
+    public Response getMyUnreadNotifications() {
         try {
-            Integer userId = getCurrentUserId(securityContext);
-            if (userId == null) {
+            if (RequestContext.getCurrentUser() == null) {
                 logger.warn("User: {} | IP: {} - Attempted to get unread notifications while not authenticated.",
                         RequestContext.getAuthor(), RequestContext.getIp());
                 return Response.status(Response.Status.UNAUTHORIZED)
                         .entity("{\"message\": \"User not authenticated.\"}")
                         .build();
             }
+            Integer userId = RequestContext.getCurrentUser().getId();
             List<NotificationDto> notifications = notificationBean.getUnreadNotificationsForUser(userId);
             logger.info("User: {} | IP: {} - Fetched {} unread notifications.",
                     RequestContext.getAuthor(), RequestContext.getIp(), notifications.size());
             return Response.ok(notifications).build();
+        } finally {
+            RequestContext.clear();
+        }
+    }
+
+        /**
+     * Gets the count of unread notifications for the current user, grouped by notification type.
+     *
+     * @return HTTP 200 com um JSON (mapa tipo -> count), ou 401 se não autenticado.
+     */
+    @GET
+    @Path("/unread/count-by-type")
+    public Response getUnreadNotificationCountsByType() {
+        try {
+            if (RequestContext.getCurrentUser() == null) {
+                logger.warn("User: {} | IP: {} - Attempted to get unread notification counts while not authenticated.",
+                        RequestContext.getAuthor(), RequestContext.getIp());
+                return Response.status(Response.Status.UNAUTHORIZED)
+                        .entity("{\"message\": \"User not authenticated.\"}")
+                        .build();
+            }
+            Integer userId = RequestContext.getCurrentUser().getId();
+            Map<NotificationType, Integer> counts = notificationBean.countUnreadNotificationsByType(userId);
+            logger.info("User: {} | IP: {} - Unread notification counts: {}", RequestContext.getAuthor(), RequestContext.getIp(), counts);
+            return Response.ok(counts).build();
         } finally {
             RequestContext.clear();
         }
@@ -86,16 +113,16 @@ public class NotificationService {
      */
     @PUT
     @Path("/read")
-    public Response markAllAsRead(@Context SecurityContext securityContext) {
+    public Response markAllAsRead() {
         try {
-            Integer userId = getCurrentUserId(securityContext);
-            if (userId == null) {
+            if (RequestContext.getCurrentUser() == null) {
                 logger.warn("User: {} | IP: {} - Attempted to mark notifications as read while not authenticated.",
                         RequestContext.getAuthor(), RequestContext.getIp());
                 return Response.status(Response.Status.UNAUTHORIZED)
                         .entity("{\"message\": \"User not authenticated.\"}")
                         .build();
             }
+            Integer userId = RequestContext.getCurrentUser().getId();
             int updated = notificationBean.markAllNotificationsAsRead(userId);
             logger.info("User: {} | IP: {} - Marked {} notifications as read.",
                     RequestContext.getAuthor(), RequestContext.getIp(), updated);
@@ -105,19 +132,4 @@ public class NotificationService {
         }
     }
 
-    /**
-     * Helper to extract the current user ID from the SecurityContext or RequestContext.
-     * Adapt this to your authentication logic if needed.
-     */
-    private Integer getCurrentUserId(SecurityContext securityContext) {
-        if (RequestContext.getCurrentUser() != null) {
-            return RequestContext.getCurrentUser().getId();
-        }
-        if (securityContext != null && securityContext.getUserPrincipal() != null) {
-            try {
-                return Integer.parseInt(securityContext.getUserPrincipal().getName());
-            } catch (NumberFormatException ignore) {}
-        }
-        return null;
-    }
 }

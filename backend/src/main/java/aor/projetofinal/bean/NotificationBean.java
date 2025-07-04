@@ -9,6 +9,7 @@ import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.NotificationType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.Map;
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -32,6 +33,22 @@ public class NotificationBean {
 
     @Inject
     private UserDao userDao;
+
+        /**
+     * Gets a map with the count of unread notifications for a user, grouped by notification type.
+     * If the user does not exist, returns an empty map.
+     *
+     * @param userId the ID of the user
+     * @return a map of NotificationType to unread count
+     */
+    public Map<NotificationType, Integer> countUnreadNotificationsByType(Integer userId) {
+        UserEntity user = userDao.findById(userId);
+        if (user == null) {
+            // Optionally, you could throw an exception here instead
+            return Map.of();
+        }
+        return notificationDao.countUnreadByType(user);
+    }
 
     /**
      * Creates and saves a new notification for a user.
