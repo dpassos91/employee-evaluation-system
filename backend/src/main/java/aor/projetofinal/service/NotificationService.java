@@ -5,10 +5,10 @@ import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dto.NotificationDto;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
+
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.SecurityContext;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -83,10 +83,36 @@ public class NotificationService {
         }
     }
 
+    /**
+ * Gets all unread notifications for the current user, excluding MESSAGE type.
+ *
+ * @return list of NotificationDto (non-MESSAGE types)
+ */
+@GET
+@Path("/unread/non-message")
+public Response getMyUnreadNonMessageNotifications() {
+    try {
+        if (RequestContext.getCurrentUser() == null) {
+            logger.warn("User: {} | IP: {} - Attempted to get unread non-message notifications while not authenticated.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"User not authenticated.\"}")
+                    .build();
+        }
+        Integer userId = RequestContext.getCurrentUser().getId();
+        List<NotificationDto> notifications = notificationBean.getUnreadNonMessageNotificationsForUser(userId);
+        logger.info("User: {} | IP: {} - Fetched {} unread non-message notifications.",
+                RequestContext.getAuthor(), RequestContext.getIp(), notifications.size());
+        return Response.ok(notifications).build();
+    } finally {
+        RequestContext.clear();
+    }
+}
+
         /**
      * Gets the count of unread notifications for the current user, grouped by notification type.
      *
-     * @return HTTP 200 com um JSON (mapa tipo -> count), ou 401 se não autenticado.
+     * @return HTTP 200 with a JSON map of notification type to count, or 401 if not authenticated.
      */
     @GET
     @Path("/unread/count-by-type")

@@ -68,10 +68,11 @@ notifications: {
   unread: `${API_BASE_URL}/notifications/unread`,
   /** @type {string} Marks all notifications as read */
   markAllAsRead: `${API_BASE_URL}/notifications/read`,
+  /** @type {string} Marks all MESSAGE-type notifications as read */
+  markAllMessageNotificationsAsRead: `${API_BASE_URL}/notifications/read/message`,
   /** @type {string} Gets unread notification counts by type */
   unreadCountByType: `${API_BASE_URL}/notifications/unread/count-by-type`,
 },
-
 
 /** Profile endpoints */
 profiles: {

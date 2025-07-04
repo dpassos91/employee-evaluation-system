@@ -64,6 +64,24 @@ public class NotificationDao {
     }
 
     /**
+ * Finds all unread notifications for a specific user, excluding a specified notification type.
+ * This method is typically used to retrieve only non-MESSAGE notifications for UI dropdowns.
+ *
+ * @param user the recipient user
+ * @param excludeType the notification type to exclude (e.g., NotificationType.MESSAGE)
+ * @return list of unread NotificationEntity objects excluding the specified type
+ */
+public List<NotificationEntity> findUnreadByUserExcludingType(UserEntity user, NotificationType excludeType) {
+    return em.createQuery(
+        "SELECT n FROM NotificationEntity n WHERE n.user = :user AND n.read = false AND n.type <> :excludeType ORDER BY n.createdAt DESC",
+        NotificationEntity.class
+    )
+    .setParameter("user", user)
+    .setParameter("excludeType", excludeType)
+    .getResultList();
+}
+
+    /**
      * Persists a new NotificationEntity.
      *
      * @param notification the NotificationEntity to persist

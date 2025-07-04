@@ -111,6 +111,24 @@ public class NotificationBean {
         return dtos;
     }
 
+/**
+ * Retrieves all unread notifications for a given user, excluding a specific notification type.
+ * Typically used to fetch non-MESSAGE notifications for notification dropdowns.
+ *
+ * @param userId the ID of the user whose notifications are to be retrieved
+ * @return a list of NotificationDto objects, excluding the specified type
+ */
+public List<NotificationDto> getUnreadNonMessageNotificationsForUser(Integer userId) {
+    UserEntity user = userDao.findById(userId);
+    if (user == null) return List.of();
+    // Delegates to the DAO to fetch unread notifications excluding MESSAGE
+    return notificationDao.findUnreadByUserExcludingType(user, NotificationType.MESSAGE)
+        .stream()
+        .map(this::toDto) // Convert entities to DTOs
+        .toList();
+}
+
+
     /**
      * Gets unread notifications for a user.
      *
