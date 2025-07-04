@@ -60,6 +60,18 @@ const API_ENDPOINTS = {
   chatSidebarConversations: `${API_BASE_URL}/messages/conversations`,
 },
 
+/** Notification endpoints */
+notifications: {
+  /** @type {string} Gets all notifications for the authenticated user */
+  list: `${API_BASE_URL}/notifications`,
+  /** @type {string} Gets all unread notifications */
+  unread: `${API_BASE_URL}/notifications/unread`,
+  /** @type {string} Marks all notifications as read */
+  markAllAsRead: `${API_BASE_URL}/notifications/read`,
+  /** @type {string} Gets unread notification counts by type */
+  unreadCountByType: `${API_BASE_URL}/notifications/unread/count-by-type`,
+},
+
 
 /** Profile endpoints */
 profiles: {
