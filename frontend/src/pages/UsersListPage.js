@@ -1,6 +1,7 @@
 import PageLayout from "../components/PageLayout";
 import profile from "../images/profile_icon.png";
 import { FormattedMessage } from "react-intl";
+import MessageUserButton from "../components/MessageUserButton";
 
 export default function UsersPage() {
   const users = [
@@ -89,8 +90,11 @@ export default function UsersPage() {
             <th className="p-2 w-[220px]">
               <FormattedMessage id="users.table.contact" defaultMessage="Contacto" />
             </th>
-            <th className="p-2 w-[60px]"></th>
             <th className="p-2 w-[100px]"></th>
+            <th className="p-2 w-[60px]"></th>
+            <th className="p-2 w-[200px]">
+              <FormattedMessage id="users.table.actions" defaultMessage="Ações" />
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -100,18 +104,21 @@ export default function UsersPage() {
               <td className="p-2">{user.office}</td>
               <td className="p-2">{user.manager}</td>
               <td className="p-2 truncate">{user.email}</td>
-              <td className="p-2 text-center">
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="w-6 h-6 rounded-full mx-auto"
-                />
-              </td>
-              <td className="p-2">
-                <button className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2 ml-10">
-                  <FormattedMessage id="users.button.view" defaultMessage="Ver" /> <span>&gt;</span>
-                </button>
-              </td>
+              <td className="p-2 pl-14">
+  <img
+    src={user.avatar}
+    alt={user.name}
+    className="w-8 h-8 rounded-full"
+  />
+</td>
+<td className="p-2 text-center pl-14">
+  <MessageUserButton userId={user.id} />
+</td>
+<td className="p-2 text-center pl-16">
+  <button className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2 ml-6">
+    <FormattedMessage id="users.button.view" defaultMessage="Ver" /> <span>&gt;</span>
+  </button>
+</td>
             </tr>
           ))}
         </tbody>
