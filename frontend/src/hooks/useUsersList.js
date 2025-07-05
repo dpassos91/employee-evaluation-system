@@ -1,0 +1,74 @@
+
+import { useState, useEffect, useCallback } from "react";
+import { apiConfig } from "../api/apiConfig";
+
+/**
+ * Custom hook para obter lista de utilizadores com filtros e paginação.
+ * @param {object} filters - { name, office, manager, page }
+ * @returns {object} { users, totalPages, totalCount, currentPage, loading, error, refetch }
+ */
+export function useUsersList(filters) {
+  const [users, setUsers] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    // Build query parameters based on filters
+    const params = new URLSearchParams();
+    if (filters.name) params.append("profile-name", filters.name);
+    if (filters.office) params.append("usual-work-place", filters.office);
+    if (filters.manager) params.append("manager-email", filters.manager);
+    if (filters.page) params.append("page", filters.page);
+
+    try {
+      const result = await apiConfig.apiCall(
+        `${apiConfig.API_ENDPOINTS.profiles.listUsersByFilters}?${params.toString()}`
+      );
+
+      // Map profiles to expected format for the table
+      const mapped = (result.profiles || []).map(profile => ({
+        id: profile.user?.id,
+        name: [profile.firstName, profile.lastName].filter(Boolean).join(" "),
+        office: profile.usualWorkplace,
+        manager: profile.user?.manager ? (
+          profile.user.manager.firstName
+            ? `${profile.user.manager.firstName} ${profile.user.manager.lastName || ""}`
+            : profile.user.manager.email
+        ) : "",
+        email: profile.user?.email,
+        avatar: profile.photograph,
+      }));
+
+      setUsers(mapped);
+      setTotalPages(result.totalPages || 1);
+      setTotalCount(result.totalCount || 0);
+      setCurrentPage(result.currentPage || filters.page || 1);
+    } catch (err) {
+      setError(err.message || "Erro ao obter utilizadores");
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
+
+  // Refetch whenever filters change
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  return {
+    users,
+    totalPages,
+    totalCount,
+    currentPage,
+    loading,
+    error,
+    refetch: fetchUsers,
+  };
+}

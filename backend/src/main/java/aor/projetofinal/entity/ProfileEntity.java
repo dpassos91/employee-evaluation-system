@@ -3,7 +3,6 @@ package aor.projetofinal.entity;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 
 import aor.projetofinal.entity.enums.UsualWorkPlaceType;

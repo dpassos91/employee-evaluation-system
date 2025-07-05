@@ -7,7 +7,7 @@ import java.util.List;
 
 @XmlRootElement
 public class PaginatedProfilesDto {
-    private List<ProfileDto> profiles;
+    private List<FlatProfileDto> profiles;
     private long totalCount;
     private int totalPages;
     private int currentPage;
@@ -15,7 +15,7 @@ public class PaginatedProfilesDto {
     public PaginatedProfilesDto() {
     }
 
-    public PaginatedProfilesDto(List<ProfileDto> profiles, long totalCount, int totalPages, int currentPage) {
+    public PaginatedProfilesDto(List<FlatProfileDto> profiles, long totalCount, int totalPages, int currentPage) {
         this.profiles = profiles;
         this.totalCount = totalCount;
         this.totalPages = totalPages;
@@ -24,11 +24,11 @@ public class PaginatedProfilesDto {
 
     // Getters e Setters
     @XmlElement
-    public List<ProfileDto> getProfiles() {
+    public List<FlatProfileDto> getProfiles() {
         return profiles;
     }
 
-    public void setProfiles(List<ProfileDto> profiles) {
+    public void setProfiles(List<FlatProfileDto> profiles) {
         this.profiles = profiles;
     }
     @XmlElement

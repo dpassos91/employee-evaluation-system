@@ -1,6 +1,7 @@
 package aor.projetofinal.util;
 
 import aor.projetofinal.dao.UserDao;
+import aor.projetofinal.dto.FlatProfileDto;
 import aor.projetofinal.dto.ProfileDto;
 import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.dto.UserDto;
@@ -8,53 +9,116 @@ import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.UsualWorkPlaceType;
-import jakarta.ejb.EJB;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Utility class for converting JPA entities to DTOs (Data Transfer Objects).
+ * <p>
+ * Ensures that conversion logic is centralized and reusable, preventing code duplication.
+ * <b>Note:</b> FlatProfileDto should never expose JPA references or complex nested objects—only simple fields,
+ * for API safety and serialization performance.
+ */
 @ApplicationScoped
 public class JavaConversionUtil {
 
     @Inject
     UserDao userDao;
 
+    /**
+     * Builds a CSV string from a list of FlatProfileDto objects.
+     * Each row will include the user's full name, workplace, manager name, and photograph URL.
+     *
+     * @param profiles The list of FlatProfileDto objects to export.
+     * @return A CSV-formatted string representing the user profiles.
+     */
+    public static String buildUsersCsvFromFlatProfiles(List<FlatProfileDto> profiles) {
+        StringBuilder csvBuilder = new StringBuilder();
+        csvBuilder.append("Full Name,Workplace,Manager,Photograph\n");
 
+        for (FlatProfileDto p : profiles) {
+            String name = (p.getFirstName() != null ? p.getFirstName() : "") + " " +
+                    (p.getLastName() != null ? p.getLastName() : "");
+            String workplace = p.getUsualWorkplace() != null ? p.getUsualWorkplace() : "";
+            String manager = p.getManagerName() != null ? p.getManagerName() : "";
+            String photo = p.getPhotograph() != null ? p.getPhotograph() : "";
 
-    //Converter de UserEntity para SessionStatusDto
-    public SessionStatusDto convertSessionTokenEntityToSessionStatusDto(SessionTokenEntity sessionTokenEntity) {
-        SessionStatusDto sessionStatusDto = new SessionStatusDto(sessionTokenEntity.getTokenValue(), sessionTokenEntity.getExpiryDate());
-
-
-        sessionStatusDto.setSessionToken(sessionTokenEntity.getTokenValue());
-        sessionStatusDto.setExpiryDate(sessionTokenEntity.getExpiryDate());
-
-        return sessionStatusDto;
+            csvBuilder.append(String.format("\"%s\",\"%s\",\"%s\",\"%s\"\n",
+                    name.trim(), workplace, manager, photo));
+        }
+        return csvBuilder.toString();
     }
 
-
-    public static UserDto convertUserEntityToUserDto(UserEntity userEntity) {
-        UserDto userDto = new UserDto();
-        userDto.setEmail(userEntity.getEmail());
-        userDto.setActive(userEntity.isActive());
-        userDto.setConfirmed(userEntity.isConfirmed());
-        userDto.setCreatedAt(userEntity.getCreatedAt());
-        userDto.setConfirmationToken(userEntity.getConfirmationToken());
-        userDto.setConfirmationTokenExpiry(userEntity.getConfirmationTokenExpiry());
-        userDto.setRecoveryToken(userEntity.getRecoveryToken());
-        userDto.setRecoveryTokenExpiry(userEntity.getRecoveryTokenExpiry());
-
-
-        //userDto.setSessionTokenExpiryDate(userEntity.getSessionTokenExpiryDate());
-
-        return userDto;
+    /**
+     * Converts a list of ProfileEntity to a list of FlatProfileDto.
+     *
+     * @param profileEntities The list of ProfileEntity objects.
+     * @return A list of FlatProfileDto.
+     */
+    public static List<FlatProfileDto> convertProfileEntityListToFlatProfileDtoList(List<ProfileEntity> profileEntities) {
+        List<FlatProfileDto> flatDtos = new ArrayList<>();
+        for (ProfileEntity p : profileEntities) {
+            FlatProfileDto flat = convertProfileEntityToFlatProfileDto(p);
+            if (flat != null) flatDtos.add(flat);
+        }
+        return flatDtos;
     }
 
+    /**
+     * Converts a ProfileEntity to a FlatProfileDto (flat, no JPA references).
+     * Only exposes simple fields for use in API list views or exports.
+     *
+     * @param profile The ProfileEntity to convert.
+     * @return A FlatProfileDto populated with simple fields, or null if profile/user is null.
+     */
+    public static FlatProfileDto convertProfileEntityToFlatProfileDto(ProfileEntity profile) {
+        if (profile == null || profile.getUser() == null) {
+            return null;
+        }
 
+        UserEntity user = profile.getUser();
+        UserEntity manager = user.getManager();
 
-    public ProfileDto convertProfileEntityToProfileDto(ProfileEntity p) {
+        // Compute manager's display name (first + last or email, or empty)
+        String managerName = "";
+        if (manager != null && manager.getProfile() != null) {
+            String mFirst = manager.getProfile().getFirstName() != null ? manager.getProfile().getFirstName() : "";
+            String mLast = manager.getProfile().getLastName() != null ? manager.getProfile().getLastName() : "";
+            managerName = (mFirst + " " + mLast).trim();
+            if (managerName.isEmpty() && manager.getEmail() != null) {
+                managerName = manager.getEmail();
+            }
+        }
+
+        // UsualWorkplace as String (Enum to String, or empty)
+        String usualWorkplace = profile.getUsualWorkplace() != null
+                ? profile.getUsualWorkplace().name()
+                : "";
+
+        FlatProfileDto flat = new FlatProfileDto();
+        flat.setUserId(Long.valueOf(user.getId()));
+        flat.setFirstName(profile.getFirstName());
+        flat.setLastName(profile.getLastName());
+        flat.setEmail(user.getEmail());
+        flat.setUsualWorkplace(usualWorkplace);
+        flat.setManagerName(managerName);
+        flat.setPhotograph(profile.getPhotograph());
+
+        return flat;
+    }
+
+    /**
+     * Converts a ProfileEntity to a ProfileDto (includes user reference).
+     * This is used for detailed profile editing or retrieval.
+     *
+     * @param p The ProfileEntity to convert.
+     * @return A ProfileDto mapped from the entity.
+     */
+    public static ProfileDto convertProfileEntityToProfileDto(ProfileEntity p) {
         ProfileDto profileDto = new ProfileDto();
 
         profileDto.setFirstName(p.getFirstName());
@@ -66,39 +130,49 @@ public class JavaConversionUtil {
         profileDto.setPhotograph(p.getPhotograph());
         profileDto.setBio(p.getBio());
 
-        // Define workplace como string (ex: "LISBOA")
+        // Set workplace as string (e.g., "LISBOA")
         if (p.getUsualWorkplace() != null) {
             profileDto.setUsualWorkplace(UsualWorkPlaceType.transformToString(p.getUsualWorkplace()));
-
         } else {
             profileDto.setUsualWorkplace(null);
         }
 
-        if (p.getUser() == null) {
-            profileDto.setUser(null);
-        } else {
-            profileDto.setUser(p.getUser());
-        }
+        profileDto.setUser(p.getUser());
 
         return profileDto;
-
     }
 
-
-
-
-
-    public ArrayList<ProfileDto> convertProfileEntityListtoProfileDtoList(ArrayList<ProfileEntity> profileEntityEntities) {
-        ArrayList<ProfileDto> profilesDtos = new ArrayList<ProfileDto>();
-        for (ProfileEntity p : profileEntityEntities) {
-            profilesDtos.add(convertProfileEntityToProfileDto(p));
-        }
-        return profilesDtos;
+    /**
+     * Converts a SessionTokenEntity to a SessionStatusDto.
+     *
+     * @param sessionTokenEntity The SessionTokenEntity.
+     * @return The SessionStatusDto.
+     */
+    public static SessionStatusDto convertSessionTokenEntityToSessionStatusDto(SessionTokenEntity sessionTokenEntity) {
+        SessionStatusDto sessionStatusDto = new SessionStatusDto(sessionTokenEntity.getTokenValue(), sessionTokenEntity.getExpiryDate());
+        sessionStatusDto.setSessionToken(sessionTokenEntity.getTokenValue());
+        sessionStatusDto.setExpiryDate(sessionTokenEntity.getExpiryDate());
+        return sessionStatusDto;
     }
 
-
-
-
-
-
+    /**
+     * Converts a UserEntity to a UserDto.
+     *
+     * @param userEntity The UserEntity to convert.
+     * @return The UserDto.
+     */
+    public static UserDto convertUserEntityToUserDto(UserEntity userEntity) {
+        UserDto userDto = new UserDto();
+        userDto.setEmail(userEntity.getEmail());
+        userDto.setActive(userEntity.isActive());
+        userDto.setConfirmed(userEntity.isConfirmed());
+        userDto.setCreatedAt(userEntity.getCreatedAt());
+        userDto.setConfirmationToken(userEntity.getConfirmationToken());
+        userDto.setConfirmationTokenExpiry(userEntity.getConfirmationTokenExpiry());
+        userDto.setRecoveryToken(userEntity.getRecoveryToken());
+        userDto.setRecoveryTokenExpiry(userEntity.getRecoveryTokenExpiry());
+        return userDto;
+    }
 }
+
+

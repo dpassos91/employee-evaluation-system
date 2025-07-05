@@ -78,6 +78,8 @@ notifications: {
 
 /** Profile endpoints */
 profiles: {
+  /** @function Export users to CSV */
+  exportUsersCsv: `${API_BASE_URL}/profiles/export-users-csv`,
   /** @function Get user profile by email */
   get: (email) => `${API_BASE_URL}/profiles/${encodeURIComponent(email)}`,
   /** @function List users by filters */
@@ -121,6 +123,7 @@ export const authInterceptor = (options = {}) => {
       headers: {
         ...options.headers,
         token,
+        sessionToken: token,
       },
     };
   }
