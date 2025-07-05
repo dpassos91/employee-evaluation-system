@@ -2,7 +2,9 @@ import { useState, useMemo } from "react";
 import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
 import MessageUserButton from "../components/MessageUserButton";
-import { useUsersList } from "../hooks/useUsersList"; // O hook que sugeri antes
+import { useUsersList } from "../hooks/useUsersList"; 
+import { formatWorkplace } from "../utils/formatWorkplace";
+import { apiConfig } from "../api/apiConfig";
 
 export default function UsersPage() {
   // Filtros e página
@@ -29,6 +31,40 @@ export default function UsersPage() {
   const offices = [
     "", "Boston", "Coimbra", "Lisboa", "Munich", "Porto", "Southampton", "Viseu"
   ];
+
+  const handleExportCSV = async () => {
+  try {
+    // Lê filtros do state (name, office, manager)
+    const params = new URLSearchParams();
+    if (name) params.append("profile-name", name);
+    if (office) params.append("usual-work-place", office);
+    if (manager) params.append("manager-email", manager);
+
+    const url = `${apiConfig.API_ENDPOINTS.profiles.exportUsersCsv}?${params.toString()}`;
+
+    const token = sessionStorage.getItem("authToken");
+
+    // Usa fetch diretamente para blobs
+    const response = await fetch(url, {
+      headers: {
+        sessionToken: token,
+        token,
+      },
+    });
+    if (!response.ok) throw new Error("Erro ao exportar CSV");
+    const blob = await response.blob();
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "users_export.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (err) {
+    alert("Erro ao exportar ficheiro.");
+  }
+};
+
+
 
   return (
     <PageLayout title={<FormattedMessage id="users.list.title" defaultMessage="Listagem de Utilizadores" />}>
@@ -65,7 +101,9 @@ export default function UsersPage() {
             />
           )}
         </FormattedMessage>
-        <button className="bg-green-600 text-white px-3 rounded" /* onClick para export CSV aqui se quiseres! */>
+        <button className="bg-green-600 text-white px-3 rounded" 
+        onClick={handleExportCSV}
+        >
           <FormattedMessage id="users.button.excel" defaultMessage="Excel" />
         </button>
       </div>
@@ -76,7 +114,8 @@ export default function UsersPage() {
 
       {/* Tabela */}
       {!loading && users.length > 0 && (
-        <table className="w-full text-left border-collapse table-fixed">
+        <div className="overflow-x-auto w-full">
+        <table className="min-w-full text-left border-collapse table-auto">
           <thead>
             <tr className="bg-gray-200 text-sm">
               <th className="p-2 w-[180px]">
@@ -102,7 +141,7 @@ export default function UsersPage() {
             {users.map((user) => (
               <tr key={user.id} className="border-b hover:bg-gray-50">
                 <td className="p-2">{user.name}</td>
-                <td className="p-2">{user.office}</td>
+                <td className="p-2">{formatWorkplace(user.office)}</td>
                 <td className="p-2">{user.manager}</td>
                 <td className="p-2 truncate">{user.email}</td>
                 <td className="p-2 pl-14">
@@ -124,6 +163,7 @@ export default function UsersPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       {/* Paginação real */}

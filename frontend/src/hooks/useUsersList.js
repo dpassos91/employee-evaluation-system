@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { apiConfig } from "../api/apiConfig";
+import { formatWorkplace } from "../utils/formatWorkplace"; 
 
 /**
  * Custom hook para obter lista de utilizadores com filtros e paginação.
@@ -32,18 +33,14 @@ export function useUsersList(filters) {
       );
 
       // Map profiles to expected format for the table
-      const mapped = (result.profiles || []).map(profile => ({
-        id: profile.user?.id,
-        name: [profile.firstName, profile.lastName].filter(Boolean).join(" "),
-        office: profile.usualWorkplace,
-        manager: profile.user?.manager ? (
-          profile.user.manager.firstName
-            ? `${profile.user.manager.firstName} ${profile.user.manager.lastName || ""}`
-            : profile.user.manager.email
-        ) : "",
-        email: profile.user?.email,
-        avatar: profile.photograph,
-      }));
+const mapped = (result.profiles || []).map(profile => ({
+  id: profile.userId, // Agora é profile.userId, não profile.user?.id
+  name: [profile.firstName, profile.lastName].filter(Boolean).join(" "),
+  office: formatWorkplace(profile.usualWorkplace),
+  manager: profile.managerName || "",
+  email: profile.email,
+  avatar: profile.photograph,
+}));
 
       setUsers(mapped);
       setTotalPages(result.totalPages || 1);
