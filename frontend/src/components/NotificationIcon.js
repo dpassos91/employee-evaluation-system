@@ -7,13 +7,13 @@ import { notificationAPI } from "../api/notificationAPI";
  * NotificationIcon component.
  * Renders the notification icon with a badge for unread ALERT, SYSTEM, and WARNING notifications.
  * On click, marks all notifications as read, fetches updated badge counts,
- * fetches updated notifications, and toggles the dropdown to display details.
+ * fetches updated notifications, e toggles o dropdown para mostrar detalhes.
  */
 export default function NotificationIcon() {
   const counts = useNotificationStore((s) => s.counts);
   const fetchCounts = useNotificationStore((s) => s.fetchCounts);
   const notifications = useNotificationStore((s) => s.notifications);
-  const fetchNotifications = useNotificationStore((s) => s.fetchNotifications);
+  const fetchNonMessageNotifications = useNotificationStore((s) => s.fetchNonMessageNotifications);
 
   // Sum non-message notification types for the badge
   const notifCount = (counts.ALERT || 0) + (counts.SYSTEM || 0) + (counts.WARNING || 0);
@@ -21,16 +21,19 @@ export default function NotificationIcon() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   /**
-   * Handles click on the notification icon:
-   * - Marks all notifications as read (notificationAPI)
-   * - Fetches updated badge counts and notification list
-   * - Opens the dropdown menu
+   * Handles click on the notification icon (dropdown).
+   * - When opening the dropdown, marks all notifications as read in the backend,
+   *   updates the badge counts, and fetches the latest unread non-MESSAGE notifications for the dropdown.
+   * - Ensures that the badge and dropdown stay in sync with the backend state.
+   *
+   * @async
+   * @function handleClick
    */
   const handleClick = async () => {
     if (!dropdownOpen) {
       await notificationAPI.markAllAsRead();
       await fetchCounts();
-      await fetchNotifications();
+      await fetchNonMessageNotifications();
     }
     setDropdownOpen((open) => !open);
   };
@@ -62,20 +65,19 @@ export default function NotificationIcon() {
             <div className="text-gray-400 text-sm">Sem notificações por ler.</div>
           )}
           <ul>
-            {notifications
-              .filter(n => n.type !== "MESSAGE")
-              .map((notif) => (
-                <li key={notif.id} className="py-2 border-b last:border-b-0">
-                  <div className="text-sm font-medium">{notif.message}</div>
-                  <div className="text-xs text-gray-400">{notif.createdAt}</div>
-                  <div className="text-xs italic text-blue-700">{notif.type}</div>
-                </li>
-              ))}
+            {notifications.map((notif) => (
+              <li key={notif.id} className="py-2 border-b last:border-b-0">
+                <div className="text-sm font-medium">{notif.message}</div>
+                <div className="text-xs text-gray-400">{notif.createdAt}</div>
+                <div className="text-xs italic text-blue-700">{notif.type}</div>
+              </li>
+            ))}
           </ul>
         </div>
       )}
     </div>
   );
 }
+
 
 

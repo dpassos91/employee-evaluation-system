@@ -50,8 +50,18 @@ const markAllAsRead = async () => {
  * @returns {Promise<Object>} API response, usually with number of notifications updated.
  */
 const markAllMessageNotificationsAsRead = async () => {
-  return apiCall(API_ENDPOINTS.notifications.markMessageNotificationsAsRead, {
+  return apiCall(API_ENDPOINTS.notifications.markAllMessageNotificationsAsRead, {
     method: 'PUT',
+  });
+};
+
+/**
+ * Fetches all unread notifications for the authenticated user, excluding MESSAGE type.
+ * @returns {Promise<Array>} List of NotificationDto objects (non-MESSAGE types).
+ */
+const getUnreadNonMessageNotifications = async () => {
+  return apiCall(API_ENDPOINTS.notifications.unreadNonMessage, {
+    method: 'GET',
   });
 };
 
@@ -79,5 +89,6 @@ export const notificationAPI = {
   getUnreadNotifications,
   markAllAsRead,
   markAllMessageNotificationsAsRead,
+  getUnreadNonMessageNotifications,
   getUnreadNotificationCountsByType,
 };

@@ -27,7 +27,7 @@ export const useNotificationStore = create((set, get) => ({
     }
   },
 
-  /** Optionally, fetches all notifications (for a notifications center). */
+  /** Fetches all notifications (for a notifications center). */
   fetchNotifications: async () => {
     set({ isLoading: true, error: null });
     try {
@@ -37,6 +37,17 @@ export const useNotificationStore = create((set, get) => ({
       set({ error: err, isLoading: false });
     }
   },
+
+  /** Fetches all unread non-MESSAGE notifications (for notification dropdown). */
+fetchNonMessageNotifications: async () => {
+  set({ isLoading: true, error: null });
+  try {
+    const notifications = await notificationAPI.getUnreadNonMessageNotifications();
+    set({ notifications, isLoading: false });
+  } catch (err) {
+    set({ error: err, isLoading: false });
+  }
+},
 
   /** Marks all notifications as read and resets the counts. */
   markAllAsRead: async () => {

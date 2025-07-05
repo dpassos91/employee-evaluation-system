@@ -24,8 +24,9 @@ export default function MessageIcon() {
    */
   const handleClick = async () => {
     try {
-      await messageAPI.markMessagesAsRead();
+      console.log("Vou marcar todas as notificações MESSAGE como lidas");
       await notificationAPI.markAllMessageNotificationsAsRead();
+      console.log("Terminei markAllMessageNotificationsAsRead");
       await fetchCounts();
     } catch (e) {
       // (Optional) Handle errors, e.g., show a toast

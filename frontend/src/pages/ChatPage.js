@@ -3,7 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { messageAPI } from "../api/messageAPI";
 import { userStore } from "../stores/userStore";
-import { useChatStore } from "../stores/chatStore"; // Import global chat store
+import { useChatStore } from "../stores/chatStore"; 
+import { notificationAPI } from "../api/notificationAPI";
 
 /**
  * ChatPage component.
@@ -73,6 +74,9 @@ export default function ChatPage() {
 
     // Mark messages as read and refresh sidebar
     messageAPI.markMessagesAsRead(selectedConvId)
+      .then(() => {
+      return notificationAPI.markAllMessageNotificationsAsRead();
+    })
       .then(() => messageAPI.chatSidebarConversations())
       .then(convs => setSidebarConversations(convs || []))
       .catch(() => setError("Failed to update read state"));

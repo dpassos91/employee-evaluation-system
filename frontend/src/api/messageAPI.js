@@ -61,6 +61,7 @@ const sendMessage = async (messageDto) => {
  * await messageAPI.markMessagesAsRead(5);
  */
 const markMessagesAsRead = async (otherUserId) => {
+  if (!otherUserId) throw new Error("otherUserId is required");
   return apiCall(API_ENDPOINTS.messages.markAsRead(otherUserId), {
     method: "PUT"
   });
