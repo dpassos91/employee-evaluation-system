@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Path("/evaluations")
@@ -99,6 +100,89 @@ public class EvaluationService {
 
 
         return Response.ok(options).build();
+    }
+
+    @GET
+    @Path("/load-evaluation")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadEvaluation(@QueryParam("email") String evaluatedEmail,
+                                   @HeaderParam("sessionToken") String token) {
+
+        // valdiate session
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity evaluator = tokenEntity.getUser();
+
+        // validates the existence of the evaluated user
+        UserEntity evaluated = userDao.findByEmail(evaluatedEmail);
+        if (evaluated == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"message\": \"Evaluated user not found.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // verifies permissions
+        boolean isAdmin = evaluator.getRole().getName().equalsIgnoreCase("admin");
+        boolean isManager = evaluated.getManager() != null &&
+                evaluated.getManager().getEmail().equalsIgnoreCase(evaluator.getEmail());
+
+        if (!isAdmin && !isManager) {
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"You are not authorized to view this evaluation.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // gets the current active evaluation cycle
+        EvaluationCycleEntity cycle = evaluationCycleBean.findActiveCycle();
+        if (cycle == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"message\": \"No active evaluation cycle found.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // gets the correct evaluation to load
+        EvaluationEntity evaluation = evaluationBean.findEvaluationByCycleAndUser(cycle, evaluated);
+        if (evaluation == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"message\": \"Evaluation not found for this user in current cycle.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // build UpdateEvaluationDto to send to the frontend
+        UpdateEvaluationDto dto = new UpdateEvaluationDto();
+        dto.setEvaluatedEmail(evaluated.getEmail());
+
+        // name comes from the profile
+        if (evaluated.getProfile() != null) {
+            dto.setEvaluatedName(evaluated.getProfile().getFirstName() + " " + evaluated.getProfile().getLastName());
+        }
+
+        if (evaluation.getGrade() != null) {
+            dto.setGrade(evaluation.getGrade().getGrade());
+        }
+
+        if (evaluation.getFeedback() != null) {
+            dto.setFeedback(evaluation.getFeedback());
+        }
+
+        return Response.ok()
+                // building a response Map<String, DTO Object>
+                .entity(Map.of(
+                        "message", "Evaluation data loaded successfully.",
+                        "evaluation", dto
+                ))
+                .type(MediaType.APPLICATION_JSON)
+                .build();
     }
 
 
@@ -180,7 +264,7 @@ public class EvaluationService {
         evaluationBean.updateEvaluationWithGradeAndFeedback(dto, evaluation, evaluator);
 
         return Response.status(Response.Status.CREATED)
-                .entity("{\"message\": \"New evaluation successfully craeted.\"}")
+                .entity("{\"message\": \"Evaluation successfully updated.\"}")
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }

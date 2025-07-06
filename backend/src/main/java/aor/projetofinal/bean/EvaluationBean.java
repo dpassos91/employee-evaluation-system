@@ -130,8 +130,15 @@ public class EvaluationBean implements Serializable {
         evaluation.setGrade(GradeEvaluationType.getEnumfromGrade(updateEvaluationDto.getGrade()));
         evaluation.setFeedback(updateEvaluationDto.getFeedback());
         evaluation.setDate(LocalDateTime.now());
-        evaluation.setState(EvaluationStateType.EVALUATED);
         evaluation.setEvaluator(evaluator);
+
+
+        // Update the evaluation state only if feedback was provided
+        if (updateEvaluationDto.getFeedback() != null && !updateEvaluationDto.getFeedback().trim().isEmpty()) {
+            evaluation.setState(EvaluationStateType.EVALUATED);
+        } else {
+            evaluation.setState(EvaluationStateType.IN_EVALUATION);
+        }
 
         evaluationDao.save(evaluation);
 
