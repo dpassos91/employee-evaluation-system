@@ -1,9 +1,12 @@
 package aor.projetofinal.bean;
 
 import aor.projetofinal.dao.EvaluationCycleDao;
+import aor.projetofinal.dao.EvaluationDao;
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.entity.EvaluationCycleEntity;
+import aor.projetofinal.entity.EvaluationEntity;
 import aor.projetofinal.entity.UserEntity;
+import aor.projetofinal.entity.enums.EvaluationStateType;
 import aor.projetofinal.util.EmailUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -26,6 +29,9 @@ public class EvaluationCycleBean implements Serializable {
     @Inject
     private UserDao userDao;
 
+    @Inject
+    private EvaluationDao evaluationDao;
+
     private static final Logger logger = LogManager.getLogger(EvaluationCycleBean.class);
 
     public EvaluationCycleEntity findActiveCycle() {
@@ -36,7 +42,9 @@ public class EvaluationCycleBean implements Serializable {
         return cycle;
     }
 
-    public void createCycle(LocalDate endDate) {
+    public void createCycleAndCreateBlankEvaluations(LocalDate endDate) {
+        //creating cycle with the end date provided by the admin from the frontend
+
         EvaluationCycleEntity newCycle = new EvaluationCycleEntity();
         newCycle.setStartDate(LocalDateTime.now());
         //we get a localdate from frontend, which we need to convert to LocalDateTime to store at the DB
@@ -47,6 +55,30 @@ public class EvaluationCycleBean implements Serializable {
 
         logger.info("New evaluation cycle created with end date: {}", endDate);
 
+
+        List<UserEntity> usersToEvaluate = userDao.findConfirmedUsersWithManager();
+
+        int createdCount = 0;
+
+        for (UserEntity user : usersToEvaluate) {
+            if (user.getManager() != null) {
+                EvaluationEntity evaluation = new EvaluationEntity();
+                evaluation.setCycle(newCycle);
+                evaluation.setEvaluated(user);
+                evaluation.setEvaluator(user.getManager());
+                evaluation.setState(EvaluationStateType.IN_EVALUATION);
+                evaluation.setDate(null);
+                // grade and feedback also stay at null
+
+                evaluationDao.create(evaluation);
+                createdCount++;
+            }
+        }
+
+        logger.info("Created {} placeholder evaluations for the new cycle.", createdCount);
+
+
+        // Notify managers and admins by email about the new cycle
         emailManagersAndAdminsOfNewCycle(newCycle);
 
 
@@ -66,7 +98,7 @@ public class EvaluationCycleBean implements Serializable {
                 String subject = "Start of a New Evalaution Cycle";
                 //Return a formatted string appplying the format method from String class, %s for any type of data
                 String body = String.format("""
-                    Dear Mr./Ms./Mrs. %s,
+                    Dear %s,
 
                     A new evaluation cycle has started, with ending date by %s.
 
