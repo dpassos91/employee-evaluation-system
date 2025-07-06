@@ -157,7 +157,9 @@ export default function UsersPage() {
                 </td>
 <td className="p-2 text-center pl-16">
 <button
-  onClick={() => navigate(`/profile/${user.id}`)}
+  onClick={() =>
+    navigate(`/profile/${user.id}`, { state: { profileOwnerEmail: user.email } })
+  }
   className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2 ml-6"
 >
   <FormattedMessage id="users.button.view" defaultMessage="Ver" /> <span>&gt;</span>

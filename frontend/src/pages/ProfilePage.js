@@ -17,13 +17,18 @@ import { userStore } from "../stores/userStore";
 import { useIntl, FormattedMessage } from "react-intl";
 import { profileAPI } from "../api/profileAPI";
 import { fieldLabelKeys } from "../utils/fieldLabels";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 export default function ProfilePage() {
   /**
    * Authenticated user info from Zustand store.
    */
   const user = userStore((state) => state.user);
+
+  /**
+   * Zustand setter for user info.
+   */
+  const setUser = userStore((state) => state.setUser);
 
   /**
    * Zustand setters for profile completeness and missing fields.
@@ -38,8 +43,11 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const location = useLocation();
+  const profileOwnerEmail = location.state?.profileOwnerEmail;
+
   // True if current user is viewing own profile or is admin (can edit)
-  const canEdit = user?.role === "admin" || String(user?.id) === String(userId);
+  const canEdit = user?.role === "ADMIN" || String(user?.id) === String(userId);
 
   /**
    * Fetch profile data from API.
@@ -132,29 +140,43 @@ export default function ProfilePage() {
   };
 
   /**
-   * Save handler (only in edit mode).
+   * Handler for form submission to save profile changes.
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const sessionToken = sessionStorage.getItem("authToken");
-      await profileAPI.updateProfile(user.email, profile, sessionToken);
-      toast.success(
-        formatMessage({
-          id: "profile.update.success",
-          defaultMessage: "Profile updated successfully!",
-        })
-      );
-      fetchProfile(); // Refresh profile after save
-    } catch (err) {
-      toast.error(
-        formatMessage({
-          id: "profile.update.error",
-          defaultMessage: "Error updating profile!",
-        })
-      );
+    // Use the profile owner's email if editing another user's profile, otherwise use the logged-in user's email
+    const emailToUpdate = profileOwnerEmail || user.email;
+    await profileAPI.updateProfile(emailToUpdate, profile, sessionToken);
+    toast.success(
+      formatMessage({
+        id: "profile.update.success",
+        defaultMessage: "Profile updated successfully!",
+      })
+    );
+    await fetchProfile(); // Refresh profile data after save
+
+    // If the currently logged-in user just updated their own profile,
+    // update the global user state so components like Sidebar reflect the new name immediately
+    if (String(user?.id) === String(userId) && profile) {
+      setUser({
+        ...user,
+        firstName: profile.firstName, // Update first name
+        lastName: profile.lastName,    // Update last name
+        // Add more fields here if you want other profile info synced to global user state
+      });
     }
-  };
+  } catch (err) {
+    toast.error(
+      formatMessage({
+        id: "profile.update.error",
+        defaultMessage: "Error updating profile!",
+      })
+    );
+  }
+};
+
 
   /**
    * Handler to start a chat with this user.
@@ -230,7 +252,7 @@ export default function ProfilePage() {
                 </label>
                 <input
                   type="email"
-                  value={user.email}
+                  value={profileOwnerEmail}
                   disabled
                   className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-gray-100 text-gray-700 cursor-not-allowed"
                 />

@@ -46,8 +46,8 @@ const login = async (credentials) => {
       id: data.id,
       email: data.email,
       role: data.role,
-      primeiroNome: data.primeiroNome,
-      ultimoNome: data.ultimoNome,
+      firstName: data.firstName,
+      lastName: data.lastName,
     });
 
     // NOVO: Guarda estado do perfil e campos em falta

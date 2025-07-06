@@ -31,7 +31,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { id: "sidebar.dashboard", icon: dashboardIcon, path: "/dashboard" },
-    { id: "sidebar.evaluations", icon: evaluationsIcon, path: "/evaluations" },
+    //{ id: "sidebar.evaluations", icon: evaluationsIcon, path: "/evaluations" },
     { id: "sidebar.profile", icon: miniprofileIcon, path: `/profile/${user.id}` },
     { id: "sidebar.users", icon: usersIcon, path: "/userslist" },
   ];
@@ -64,7 +64,7 @@ export default function Sidebar() {
           <div className="flex flex-col items-center py-6">
             <img src={profileIcon} alt="Utilizador" className="w-20 h-20 rounded-full bg-white" />
             <span className="mt-2 text-sm font-light">
-  {user?.primeiroNome} {user?.ultimoNome}
+  {user?.firstName} {user?.lastName}
 </span>
           </div>
 
