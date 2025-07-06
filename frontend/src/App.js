@@ -114,7 +114,7 @@ const handleWebSocketMessage = useCallback((data) => {
             }
           />
           <Route
-            path="/profile"
+            path="/profile/:userId"
             element={
               <PrivateRoute>
                 <ProfilePage />

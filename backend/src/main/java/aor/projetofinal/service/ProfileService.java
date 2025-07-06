@@ -5,6 +5,7 @@ import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.*;
+import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.UsualWorkPlaceType;
@@ -151,6 +152,79 @@ return Response.ok(csv)
     }
 
     /**
+ * Retrieves a user's profile by their unique user ID.
+ * Only accessible by the user themselves or by an admin.
+ *
+ * @param userId         The unique ID of the user (from the URL path).
+ * @param sessionToken   The session token for authentication (from the request header).
+ * @return HTTP 200 with the ProfileDto if authorized, or an appropriate error response otherwise.
+ */
+@GET
+@Path("/by-id/{userId}")
+@Produces(MediaType.APPLICATION_JSON)
+public Response getProfileById(
+        @PathParam("userId") int userId,
+        @HeaderParam("sessionToken") String sessionToken
+) {
+    // Validate and refresh the session token
+    SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
+    if (sessionStatusDto == null) {
+        logger.warn("User: {} | IP: {} - Invalid or expired session while fetching profile by id '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), userId);
+        return Response.status(401)
+                .entity("{\"message\": \"Session expired. Please log in again.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    // Get current user (by token) and profile owner (by id)
+    SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
+    UserEntity currentUser = sessionTokenEntity.getUser();
+    UserEntity profileOwner = userDao.findById(userId);
+
+    if (profileOwner == null) {
+        logger.warn("User: {} | IP: {} - Tried to fetch non-existent user profile by id: '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), userId);
+        return Response.status(404)
+                .entity("{\"message\": \"User not found.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    // Only admin or the profile owner can access the profile
+    if (!(currentUser.getRole().getName().equalsIgnoreCase("admin")
+            || currentUser.getId() == profileOwner.getId())) {
+        logger.warn("User: {} | IP: {} - Not authorized to fetch the profile of id '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), userId);
+        return Response.status(403)
+                .entity("{\"message\": \"Not authorized to access this profile.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    // Get the associated ProfileEntity
+    ProfileEntity profileEntity = profileOwner.getProfile();
+    if (profileEntity == null) {
+        logger.warn("User: {} | IP: {} - No profile found for user id '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), userId);
+        return Response.status(404)
+                .entity("{\"message\": \"Profile not found for this user.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    // Convert ProfileEntity to ProfileDto
+    ProfileDto profileDto = profileBean.convertToDto(profileEntity);
+
+    logger.info("User: {} | IP: {} - Successfully fetched profile of user id '{}'.",
+            RequestContext.getAuthor(), RequestContext.getIp(), userId);
+
+    // Success
+    return Response.ok(profileDto).build();
+}
+
+
+    /**
      * Retrieves a paginated list of user profiles filtered by name, workplace, or manager.
      * Returns only flat DTOs (FlatProfileDto) for API safety.
      *
@@ -183,7 +257,6 @@ public Response listUsersPaginated(
     PaginatedProfilesDto paginatedResult = profileBean.findProfilesWithFiltersPaginated(
             profileName, usualLocation, managerEmail, page);
 
-    // Não faças nova conversão!
     return Response.ok(paginatedResult)
             .type(MediaType.APPLICATION_JSON)
             .build();

@@ -5,6 +5,7 @@ import MessageUserButton from "../components/MessageUserButton";
 import { useUsersList } from "../hooks/useUsersList"; 
 import { formatWorkplace } from "../utils/formatWorkplace";
 import { apiConfig } from "../api/apiConfig";
+import { useNavigate } from "react-router-dom";
 
 export default function UsersPage() {
   // Filtros e página
@@ -12,6 +13,7 @@ export default function UsersPage() {
   const [office, setOffice] = useState("");
   const [manager, setManager] = useState("");
   const [page, setPage] = useState(1);
+  const navigate = useNavigate(); 
 
     const filters = useMemo(
     () => ({ name, office, manager, page }),
@@ -63,7 +65,6 @@ export default function UsersPage() {
     alert("Erro ao exportar ficheiro.");
   }
 };
-
 
 
   return (
@@ -154,11 +155,14 @@ export default function UsersPage() {
                 <td className="p-2 text-center pl-14">
                   <MessageUserButton userId={user.id} />
                 </td>
-                <td className="p-2 text-center pl-16">
-                  <button className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2 ml-6">
-                    <FormattedMessage id="users.button.view" defaultMessage="Ver" /> <span>&gt;</span>
-                  </button>
-                </td>
+<td className="p-2 text-center pl-16">
+<button
+  onClick={() => navigate(`/profile/${user.id}`)}
+  className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2 ml-6"
+>
+  <FormattedMessage id="users.button.view" defaultMessage="Ver" /> <span>&gt;</span>
+</button>
+</td>
               </tr>
             ))}
           </tbody>

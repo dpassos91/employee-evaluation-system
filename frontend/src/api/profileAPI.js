@@ -1,6 +1,4 @@
 
-
-
 /**
  * Profile API
  * Centralized functions for user profile management.
@@ -23,8 +21,21 @@ const { apiCall, API_ENDPOINTS } = apiConfig;
  * @param {string} sessionToken - The session token for authorization.
  * @returns {Promise<Object>} The user's profile DTO from the backend.
  */
-const getProfile = async (email, sessionToken) => {
-  return apiCall(API_ENDPOINTS.profiles.get(email), {
+const getProfileByEmail = async (email, sessionToken) => {
+  return apiCall(API_ENDPOINTS.profiles.getProfileByEmail(email), {
+    method: 'GET',
+    headers: { sessionToken },
+  });
+};
+
+/**
+ * Fetches the profile of a user by ID.
+ * @param {string} id - The user's ID.
+ * @param {string} sessionToken - The session token for authorization.
+ * @returns {Promise<Object>} The user's profile DTO from the backend.
+ */
+const getProfileById = async (userId, sessionToken) => {
+  return apiCall(API_ENDPOINTS.profiles.getProfileById(userId), {
     method: 'GET',
     headers: { sessionToken },
   });
@@ -80,7 +91,8 @@ const updateProfile = async (email, profileData, sessionToken) => {
 };
 
 export const profileAPI = {
-  getProfile,
+  getProfileByEmail,
+  getProfileById,
   getUsualWorkplaces,
   listUsersByFilters,
   updateProfile,
