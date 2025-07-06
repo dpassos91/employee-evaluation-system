@@ -5,9 +5,9 @@ import aor.projetofinal.dto.*;
 import aor.projetofinal.entity.*;
 import aor.projetofinal.util.JavaConversionUtil;
 import aor.projetofinal.util.PasswordUtil;
-import aor.projetofinal.util.StringUtils;
+
 import aor.projetofinal.context.RequestContext;
-import aor.projetofinal.entity.enums.UsualWorkPlaceType;
+
 import aor.projetofinal.exception.EmailAlreadyExistsException;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -1117,6 +1117,19 @@ public Integer findUserIdBySessionToken(String sessionToken) {
         logger.warn("User: {} | IP: {} - No UserId found for session token: {}.", RequestContext.getAuthor(), RequestContext.getIp(), sessionToken);
         return null;
     }
+}
+
+/**
+ * Checks if the provided raw password matches the current user's password.
+ * @param user The user whose password to check.
+ * @param rawPassword The password entered by the user.
+ * @return true if the password matches, false otherwise.
+ */
+public boolean isPasswordValid(UserEntity user, String rawPassword) {
+    if (user == null || user.getPassword() == null || rawPassword == null) {
+        return false;
+    }
+    return checkPassword(rawPassword, user.getPassword());
 }
 
 }

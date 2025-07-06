@@ -19,6 +19,8 @@ const API_BASE_URL = 'https://localhost:8443/grupo7/rest';
 const API_ENDPOINTS = {
   /** Authentication endpoints */
   auth: {
+    /** @function Change user password by email */
+    changePassword: (email) => `${API_BASE_URL}/users/update/${email}/password`,
     /** @function Confirm user registration with token */
     confirm: (token) => `${API_BASE_URL}/users/confirm?token=${token}`,
     /** @type {string} User login endpoint */

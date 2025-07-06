@@ -16,6 +16,28 @@ import { apiConfig } from './apiConfig.js';
 const { apiCall, API_ENDPOINTS } = apiConfig;
 
 /**
+ * Updates the password for the authenticated user.
+ * @param {string} email - The user's email.
+ * @param {string} currentPassword - The current password (required for validation).
+ * @param {string} newPassword - The new password to set.
+ * @param {string} sessionToken - The session token for authorization.
+ * @returns {Promise<Object>} The API response.
+ */
+const changePassword = async (email, currentPassword, newPassword, sessionToken) => {
+  return apiCall(`${API_ENDPOINTS.auth.changePassword(email)}`, {
+    method: 'PATCH',
+    headers: {
+      "Content-Type": "application/json",
+      sessionToken,
+    },
+    body: JSON.stringify({
+      currentPassword,
+      newPassword,
+    }),
+  });
+};
+
+/**
  * Confirms a user account using the confirmation token sent by email.
  * @param {string} confirmToken - The confirmation token from the email link.
  * @returns {Promise<Object>} API response indicating success or failure.
@@ -131,6 +153,7 @@ const validateSession = async (sessionToken) => {
 };
 
 export const authAPI = {
+  changePassword,
   confirmAccount,
   loginUser,
   logoutUser,

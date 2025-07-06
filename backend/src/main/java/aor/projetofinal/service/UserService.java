@@ -51,60 +51,81 @@ public class UserService {
      * @return HTTP 200 if updated, or error if not authorized or invalid input.
      */
     @PATCH
-    @Path("/update/{email}/password")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUserPassword(@HeaderParam("sessionToken") String sessionToken, @PathParam("email") String email,
-                                       ResetPasswordDto passwordAtualizado) {
+@Path("/update/{email}/password")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+/**
+ * Updates the user's password.
+ * Only the user themselves can update their password and must provide the current password for validation.
+ *
+ * @param sessionToken The session token for authentication (header).
+ * @param email The email of the user whose password is to be updated.
+ * @param updatePasswordDto The DTO containing current and new passwords.
+ * @return HTTP 200 if updated, or error if not authorized or invalid input.
+ */
+public Response updateUserPassword(
+    @HeaderParam("sessionToken") String sessionToken,
+    @PathParam("email") String email,
+    UpdatePasswordDto updatePasswordDto) {
 
-        // Validate session
-        SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
-
-        if (sessionStatusDto == null) {
-            logger.warn("Invalid or expired session - update user password");
-            return Response.status(401)
-                    .entity("{\"message\": \"Session expired. Please log in again.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-        SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
-        UserEntity currentUserLoggedIn = sessionTokenEntity.getUser();
-        UserEntity currentProfile = userDao.findByEmail(email);
-
-        // Authorization: only the user themselves can update their password
-        if (!(currentUserLoggedIn.getEmail()).equals(currentProfile.getEmail())) {
-            logger.warn("update user - not authorized");
-            return Response.status(403)
-                    .entity("{\"message\": \"You are not authorized to update this user.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-        String newPassword = passwordAtualizado.getPassword();
-
-        if (newPassword.length() <= 5) {
-            logger.warn("Password too short");
-            return Response.status(400)
-                    .entity("{\"message\": \"Password's length must be over 5 characters.\"}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-        boolean success = userBean.resetPasswordOnProfile(currentProfile, newPassword);
-
-        if (!success) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"message\": \"Error redefining password. Please try again.\", \"error\": true}")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-
-        return Response.ok()
-                .entity("{\"message\": \"Password successfully updated!\", \"error\": false}")
-                .type(MediaType.APPLICATION_JSON)
-                .build();
+    // Validate session
+    SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
+    if (sessionStatusDto == null) {
+        logger.warn("Invalid or expired session - update user password");
+        return Response.status(401)
+            .entity("{\"message\": \"Session expired. Please log in again.\"}")
+            .type(MediaType.APPLICATION_JSON)
+            .build();
     }
+
+    SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
+    UserEntity currentUserLoggedIn = sessionTokenEntity.getUser();
+    UserEntity currentProfile = userDao.findByEmail(email);
+
+    // Authorization: only the user themselves can update their password
+    if (!(currentUserLoggedIn.getEmail()).equals(currentProfile.getEmail())) {
+        logger.warn("update user - not authorized");
+        return Response.status(403)
+            .entity("{\"message\": \"You are not authorized to update this user.\"}")
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+    }
+
+    String currentPassword = updatePasswordDto.getCurrentPassword();
+    String newPassword = updatePasswordDto.getNewPassword();
+
+    // Check password length
+    if (newPassword == null || newPassword.length() <= 5) {
+        logger.warn("Password too short");
+        return Response.status(400)
+            .entity("{\"message\": \"Password's length must be over 5 characters.\"}")
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+    }
+
+    // Validate current password
+    if (!userBean.isPasswordValid(currentProfile, currentPassword)) {
+        logger.warn("Current password invalid for user '{}'", email);
+        return Response.status(400)
+            .entity("{\"message\": \"Current password is incorrect.\"}")
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+    }
+
+    boolean success = userBean.resetPasswordOnProfile(currentProfile, newPassword);
+
+    if (!success) {
+        return Response.status(Response.Status.BAD_REQUEST)
+            .entity("{\"message\": \"Error redefining password. Please try again.\", \"error\": true}")
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+    }
+
+    return Response.ok()
+        .entity("{\"message\": \"Password successfully updated!\", \"error\": false}")
+        .type(MediaType.APPLICATION_JSON)
+        .build();
+}
 
 
     /**

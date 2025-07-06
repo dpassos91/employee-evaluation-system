@@ -16,8 +16,10 @@ import { toast } from "react-toastify";
 import { userStore } from "../stores/userStore";
 import { useIntl, FormattedMessage } from "react-intl";
 import { profileAPI } from "../api/profileAPI";
+import { authAPI } from "../api/authAPI";
 import { fieldLabelKeys } from "../utils/fieldLabels";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import Modal from "../components/Modal";
 
 export default function ProfilePage() {
   /**
@@ -45,6 +47,12 @@ export default function ProfilePage() {
 
   const location = useLocation();
   const profileOwnerEmail = location.state?.profileOwnerEmail;
+
+  // Password modal states
+  const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // True if current user is viewing own profile or is admin (can edit)
   const canEdit = user?.role === "ADMIN" || String(user?.id) === String(userId);
@@ -89,7 +97,7 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  }, [userId, user?.id, formatMessage]); // Do NOT include Zustand setters here!
+  }, [userId, user?.id, formatMessage]);
 
   /**
    * Triggers fetching the profile whenever the userId in the route changes.
@@ -146,37 +154,64 @@ export default function ProfilePage() {
     e.preventDefault();
     try {
       const sessionToken = sessionStorage.getItem("authToken");
-    // Use the profile owner's email if editing another user's profile, otherwise use the logged-in user's email
-    const emailToUpdate = profileOwnerEmail || user.email;
-    await profileAPI.updateProfile(emailToUpdate, profile, sessionToken);
-    toast.success(
-      formatMessage({
-        id: "profile.update.success",
-        defaultMessage: "Profile updated successfully!",
-      })
-    );
-    await fetchProfile(); // Refresh profile data after save
+      // Use the profile owner's email if editing another user's profile, otherwise use the logged-in user's email
+      const emailToUpdate = profileOwnerEmail || user.email;
+      await profileAPI.updateProfile(emailToUpdate, profile, sessionToken);
+      toast.success(
+        formatMessage({
+          id: "profile.update.success",
+          defaultMessage: "Profile updated successfully!",
+        })
+      );
+      await fetchProfile(); // Refresh profile data after save
 
-    // If the currently logged-in user just updated their own profile,
-    // update the global user state so components like Sidebar reflect the new name immediately
-    if (String(user?.id) === String(userId) && profile) {
-      setUser({
-        ...user,
-        firstName: profile.firstName, // Update first name
-        lastName: profile.lastName,    // Update last name
-        // Add more fields here if you want other profile info synced to global user state
-      });
+      // If the currently logged-in user just updated their own profile,
+      // update the global user state so components like Sidebar reflect the new name immediately
+      if (String(user?.id) === String(userId) && profile) {
+        setUser({
+          ...user,
+          firstName: profile.firstName, // Update first name
+          lastName: profile.lastName,   // Update last name
+          // Add more fields here if you want other profile info synced to global user state
+        });
+      }
+    } catch (err) {
+      toast.error(
+        formatMessage({
+          id: "profile.update.error",
+          defaultMessage: "Error updating profile!",
+        })
+      );
     }
-  } catch (err) {
-    toast.error(
-      formatMessage({
-        id: "profile.update.error",
-        defaultMessage: "Error updating profile!",
-      })
-    );
-  }
-};
+  };
 
+  /**
+   * Handler for changing the user's password via modal.
+   */
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+
+    if (newPassword.length < 6) {
+      toast.error(formatMessage({ id: "profile.password.short", defaultMessage: "Password must have at least 6 characters." }));
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error(formatMessage({ id: "profile.password.mismatch", defaultMessage: "Passwords do not match." }));
+      return;
+    }
+    try {
+      const sessionToken = sessionStorage.getItem("authToken");
+      // Always use the profile owner's email
+      const emailToUpdate = profileOwnerEmail || user.email;
+      await authAPI.changePassword(emailToUpdate, currentPassword, newPassword, sessionToken);
+      toast.success(formatMessage({ id: "profile.password.success", defaultMessage: "Password updated successfully!" }));
+      setPasswordModalOpen(false);
+      setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
+    } catch (err) {
+      console.log(err)
+      toast.error(formatMessage({ id: "profile.password.error", defaultMessage: "Error updating password!" }));
+    }
+  };
 
   /**
    * Handler to start a chat with this user.
@@ -232,7 +267,7 @@ export default function ProfilePage() {
                 onClick={handleSendMessage}
               >
                 <ChatBubbleBottomCenterTextIcon className="w-5 h-5 mr-2" />
-                <FormattedMessage id="profile.message" defaultMessage="Enviar mensagem" />
+                <FormattedMessage id="profile.message" defaultMessage="Send Message" />
               </AppButton>
             )}
           </div>
@@ -281,8 +316,8 @@ export default function ProfilePage() {
                   value={profile.firstName}
                   onChange={(e) => handleChange("firstName", e.target.value)}
                   className={`border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm ${
-    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
-  }`}
+                    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
                   disabled={!canEdit}
                 />
               </div>
@@ -295,8 +330,8 @@ export default function ProfilePage() {
                   value={profile.lastName}
                   onChange={(e) => handleChange("lastName", e.target.value)}
                   className={`border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm ${
-    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
-  }`}
+                    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
                   disabled={!canEdit}
                 />
               </div>
@@ -378,9 +413,9 @@ export default function ProfilePage() {
               <textarea
                 value={profile.bio || ""}
                 onChange={(e) => handleChange("bio", e.target.value)}
-                  className={`border border-gray-300 focus:border-[#D41C1C] rounded w-full min-h-[155px] max-h-[220px] px-3 py-2 text-sm ${
-    !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
-  }`}
+                className={`border border-gray-300 focus:border-[#D41C1C] rounded w-full min-h-[155px] max-h-[220px] px-3 py-2 text-sm ${
+                  !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                }`}
                 disabled={!canEdit}
               />
             </div>
@@ -392,9 +427,10 @@ export default function ProfilePage() {
                   type="button"
                   variant="secondary"
                   className="w-full flex items-center justify-center gap-2 px-4 py-2 text-base"
+                  onClick={() => setPasswordModalOpen(true)}
                 >
                   <LockClosedIcon className="w-5 h-5" />
-                  <FormattedMessage id="profile.changePassword" defaultMessage="Alterar password" />
+                  <FormattedMessage id="profile.changePassword" defaultMessage="Change Password" />
                 </AppButton>
                 <AppButton
                   type="submit"
@@ -406,11 +442,65 @@ export default function ProfilePage() {
               </div>
             )}
           </form>
+          {/* Password Modal */}
+          <Modal
+            isOpen={isPasswordModalOpen}
+            onClose={() => setPasswordModalOpen(false)}
+            title={formatMessage({ id: "profile.changePassword", defaultMessage: "Alterar password" })}
+            actions={[
+              <AppButton key="cancel" variant="secondary" onClick={() => setPasswordModalOpen(false)}>
+                <FormattedMessage id="modal.cancel" defaultMessage="Cancelar" />
+              </AppButton>,
+              <AppButton key="save" variant="primary" type="submit" onClick={handleChangePassword}>
+                <FormattedMessage id="modal.save" defaultMessage="Guardar" />
+              </AppButton>,
+            ]}
+          >
+            <form onSubmit={handleChangePassword}>
+              <div className="mb-3">
+                <label className="block text-sm font-medium mb-1">
+                  <FormattedMessage id="profile.currentPassword" defaultMessage="Password atual" />
+                </label>
+                <input
+                  type="password"
+                  className="border px-2 py-1 rounded w-full"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label className="block text-sm font-medium mb-1">
+                  <FormattedMessage id="profile.newPassword" defaultMessage="Nova password" />
+                </label>
+                <input
+                  type="password"
+                  className="border px-2 py-1 rounded w-full"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label className="block text-sm font-medium mb-1">
+                  <FormattedMessage id="profile.confirmPassword" defaultMessage="Confirmar password" />
+                </label>
+                <input
+                  type="password"
+                  className="border px-2 py-1 rounded w-full"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </form>
+          </Modal>
         </div>
       </section>
     </PageLayout>
   );
 }
+
 
 
 
