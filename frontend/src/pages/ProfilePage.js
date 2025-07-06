@@ -26,7 +26,7 @@ export default function ProfilePage() {
   const user = userStore((state) => state.user);
 
   /**
-   * Zustand setters - never place in dependencies of effects/callbacks!
+   * Zustand setters for profile completeness and missing fields.
    */
   const setProfileComplete = userStore.getState().setProfileComplete;
   const setMissingFields = userStore.getState().setMissingFields;
@@ -138,7 +138,7 @@ export default function ProfilePage() {
     e.preventDefault();
     try {
       const sessionToken = sessionStorage.getItem("authToken");
-      await profileAPI.updateProfile(profile.email, profile, sessionToken);
+      await profileAPI.updateProfile(user.email, profile, sessionToken);
       toast.success(
         formatMessage({
           id: "profile.update.success",
@@ -210,7 +210,7 @@ export default function ProfilePage() {
                 onClick={handleSendMessage}
               >
                 <ChatBubbleBottomCenterTextIcon className="w-5 h-5 mr-2" />
-                <FormattedMessage id="profile.message" defaultMessage="Send Message" />
+                <FormattedMessage id="profile.message" defaultMessage="Enviar mensagem" />
               </AppButton>
             )}
           </div>
@@ -230,7 +230,7 @@ export default function ProfilePage() {
                 </label>
                 <input
                   type="email"
-                  value={profile.email}
+                  value={user.email}
                   disabled
                   className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-gray-100 text-gray-700 cursor-not-allowed"
                 />
@@ -258,7 +258,9 @@ export default function ProfilePage() {
                   type="text"
                   value={profile.firstName}
                   onChange={(e) => handleChange("firstName", e.target.value)}
-                  className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
+                  className={`border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm ${
+    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+  }`}
                   disabled={!canEdit}
                 />
               </div>
@@ -270,7 +272,9 @@ export default function ProfilePage() {
                   type="text"
                   value={profile.lastName}
                   onChange={(e) => handleChange("lastName", e.target.value)}
-                  className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
+                  className={`border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm ${
+    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+  }`}
                   disabled={!canEdit}
                 />
               </div>
@@ -281,7 +285,9 @@ export default function ProfilePage() {
                 <select
                   value={profile.usualWorkplace}
                   onChange={(e) => handleChange("usualWorkplace", e.target.value)}
-                  className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
+                  className={`border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm ${
+                    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
                   disabled={!canEdit}
                 >
                   <option value=""> </option>
@@ -306,7 +312,9 @@ export default function ProfilePage() {
                   type="text"
                   value={profile.address || ""}
                   onChange={(e) => handleChange("address", e.target.value)}
-                  className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
+                  className={`border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm ${
+                    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
                   disabled={!canEdit}
                 />
               </div>
@@ -318,7 +326,9 @@ export default function ProfilePage() {
                   type="date"
                   value={profile.birthDate || ""}
                   onChange={(e) => handleChange("birthDate", e.target.value)}
-                  className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
+                  className={`border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm ${
+                    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
                   disabled={!canEdit}
                 />
               </div>
@@ -330,7 +340,9 @@ export default function ProfilePage() {
                   type="tel"
                   value={profile.phone || ""}
                   onChange={(e) => handleChange("phone", e.target.value)}
-                  className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
+                  className={`border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm ${
+                    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
                   disabled={!canEdit}
                 />
               </div>
@@ -344,7 +356,9 @@ export default function ProfilePage() {
               <textarea
                 value={profile.bio || ""}
                 onChange={(e) => handleChange("bio", e.target.value)}
-                className="border border-gray-300 focus:border-[#D41C1C] rounded w-full min-h-[155px] max-h-[220px] px-3 py-2 bg-white text-sm"
+                  className={`border border-gray-300 focus:border-[#D41C1C] rounded w-full min-h-[155px] max-h-[220px] px-3 py-2 text-sm ${
+    !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+  }`}
                 disabled={!canEdit}
               />
             </div>

@@ -121,7 +121,7 @@ return Response.ok(csv)
                     .build();
         }
 
-        if (!(currentUser.getRole().getName().equalsIgnoreCase("admin") ||
+        /*if (!(currentUser.getRole().getName().equalsIgnoreCase("admin") ||
                 currentUser.getEmail().equalsIgnoreCase(profileOwner.getEmail()))) {
             logger.warn("User: {} | IP: {} - Not authorized to fetch the profile of '{}'.",
                     RequestContext.getAuthor(), RequestContext.getIp(), email);
@@ -129,7 +129,7 @@ return Response.ok(csv)
                     .entity("{\"message\": \"Not authorized to access this profile.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
-        }
+        }*/
 
         // Get the associated ProfileEntity
         var profileEntity = profileOwner.getProfile();
@@ -192,7 +192,7 @@ public Response getProfileById(
     }
 
     // Only admin or the profile owner can access the profile
-    if (!(currentUser.getRole().getName().equalsIgnoreCase("admin")
+    /*if (!(currentUser.getRole().getName().equalsIgnoreCase("admin")
             || currentUser.getId() == profileOwner.getId())) {
         logger.warn("User: {} | IP: {} - Not authorized to fetch the profile of id '{}'.",
                 RequestContext.getAuthor(), RequestContext.getIp(), userId);
@@ -200,7 +200,7 @@ public Response getProfileById(
                 .entity("{\"message\": \"Not authorized to access this profile.\"}")
                 .type(MediaType.APPLICATION_JSON)
                 .build();
-    }
+    }*/
 
     // Get the associated ProfileEntity
     ProfileEntity profileEntity = profileOwner.getProfile();
