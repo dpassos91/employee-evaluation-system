@@ -2,7 +2,7 @@ package aor.projetofinal.bean;
 
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.EvaluationDao;
-import aor.projetofinal.dto.CreateEvaluationDto;
+import aor.projetofinal.dto.UpdateEvaluationDto;
 import aor.projetofinal.dto.EvaluationOptionsDto;
 import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.dto.UsersWithIncompleteEvaluationsDto;
@@ -121,22 +121,22 @@ public class EvaluationBean implements Serializable {
 
 
 
-    public void createEvaluation(CreateEvaluationDto createEvaluationDto,
-                                 EvaluationCycleEntity cycle,
-                                 UserEntity evaluated,
-                                 UserEntity evaluator) {
+    public void updateEvaluationWithGradeAndFeedback(UpdateEvaluationDto updateEvaluationDto,
+                                                     EvaluationEntity evaluation,
+                                                     UserEntity evaluator) {
 
 
-        EvaluationEntity evaluation = new EvaluationEntity();
-        evaluation.setGrade(GradeEvaluationType.getEnumfromGrade(createEvaluationDto.getGrade()));
-        evaluation.setFeedback(createEvaluationDto.getFeedback());
+
+        evaluation.setGrade(GradeEvaluationType.getEnumfromGrade(updateEvaluationDto.getGrade()));
+        evaluation.setFeedback(updateEvaluationDto.getFeedback());
         evaluation.setDate(LocalDateTime.now());
         evaluation.setState(EvaluationStateType.EVALUATED);
         evaluation.setEvaluator(evaluator);
-        evaluation.setEvaluated(evaluated);
-        evaluation.setCycle(cycle);
 
-        evaluationDao.create(evaluation);
+        evaluationDao.save(evaluation);
+
+        logger.info("Evaluation updated for user {} by {}.",
+                evaluation.getEvaluated().getEmail(), evaluator.getEmail());
     }
 
 

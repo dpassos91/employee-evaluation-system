@@ -1,6 +1,6 @@
 package aor.projetofinal.dto;
 
-public class CreateEvaluationDto {
+public class UpdateEvaluationDto {
     private int grade;                // the frontend should send a number between 1 and 4
     private String feedback;         // manager's feedback on the evaluation
     private String evaluatedEmail;   // evaluated user's email

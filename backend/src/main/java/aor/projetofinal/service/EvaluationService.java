@@ -8,12 +8,14 @@ import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.EvaluationCycleDao;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
-import aor.projetofinal.dto.CreateEvaluationDto;
+import aor.projetofinal.dto.UpdateEvaluationDto;
 import aor.projetofinal.dto.EvaluationOptionsDto;
 import aor.projetofinal.dto.SessionStatusDto;
 import aor.projetofinal.entity.EvaluationCycleEntity;
+import aor.projetofinal.entity.EvaluationEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
+import aor.projetofinal.entity.enums.EvaluationStateType;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -100,11 +102,11 @@ public class EvaluationService {
     }
 
 
-    @POST
-    @Path("/create-evaluation")
+    @PUT
+    @Path("/update-evaluation")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createEvaluation(CreateEvaluationDto dto,
+    public Response updateEvaluation(UpdateEvaluationDto dto,
                                      @HeaderParam("sessionToken") String token) {
 
         // check if the session token is valid
@@ -137,6 +139,19 @@ public class EvaluationService {
                     .build();
         }
 
+
+        //search for the correct evaluation in the current cycle
+        EvaluationEntity evaluation = evaluationBean.findEvaluationByCycleAndUser(cycle, evaluated);
+        if (evaluation == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"message\": \"Evaluation not found for this user in current cycle.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+
+
 //verify if the evaluator is allowed to evaluate the evaluated user,
 // such that he must be either an admin or the manager of the evaluated user
         boolean isAdmin = evaluator.getRole().getName().equalsIgnoreCase("admin");
@@ -150,19 +165,19 @@ public class EvaluationService {
         }
 
 
-
-
-        // verify if the evaluated user has been evaluated before in this cycle
-        boolean alreadyEvaluated = evaluationBean.alreadyEvaluatedAtCurrentCycle(cycle, evaluated);
-        if (alreadyEvaluated) {
+//check if the evaluation is still to fill
+        if (evaluation.getState() != EvaluationStateType.IN_EVALUATION) {
             return Response.status(Response.Status.CONFLICT)
-                    .entity("{\"message\": \"This same user has already been evaluated in this cycle.\"}")
+                    .entity("{\"message\": \"This evaluation is already completed or closed.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
+
+
+
         // create new evaluation based on the data received from the frontend
-        evaluationBean.createEvaluation(dto, cycle, evaluated, evaluator);
+        evaluationBean.updateEvaluationWithGradeAndFeedback(dto, evaluation, evaluator);
 
         return Response.status(Response.Status.CREATED)
                 .entity("{\"message\": \"New evaluation successfully craeted.\"}")
