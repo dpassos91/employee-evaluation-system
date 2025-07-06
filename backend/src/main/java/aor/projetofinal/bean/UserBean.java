@@ -4,6 +4,7 @@ import aor.projetofinal.dao.*;
 import aor.projetofinal.dto.*;
 import aor.projetofinal.entity.*;
 import aor.projetofinal.util.JavaConversionUtil;
+import aor.projetofinal.util.PasswordUtil;
 import aor.projetofinal.util.StringUtils;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.entity.enums.UsualWorkPlaceType;
@@ -595,6 +596,8 @@ public class UserBean implements Serializable {
         return user.isConfirmed();
     }
 
+
+
     /**
      * Validates whether the given password recovery token is still active.
      * Logs the validation attempt and outcome for audit purposes.
@@ -911,6 +914,28 @@ public class UserBean implements Serializable {
         }
         // Convert to userDto and return
         return new UserDto(user);
+    }
+
+            /**
+     * Resets the password of the given user profile.
+     *
+     * @param currentProfile The UserEntity whose password is to be reset.
+     * @param newPassword    The new plain text password to be hashed and stored.
+     * @return true if the password was reset successfully, false if the user is null.
+     */
+    public boolean resetPasswordOnProfile(UserEntity currentProfile, String newPassword) {
+        String email = currentProfile != null ? currentProfile.getEmail() : "unknown";
+        if (currentProfile == null) {
+            logger.warn("User: {} | IP: {} | Email: {} - Attempted to reset password for null user. Operation aborted.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), email);
+            return false;
+        }
+        String hashedPassword = PasswordUtil.hashPassword(newPassword);
+        currentProfile.setPassword(hashedPassword);
+        userDao.save(currentProfile);
+        logger.info("User: {} | IP: {} | Email: {} - Successfully reset password.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return true;
     }
 
     /**

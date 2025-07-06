@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import logo from "../images/logo_white_wordless.png";
 import profileIcon from "../images/profile_icon.png";
 import dashboardIcon from "../images/dashboard_icon.png";
-import evaluationsIcon from "../images/evaluations_icon.png";
 import miniprofileIcon from "../images/miniprofile_icon.png";
 import usersIcon from "../images/users_icon.png";
 import { FaSignOutAlt } from "react-icons/fa";

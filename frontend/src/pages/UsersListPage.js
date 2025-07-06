@@ -139,35 +139,36 @@ export default function UsersPage() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user.id} className="border-b hover:bg-gray-50">
-                <td className="p-2">{user.name}</td>
-                <td className="p-2">{formatWorkplace(user.office)}</td>
-                <td className="p-2">{user.manager}</td>
-                <td className="p-2 truncate">{user.email}</td>
-                <td className="p-2 pl-14">
-                  <img
-                    src={user.avatar || "/default_avatar.png"}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full"
-                  />
-                </td>
-                <td className="p-2 text-center pl-14">
-                  <MessageUserButton userId={user.id} />
-                </td>
-<td className="p-2 text-center pl-16">
-<button
-  onClick={() =>
-    navigate(`/profile/${user.id}`, { state: { profileOwnerEmail: user.email } })
-  }
-  className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2 ml-6"
->
-  <FormattedMessage id="users.button.view" defaultMessage="Ver" /> <span>&gt;</span>
-</button>
-</td>
-              </tr>
-            ))}
-          </tbody>
+  {users.map((user) => (
+    <tr key={user.id} className="border-b hover:bg-gray-50">
+      <td className="p-2">{user.name}</td>
+      <td className="p-2">{formatWorkplace(user.office)}</td>
+      <td className="p-2">{user.manager}</td>
+      <td className="p-2 truncate">{user.email}</td>
+      <td className="p-2 pl-20">
+        <img
+          src={user.avatar || "/default_avatar.png"}
+          alt={user.name}
+          className="w-8 h-8 rounded-full"
+        />
+      </td>
+      {/* Juntar os botões num só <td> */}
+      <td className="p-2 text-center pr-8" colSpan={2}>
+        <div className="flex flex-row items-center gap-2 justify-center">
+          <MessageUserButton userId={user.id} />
+          <button
+            onClick={() =>
+              navigate(`/profile/${user.id}`, { state: { profileOwnerEmail: user.email } })
+            }
+            className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2"
+          >
+            <FormattedMessage id="users.button.view" defaultMessage="Ver" /> <span>&gt;</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+  ))}
+</tbody>
         </table>
         </div>
       )}

@@ -252,7 +252,7 @@ export default function ProfilePage() {
                 </label>
                 <input
                   type="email"
-                  value={profileOwnerEmail}
+                  value={profileOwnerEmail || user.email || ""}
                   disabled
                   className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-gray-100 text-gray-700 cursor-not-allowed"
                 />
@@ -394,7 +394,7 @@ export default function ProfilePage() {
                   className="w-full flex items-center justify-center gap-2 px-4 py-2 text-base"
                 >
                   <LockClosedIcon className="w-5 h-5" />
-                  <FormattedMessage id="profile.changePassword" defaultMessage="Change password" />
+                  <FormattedMessage id="profile.changePassword" defaultMessage="Alterar password" />
                 </AppButton>
                 <AppButton
                   type="submit"

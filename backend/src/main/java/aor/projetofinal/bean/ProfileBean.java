@@ -132,27 +132,6 @@ public class ProfileBean implements Serializable {
         return new PaginatedProfilesDto(profileDtos, totalCount, totalPages, page);
     }
 
-    /**
-     * Resets the password of the given user profile.
-     *
-     * @param currentProfile The UserEntity whose password is to be reset.
-     * @param newPassword    The new plain text password to be hashed and stored.
-     * @return true if the password was reset successfully, false if the user is null.
-     */
-    public boolean resetPasswordOnProfile(UserEntity currentProfile, String newPassword) {
-        String email = currentProfile != null ? currentProfile.getEmail() : "unknown";
-        if (currentProfile == null) {
-            logger.warn("User: {} | IP: {} | Email: {} - Attempted to reset password for null user. Operation aborted.",
-                    RequestContext.getAuthor(), RequestContext.getIp(), email);
-            return false;
-        }
-        String hashedPassword = PasswordUtil.hashPassword(newPassword);
-        currentProfile.setPassword(hashedPassword);
-        userDao.save(currentProfile);
-        logger.info("User: {} | IP: {} | Email: {} - Successfully reset password.",
-                RequestContext.getAuthor(), RequestContext.getIp(), email);
-        return true;
-    }
 
     /**
      * Updates the profile information of a user identified by their email.
