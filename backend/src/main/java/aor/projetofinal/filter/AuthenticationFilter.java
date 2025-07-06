@@ -45,7 +45,7 @@ public class AuthenticationFilter implements Filter {
         logger.info("User: {} | IP: {} - Incoming request path: {}", RequestContext.getAuthor(), RequestContext.getIp(), path);
 
         // Allow public endpoints without authentication
-        if (path.endsWith("/login") || path.endsWith("/createUser") || path.contains("/request-reset") || path.contains("/reset-password")) {
+        if (path.endsWith("/login") || path.endsWith("/createUser") || path.contains("/confirmAccount") || path.contains("/request-reset") || path.contains("/reset-password")) {
             logger.info("User: {} | IP: {} - Public endpoint, skipping authentication for path: {}", RequestContext.getAuthor(), RequestContext.getIp(), path);
             chain.doFilter(servletRequest, servletResponse);
             return;
@@ -53,6 +53,9 @@ public class AuthenticationFilter implements Filter {
 
         // Try to get token from header (REST) or querystring (WebSocket)
         String token = request.getHeader("token");
+        if (token == null || token.isBlank()) {
+            token = request.getHeader("sessionToken"); // also accepts sessionToken
+        }
         boolean fromQueryString = false;
 
         if ((token == null || token.isBlank()) && request.getQueryString() != null) {
