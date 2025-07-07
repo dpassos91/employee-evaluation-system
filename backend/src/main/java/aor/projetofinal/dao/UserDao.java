@@ -87,6 +87,20 @@ public UserEntity findBySessionToken(String token) {
 }
 
 
+    public List<UserEntity> findConfirmedUsersWithManager() {
+        TypedQuery<UserEntity> query = em.createQuery(
+                "SELECT u FROM UserEntity u " +
+                        "WHERE u.active = true " +
+                        "AND u.confirmed = true " +
+                        "AND u.manager IS NOT NULL " +
+                        "AND LOWER(u.role.name) <> 'admin'",
+                UserEntity.class
+        );
+        return query.getResultList();
+    }
+
+
+
     public List<UserEntity> findConfirmedUsersWithoutManager() {
         TypedQuery<UserEntity> query = em.createQuery(
                 "SELECT u FROM UserEntity u WHERE u.confirmed = true AND u.manager IS NULL",

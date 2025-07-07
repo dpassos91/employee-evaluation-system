@@ -41,5 +41,11 @@ public class EvaluationCycleDao {
         em.persist(evaluationCycle);
     }
 
+    public void save(EvaluationCycleEntity evaluationCycle) {
+        em.merge(evaluationCycle);
+    }
+
+
+
 
 }

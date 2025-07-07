@@ -2,7 +2,7 @@ package aor.projetofinal.bean;
 
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.EvaluationDao;
-import aor.projetofinal.dto.CreateEvaluationDto;
+import aor.projetofinal.dto.UpdateEvaluationDto;
 import aor.projetofinal.dto.EvaluationOptionsDto;
 import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.dto.UsersWithIncompleteEvaluationsDto;
@@ -37,7 +37,7 @@ public class EvaluationBean implements Serializable {
     //method to list all evaluation options for the dropdown menu in the frontend
     public List<EvaluationOptionsDto> listEvaluationOptions() {
         List<EvaluationOptionsDto> list = new ArrayList<>();
-    //GradeEvaluationType.values returns all the enum values as an array:
+        //GradeEvaluationType.values returns all the enum values as an array:
         for (GradeEvaluationType evaluation : GradeEvaluationType.values()) {
             list.add(new EvaluationOptionsDto(
                     //dto enum name
@@ -50,6 +50,10 @@ public class EvaluationBean implements Serializable {
         }
 
         return list;
+    }
+
+    public EvaluationEntity findEvaluationById(Long id) {
+        return evaluationDao.findById(id);
     }
 
 
@@ -72,10 +76,6 @@ public class EvaluationBean implements Serializable {
 
         return evaluation;
     }
-
-
-
-
 
 
     public UsersWithIncompleteEvaluationsDto listUsersWithIncompleteEvaluationsFromLastCycle() {
@@ -117,37 +117,51 @@ public class EvaluationBean implements Serializable {
     }
 
 
+    public boolean revertEvaluationToInEvaluation(EvaluationEntity evaluation) {
+        if (evaluation.getState() != EvaluationStateType.EVALUATED) {
+            logger.warn("Cannot revert evaluation ID {} because it's not in EVALUATED state.", evaluation.getId());
+            return false;
+        }
 
+        evaluation.setState(EvaluationStateType.IN_EVALUATION);
+        evaluationDao.save(evaluation);
 
-
-
-    public void createEvaluation(CreateEvaluationDto createEvaluationDto,
-                                 EvaluationCycleEntity cycle,
-                                 UserEntity evaluated,
-                                 UserEntity evaluator) {
-
-
-        EvaluationEntity evaluation = new EvaluationEntity();
-        evaluation.setGrade(GradeEvaluationType.getEnumfromGrade(createEvaluationDto.getGrade()));
-        evaluation.setFeedback(createEvaluationDto.getFeedback());
-        evaluation.setDate(LocalDateTime.now());
-        evaluation.setState(EvaluationStateType.EVALUATED);
-        evaluation.setEvaluator(evaluator);
-        evaluation.setEvaluated(evaluated);
-        evaluation.setCycle(cycle);
-
-        evaluationDao.create(evaluation);
+        logger.info("Evaluation ID {} reverted to IN_EVALUATION.", evaluation.getId());
+        return true;
     }
 
+
+
+
+
+    public void updateEvaluationWithGradeAndFeedback(UpdateEvaluationDto updateEvaluationDto,
+                                                     EvaluationEntity evaluation,
+                                                     UserEntity evaluator) {
+
+
+        evaluation.setGrade(GradeEvaluationType.getEnumfromGrade(updateEvaluationDto.getGrade()));
+        evaluation.setFeedback(updateEvaluationDto.getFeedback());
+        evaluation.setDate(LocalDateTime.now());
+        evaluation.setEvaluator(evaluator);
+
+
+        // Update the evaluation state only if feedback was provided
+        if (updateEvaluationDto.getFeedback() != null && !updateEvaluationDto.getFeedback().trim().isEmpty()) {
+            evaluation.setState(EvaluationStateType.EVALUATED);
+        } else {
+            evaluation.setState(EvaluationStateType.IN_EVALUATION);
+        }
+
+        evaluationDao.save(evaluation);
+
+        logger.info("Evaluation updated for user {} by {}.",
+                evaluation.getEvaluated().getEmail(), evaluator.getEmail());
+    }
 
 
     public boolean alreadyEvaluatedAtCurrentCycle(EvaluationCycleEntity cycle, UserEntity evaluated) {
         return evaluationDao.alreadyEvaluatedAtCurrentCycle(cycle, evaluated);
     }
-
-
-
-
 
 
 }

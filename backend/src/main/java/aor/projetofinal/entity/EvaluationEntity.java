@@ -26,13 +26,13 @@ public class EvaluationEntity implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "grade", nullable = false)
+    @Column(name = "grade", nullable = true)
     private GradeEvaluationType grade;
 
-    @Column(name = "feedback", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "feedback", nullable = true, columnDefinition = "TEXT")
     private String feedback;
 
-    @Column(name = "evaluation_date", nullable = false)
+    @Column(name = "evaluation_date", nullable = true)
     private LocalDateTime date;
 
 

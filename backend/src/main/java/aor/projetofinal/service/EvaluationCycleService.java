@@ -135,7 +135,7 @@ public class EvaluationCycleService {
 
 
         //create a new evaluation cycle
-        evaluationCycleBean.createCycle(dto.getEndDate());
+        evaluationCycleBean.createCycleAndCreateBlankEvaluations(dto.getEndDate());
 
         return Response.status(Response.Status.CREATED)
                 .entity("{\"message\": \"New evaluation cycle successfully created.\"}")
