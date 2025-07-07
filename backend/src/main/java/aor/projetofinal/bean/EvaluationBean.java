@@ -117,6 +117,23 @@ public class EvaluationBean implements Serializable {
     }
 
 
+    public boolean revertEvaluationToInEvaluation(EvaluationEntity evaluation) {
+        if (evaluation.getState() != EvaluationStateType.EVALUATED) {
+            logger.warn("Cannot revert evaluation ID {} because it's not in EVALUATED state.", evaluation.getId());
+            return false;
+        }
+
+        evaluation.setState(EvaluationStateType.IN_EVALUATION);
+        evaluationDao.save(evaluation);
+
+        logger.info("Evaluation ID {} reverted to IN_EVALUATION.", evaluation.getId());
+        return true;
+    }
+
+
+
+
+
     public void updateEvaluationWithGradeAndFeedback(UpdateEvaluationDto updateEvaluationDto,
                                                      EvaluationEntity evaluation,
                                                      UserEntity evaluator) {

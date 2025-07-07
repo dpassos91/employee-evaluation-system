@@ -284,6 +284,67 @@ public class EvaluationService {
                 .build();
     }
 
+    @PUT
+    @Path("/reopen-for-editing/{evaluationId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reopenEvaluationForEditing(@PathParam("evaluationId") Long evaluationId,
+                                               @HeaderParam("sessionToken") String token) {
+
+        // validate session
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity currentUser = tokenEntity.getUser();
+
+        // verifies if it is an admin
+        if (!currentUser.getRole().getName().equalsIgnoreCase("admin")) {
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Only admins can reopen evaluations for editing.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // get correct evaluation by ID
+        EvaluationEntity evaluation = evaluationBean.findEvaluationById(evaluationId);
+        if (evaluation == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"message\": \"Evaluation not found.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // can only open evaluations that are in EVALUATED state
+        if (evaluation.getState() != EvaluationStateType.EVALUATED) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("{\"message\": \"Only evaluations in EVALUATED state can be reverted for editing.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // set the evaluation state back to IN_EVALUATION
+        boolean reverted = evaluationBean.revertEvaluationToInEvaluation(evaluation);
+        if (!reverted) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("{\"message\": \"Only evaluations in EVALUATED state can be reverted for editing.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        logger.info("Admin {} reverted evaluation ID {} to IN_EVALUATION.", currentUser.getEmail(), evaluationId);
+
+        return Response.ok()
+                .entity("{\"message\": \"Evaluation successfully reverted to IN_EVALUATION.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+
+    
 
     @PUT
     @Path("/update-evaluation")
