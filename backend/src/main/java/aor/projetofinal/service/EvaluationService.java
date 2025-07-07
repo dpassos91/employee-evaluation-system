@@ -294,6 +294,28 @@ public class EvaluationService {
     }
 
 
+    /**
+     * Public endpoint to retrieve all possible evaluation states (IN_EVALUATION, EVALUATED, CLOSED).
+     * Useful for UI filter dropdowns or forms. This endpoint does not require authentication.
+     *
+     * @return HTTP 200 with wrapped list of evaluation states.
+     */
+    @GET
+    @Path("/states")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllEvaluationStates() {
+        List<EvaluationStateDto> list = evaluationBean.getAllEvaluationStates();
+        EvaluationStatesDto wrapper = new EvaluationStatesDto(list);
+
+        logger.info("IP: {} - Publicly fetched {} evaluation states.",
+                RequestContext.getIp(),
+                list.size()
+        );
+
+        return Response.ok(wrapper)
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
 
 
 

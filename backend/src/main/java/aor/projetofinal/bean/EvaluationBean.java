@@ -75,6 +75,41 @@ public class EvaluationBean implements Serializable {
 
 
     /**
+     * Retrieves all possible evaluation states and their human-readable labels.
+     * Intended for use in dropdown filters or UI forms.
+     *
+     * @return List of EvaluationStateDto objects representing all enum states.
+     */
+    public List<EvaluationStateDto> getAllEvaluationStates() {
+        logger.info("User: {} | IP: {} - Fetching available evaluation states for UI filter.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp()
+        );
+
+        List<EvaluationStateDto> states = new ArrayList<>();
+
+        for (EvaluationStateType type : EvaluationStateType.values()) {
+            String label = switch (type) {
+                case IN_EVALUATION -> "In Evaluation";
+                case EVALUATED     -> "Evaluated";
+                case CLOSED        -> "Closed";
+            };
+            states.add(new EvaluationStateDto(type.name(), label));
+        }
+
+        logger.info("User: {} | IP: {} - Loaded {} evaluation states.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                states.size()
+        );
+
+        return states;
+    }
+
+
+
+
+    /**
      * Returns a paginated history of closed evaluations for the given user.
      * Evaluations are filtered by state CLOSED and cycle inactive, and ordered by date (most recent first).
      *
