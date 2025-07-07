@@ -18,7 +18,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @ApplicationScoped
 public class EvaluationCycleBean implements Serializable {
@@ -72,6 +74,8 @@ public class EvaluationCycleBean implements Serializable {
                 evaluationDao.save(e);
             }
 
+            emailManagersAndEvaluatedOfCycleClosure(cycle);
+
             logger.info("Cycle ID {} closed. All evaluations marked with date {}.", cycle.getId(), LocalDateTime.now());
         }
 
@@ -122,6 +126,56 @@ public class EvaluationCycleBean implements Serializable {
     }
 
 
+    private void emailManagersAndEvaluatedOfCycleClosure(EvaluationCycleEntity cycle) {
+        Set<String> sentEmails = new HashSet<>(); // validates that any person is only emailed once
+
+        // add emails of managers and evaluated users from the cycle
+        for (EvaluationEntity evaluation : cycle.getEvaluations()) {
+            if (evaluation.getEvaluator() != null && evaluation.getEvaluator().getEmail() != null) {
+                sentEmails.add(evaluation.getEvaluator().getEmail());
+            }
+            if (evaluation.getEvaluated() != null && evaluation.getEvaluated().getEmail() != null) {
+                sentEmails.add(evaluation.getEvaluated().getEmail());
+            }
+        }
+
+        // add admins' emails
+        List<UserEntity> admins = userDao.findUsersByRole("ADMIN");
+        for (UserEntity admin : admins) {
+            if (admin.getEmail() != null) {
+                sentEmails.add(admin.getEmail());
+            }
+        }
+
+        // send only one email per unique address
+        for (String email : sentEmails) {
+            if (!email.isEmpty()) {
+                String subject = "Evaluation Cycle Closed – Results Available";
+
+                String body = String.format("""
+                    Dear %s,
+                    
+                    The evaluation cycle has been officially closed on %s.
+                    
+                    You may now access the platform to consult the final evaluations.
+                    
+                    Best regards,
+                    The board.
+                    """, email, LocalDateTime.now().toLocalDate());
+
+                EmailUtil.sendEmail(email, subject, body);
+            }
+        }
+
+        logger.info("Unique emails sent to all involved (admins, managers, evaluated). Total: {}", sentEmails.size());
+    }
+
+
+
+
+
+
+
     private void emailManagersAndAdminsOfNewCycle(EvaluationCycleEntity cycle) {
         List<UserEntity> managers = userDao.findUsersByRole("MANAGER");
         List<UserEntity> admins = userDao.findUsersByRole("ADMIN");
@@ -151,6 +205,12 @@ public class EvaluationCycleBean implements Serializable {
 
         logger.info("Admins and managers notified by email about the openning of a new evaluation cycle.");
     }
+
+
+
+
+
+
 
 
 }
