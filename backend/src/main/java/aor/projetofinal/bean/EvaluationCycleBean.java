@@ -72,7 +72,7 @@ public class EvaluationCycleBean implements Serializable {
                 evaluationDao.save(e);
             }
 
-            logger.info("Cycle ID {} closed. All evaluations marked with date {}.", cycle.getId(), now);
+            logger.info("Cycle ID {} closed. All evaluations marked with date {}.", cycle.getId(), LocalDateTime.now());
         }
 
 
