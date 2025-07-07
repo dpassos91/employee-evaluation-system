@@ -5,137 +5,152 @@ import { useIntl } from "react-intl";
 import { toast } from "react-toastify";
 import { fieldLabelKeys } from "../utils/fieldLabels";
 import { useNotificationStore } from "../stores/notificationStore";
+import { profileAPI } from "../api/profileAPI";
 
 /**
  * Custom hook to manage authentication logic (login, logout).
  * Integrates with Zustand userStore, sessionStorage, and react-toastify for notifications.
  *
- * @returns {Object} { login, logout }
+ * @returns {Object} An object containing the login and logout functions.
  */
 export function useAuth() {
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
 
-  // Aceder a métodos do Zustand store se precisares (podes alargar conforme necessário)
+  // Access Zustand store methods if needed (extend as required)
   const updateName = userStore((state) => state.updateName);
 
+  // Get methods to update global user state
   const { setUser, setProfileComplete, setMissingFields } = userStore.getState();
 
+  // Fetch notification counters on login
   const fetchCounts = useNotificationStore.getState().fetchCounts;
 
   /**
-   * Attempts to log in a user using provided credentials.
-   * On success, stores sessionToken and updates userStore.
-   * Shows a toast notification and redirects to dashboard.
+   * Logs in a user using provided credentials.
+   * After successful login, fetches the full profile (including photograph) and updates the userStore.
+   * Shows a toast notification and redirects based on profile completion.
    *
-   * @param {Object} credentials - { email, password }
-   * @returns {boolean} true if login successful, false otherwise
+   * @param {Object} credentials - Object containing 'email' and 'password'
+   * @returns {Promise<boolean>} True if login was successful, false otherwise
    */
+  const login = async (credentials) => {
+    try {
+      // 1. Call the login API and get response data
+      const data = await authAPI.loginUser(credentials);
+      console.log("Received login data:", data);
 
+      // 2. Store session token in sessionStorage
+      sessionStorage.setItem("authToken", data.sessionToken);
 
-const login = async (credentials) => {
-  try {
-    // Chama a API e obtém a resposta do backend
-    const data = await authAPI.loginUser(credentials);
-    console.log("data recebida:", data);
-    // Guarda o token
-    sessionStorage.setItem("authToken", data.sessionToken);
+      // 3. Fetch full profile (contains photograph and other personal info)
+      const profile = await profileAPI.getProfileById(data.id);
 
-    // Guarda o user autenticado no userStore (com role, nomes, etc.)
-    setUser({
-      id: data.id,
-      email: data.email,
-      role: data.role,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      photograph: data.photograph || null, // Pode ser null se não houver foto
-    });
+      // 4. Save authenticated user in userStore, including photograph
+      setUser({
+        id: data.id,
+        email: data.email,
+        role: data.role,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        photograph: profile.photograph || null, // Can be null if user has no photo
+      });
 
-    // NOVO: Guarda estado do perfil e campos em falta
-    setProfileComplete(data.profileComplete);
-    setMissingFields(data.missingFields || []);
+      // 5. Update profile completion status and any missing fields
+      setProfileComplete(data.profileComplete);
+      setMissingFields(data.missingFields || []);
 
-    await fetchCounts();
+      // 6. Refresh notification counts
+      await fetchCounts();
 
-    console.log("Profile complete?", data.profileComplete);
-    console.log("Missing fields:", data.missingFields);
+      console.log("Profile complete?", data.profileComplete);
+      console.log("Missing fields:", data.missingFields);
 
-    toast.success(formatMessage({
-      id: "auth.login.success",
-      defaultMessage: "Login efetuado com sucesso!"
-    }));
+      // 7. Show success toast
+      toast.success(
+        formatMessage({
+          id: "auth.login.success",
+          defaultMessage: "Login successful!"
+        })
+      );
 
-    // Redirecionamento inteligente com mensagem personalizada dos campos em falta
-    if (data.profileComplete === false) {
-      // Traduzir nomes dos campos em falta
-      const missingLabels = (data.missingFields || [])
-        .map((field) =>
-          fieldLabelKeys[field]
-            ? formatMessage({ id: fieldLabelKeys[field] })
-            : field // fallback se faltar tradução
-        )
-        .join(", ");
+      // 8. Smart redirect based on profile completion
+      if (data.profileComplete === false) {
+        // Translate missing field labels for info banner (if needed)
+        const missingLabels = (data.missingFields || [])
+          .map((field) =>
+            fieldLabelKeys[field]
+              ? formatMessage({ id: fieldLabelKeys[field] })
+              : field // fallback if translation missing
+          )
+          .join(", ");
+        navigate("/profile");
+      } else {
+        navigate("/dashboard");
+      }
 
-      navigate("/profile");
-    } else {
-      navigate("/dashboard");
+      return true;
+    } catch (error) {
+      // Special case: unconfirmed account (status 403 + specific backend message)
+      if (error.status === 403 && error.message?.includes("not yet been confirmed")) {
+        toast.info(formatMessage({
+          id: "auth.login.unconfirmed",
+          defaultMessage: "Your account has not yet been confirmed! Please check your email."
+        }));
+      } else {
+        toast.error(formatMessage({
+          id: "auth.login.failed",
+          defaultMessage: "Login failed! Please check your credentials."
+        }));
+      }
+      return false;
     }
-
-    return true;
-  } catch (error) {
-    // Conta não confirmada (status 403 + mensagem personalizada)
-    if (error.status === 403 && error.message.includes("not yet been confirmed")) {
-      toast.info(formatMessage({
-        id: "auth.login.unconfirmed",
-        defaultMessage: "A sua conta ainda não foi confirmada! Por favor, verifique o seu email."
-      }));
-    } else {
-      toast.error(formatMessage({
-        id: "auth.login.failed",
-        defaultMessage: "Login falhou! Por favor verifique as suas credenciais."
-      }));
-    }
-    return false;
-  }
-};
-
+  };
 
   /**
-   * Logs out the user: invalidates session server-side and clears storage/state.
-   * Shows a toast notification on success or error.
+   * Logs out the current user:
+   * - Invalidates the session on the backend
+   * - Clears notification counts
+   * - Clears all user/session data from Zustand and storage
+   * - Shows a toast notification and redirects to login page
+   *
+   * @returns {Promise<void>}
    */
+  const clearCounts = useNotificationStore.getState().markAllAsRead;
+  const logout = async () => {
+    try {
+      // 1. Call backend logout endpoint
+      await authAPI.logoutUser();
+      // 2. Clear notification counts
+      await clearCounts();
 
-const clearCounts = useNotificationStore.getState().markAllAsRead;
-const logout = async () => {
-  try {
-    await authAPI.logoutUser();
-    await clearCounts();
-    toast.success(
-  formatMessage({
-    id: "auth.logout.success",
-    defaultMessage: "Logout efetuado com sucesso!"
-  }),
-  {
-    onClose: () => navigate("/login"),
-    autoClose: 2000 // ou o tempo que quiseres, em ms
-  }
-);
-  } catch (error) {
-    if (error?.status && [401, 403].includes(error.status)) {
-      // Sessão já inválida, continua normalmente
-    } else {
-      toast.error(formatMessage({
-        id: "auth.logout.failed",
-        defaultMessage: "Houve um problema ao fazer logout. Por favor tente novamente."
-      }));
+      // 3. Show success toast and redirect
+      toast.success(
+        formatMessage({
+          id: "auth.logout.success",
+          defaultMessage: "Logout successful!"
+        }),
+        {
+          onClose: () => navigate("/login"),
+          autoClose: 2000 // Adjust time as needed
+        }
+      );
+    } catch (error) {
+      // If session already invalid, continue normally
+      if (!(error?.status && [401, 403].includes(error.status))) {
+        toast.error(formatMessage({
+          id: "auth.logout.failed",
+          defaultMessage: "There was a problem logging out. Please try again."
+        }));
+      }
+    } finally {
+      // 4. Clear user-related state and all storage
+      userStore.setState({ username: "" });
+      sessionStorage.removeItem("authToken");
+      localStorage.removeItem("userData");
+      sessionStorage.removeItem("user-store");
     }
-  } finally {
-    userStore.setState({ username: "" });
-    sessionStorage.removeItem("authToken");
-    localStorage.removeItem("userData");
-    sessionStorage.removeItem("user-store");
-  }
-};
+  };
 
   return { login, logout };
 }
