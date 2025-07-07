@@ -29,6 +29,35 @@ public class JavaConversionUtil {
     UserDao userDao;
 
     /**
+     * Builds a CSV string from a list of FlatEvaluationDto.
+     * Each row includes evaluation metadata for export.
+     *
+     * @param evaluations The list of evaluation DTOs to export.
+     * @return A CSV-formatted string.
+     */
+    public static String buildCsvFromEvaluations(List<FlatEvaluationDto> evaluations) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Evaluated Name,Email,State,Grade,Evaluator,Cycle End Date\n");
+
+        for (FlatEvaluationDto dto : evaluations) {
+            sb.append('"').append(dto.getEvaluatedName() != null ? dto.getEvaluatedName() : "").append("\",")
+                    .append(dto.getEvaluatedEmail() != null ? dto.getEvaluatedEmail() : "").append(",")
+                    .append(dto.getState() != null ? dto.getState() : "").append(",")
+                    .append(dto.getGrade() != null ? dto.getGrade() : "").append(",")
+                    .append(dto.getEvaluatorName() != null ? dto.getEvaluatorName() : "").append(",")
+                    .append(dto.getCycleEndDate() != null ? dto.getCycleEndDate() : "").append("\n");
+        }
+
+        return sb.toString();
+    }
+
+
+
+
+
+
+
+    /**
      * Builds a CSV string from a list of FlatProfileDto objects.
      * Each row will include the user's full name, workplace, manager name, and photograph URL.
      *

@@ -6,16 +6,16 @@ import aor.projetofinal.bean.EvaluationCycleBean;
 import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.EvaluationCycleDao;
+import aor.projetofinal.dao.EvaluationDao;
 import aor.projetofinal.dao.SessionTokenDao;
 import aor.projetofinal.dao.UserDao;
-import aor.projetofinal.dto.UpdateEvaluationDto;
-import aor.projetofinal.dto.EvaluationOptionsDto;
-import aor.projetofinal.dto.SessionStatusDto;
+import aor.projetofinal.dto.*;
 import aor.projetofinal.entity.EvaluationCycleEntity;
 import aor.projetofinal.entity.EvaluationEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.EvaluationStateType;
+import aor.projetofinal.util.JavaConversionUtil;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -23,6 +23,8 @@ import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +45,10 @@ public class EvaluationService {
 
     @Inject
     private UserDao userDao;
+
+    @Inject
+    private EvaluationDao evaluationDao;
+    
 
     @Inject
     private SessionTokenDao sessionTokenDao;
@@ -143,7 +149,162 @@ public class EvaluationService {
     }
 
 
+    /**
+     * Exports all evaluations matching the given filters into a downloadable CSV file.
+     * Only accessible to Admins and Managers.
+     *
+     * @param token          Session token of the authenticated user
+     * @param name           Optional name filter of evaluated user
+     * @param state          Optional evaluation state
+     * @param grade          Optional grade filter
+     * @param cycleEndString Optional exact end date of evaluation cycle (yyyy-MM-dd)
+     * @return CSV file as HTTP attachment
+     */
+    @GET
+    @Path("/export-csv")
+    @Produces("text/csv")
+    public Response exportEvaluationsToCsv(
+            @HeaderParam("sessionToken") String token,
+            @QueryParam("name") String name,
+            @QueryParam("state") EvaluationStateType state,
+            @QueryParam("grade") Integer grade,
+            @QueryParam("cycleEnd") String cycleEndString
+    ) {
+        // 1. Validate session
+        SessionTokenEntity session = sessionTokenDao.findBySessionToken(token);
+        if (session == null || session.getUser() == null) {
+            logger.warn("Unauthorized CSV export attempt.");
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("Session expired or invalid.")
+                    .build();
+        }
 
+        UserEntity requester = session.getUser();
+        String roleName = requester.getRole().getName().toUpperCase();
+        if (!roleName.equals("ADMIN") && !roleName.equals("MANAGER")) {
+            logger.warn("User: {} | IP: {} - Access denied for evaluation CSV export.",
+                    requester.getEmail(), RequestContext.getIp());
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("Only administrators and managers can export evaluations.")
+                    .build();
+        }
+
+        // 2. Parse optional cycle end date
+        LocalDate cycleEnd = null;
+        if (cycleEndString != null && !cycleEndString.isBlank()) {
+            try {
+                cycleEnd = LocalDate.parse(cycleEndString);
+            } catch (DateTimeParseException e) {
+                logger.warn("User: {} | IP: {} - Invalid cycle end date: {}", requester.getEmail(), RequestContext.getIp(), cycleEndString);
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Invalid date format. Use yyyy-MM-dd.")
+                        .build();
+            }
+        }
+
+        // 3. Fetch all matching evaluations (no pagination)
+        List<EvaluationEntity> results = evaluationDao.findEvaluationsWithFiltersPaginated(
+                name, state, grade, cycleEnd, requester, 1, Integer.MAX_VALUE // fetch all
+        );
+
+        List<FlatEvaluationDto> dtos = results.stream()
+                .map(JavaConversionUtil::convertEvaluationToFlatDto)
+                .toList();
+
+        logger.info("User: {} | IP: {} - Exported {} evaluations to CSV.",
+                requester.getEmail(), RequestContext.getIp(), dtos.size());
+
+        // 4. Build CSV content
+        String csv = JavaConversionUtil.buildCsvFromEvaluations(dtos);
+
+        return Response.ok(csv)
+                .header("Content-Disposition", "attachment; filename=evaluations_export.csv")
+                .type("text/csv")
+                .build();
+    }
+
+
+
+
+
+
+
+
+    /**
+     * Lists evaluations filtered by name, state, grade, and cycle end date,
+     * returning results paginated in a lightweight DTO format.
+     * Access is restricted to Admins and Managers only.
+     *
+     * @param token           Session token of the authenticated user
+     * @param name            Optional partial name of the evaluated user
+     * @param state           Optional evaluation state filter
+     * @param grade           Optional evaluation grade filter (1-4)
+     * @param cycleEndString  Optional exact cycle end date in yyyy-MM-dd format
+     * @param page            Page number for pagination (1-based)
+     * @return A paginated list of filtered evaluations, or appropriate error response
+     */
+    @GET
+    @Path("/list-by-filters")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listEvaluationsFiltered(
+            @HeaderParam("sessionToken") String token,
+            @QueryParam("name") String name,
+            @QueryParam("state") EvaluationStateType state,
+            @QueryParam("grade") Integer grade,
+            @QueryParam("cycleEnd") String cycleEndString,
+            @QueryParam("page") @DefaultValue("1") int page
+    ) {
+        // 1. Validate session
+        SessionTokenEntity session = sessionTokenDao.findBySessionToken(token);
+        if (session == null || session.getUser() == null) {
+            logger.warn("Unauthorized access attempt to evaluations list.");
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Session expired or invalid.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity requester = session.getUser();
+
+        // 2. Role check
+        String roleName = requester.getRole().getName().toUpperCase();
+        if (!roleName.equals("ADMIN") && !roleName.equals("MANAGER")) {
+            logger.warn("User: {} | IP: {} - Access denied: not admin or manager.",
+                    requester.getEmail(), RequestContext.getIp());
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Only administrators and managers can access the evaluations list.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        logger.info("User: {} | IP: {} - Requested filtered evaluations list.", requester.getEmail(), RequestContext.getIp());
+
+        // 3. Parse cycle end date
+        LocalDate cycleEnd = null;
+        if (cycleEndString != null && !cycleEndString.isBlank()) {
+            try {
+                cycleEnd = LocalDate.parse(cycleEndString);
+            } catch (DateTimeParseException e) {
+                logger.warn("User: {} | IP: {} - Invalid cycle end date: {}", requester.getEmail(), RequestContext.getIp(), cycleEndString);
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"message\": \"Invalid date format for cycle end. Use yyyy-MM-dd.\"}")
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
+        }
+
+        // 4. Load filtered paginated evaluations
+        PaginatedEvaluationsDto paginated = evaluationBean.findEvaluationsWithFiltersPaginated(
+                name, state, grade, cycleEnd, requester, page
+        );
+
+        logger.info("User: {} | IP: {} - Returned {} evaluations on page {}.",
+                requester.getEmail(), RequestContext.getIp(), paginated.getEvaluations().size(), page);
+
+        return Response.ok(paginated)
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
 
 
 

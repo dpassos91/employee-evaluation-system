@@ -2,10 +2,7 @@ package aor.projetofinal.bean;
 
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.EvaluationDao;
-import aor.projetofinal.dto.UpdateEvaluationDto;
-import aor.projetofinal.dto.EvaluationOptionsDto;
-import aor.projetofinal.dto.UserDto;
-import aor.projetofinal.dto.UsersWithIncompleteEvaluationsDto;
+import aor.projetofinal.dto.*;
 import aor.projetofinal.entity.EvaluationCycleEntity;
 import aor.projetofinal.entity.EvaluationEntity;
 import aor.projetofinal.entity.UserEntity;
@@ -19,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -32,6 +30,52 @@ public class EvaluationBean implements Serializable {
 
     @Inject
     private EvaluationCycleBean evaluationCycleBean;
+
+    /**
+     * Returns a paginated list of evaluations matching the provided filters,
+     * converted into flat DTOs for list display.
+     *
+     * @param name      Partial name of evaluated user (nullable)
+     * @param state     Evaluation state filter (nullable)
+     * @param grade     Grade filter (nullable)
+     * @param cycleEnd  Exact cycle end date filter (nullable)
+     * @param requester The user making the request (used for access control)
+     * @param page      The page number (1-based)
+     * @return A PaginatedEvaluationsDto containing results and pagination metadata
+     */
+    public PaginatedEvaluationsDto findEvaluationsWithFiltersPaginated(String name,
+                                                                       EvaluationStateType state,
+                                                                       Integer grade,
+                                                                       LocalDate cycleEnd,
+                                                                       UserEntity requester,
+                                                                       int page) {
+
+        int pageSize = 10;
+
+        // 1. Load matching evaluations (paginated)
+        List<EvaluationEntity> evaluations = evaluationDao.findEvaluationsWithFiltersPaginated(
+                name, state, grade, cycleEnd, requester, page, pageSize
+        );
+
+        // 2. Count total records matching filters (for pagination)
+        long totalCount = evaluationDao.countEvaluationsWithFilters(
+                name, state, grade, cycleEnd, requester
+        );
+
+        // 3. Convert to DTOs
+        List<FlatEvaluationDto> dtoList = evaluations.stream()
+                .map(JavaConversionUtil::convertEvaluationToFlatDto)
+                .toList();
+
+        // 4. Calculate total pages
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+        return new PaginatedEvaluationsDto(dtoList, totalCount, totalPages, page);
+    }
+
+
+
+
 
 
     //method to list all evaluation options for the dropdown menu in the frontend
