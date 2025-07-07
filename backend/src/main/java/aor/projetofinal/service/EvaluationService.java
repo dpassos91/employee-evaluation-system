@@ -48,6 +48,49 @@ public class EvaluationService {
     private SessionTokenDao sessionTokenDao;
 
 
+
+    @PUT
+    @Path("/close-all")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response closeAllEvaluations(@HeaderParam("sessionToken") String token) {
+
+        // validate session
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity currentUser = tokenEntity.getUser();
+
+        // only and admin can close evaluations in bulk
+        if (!currentUser.getRole().getName().equalsIgnoreCase("admin")) {
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Only admins can close evaluations in bulk.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // 3. close in bulk all evaluations in the current cycle
+        evaluationCycleBean.bulkCloseEvaluationsAndCycle();
+
+        return Response.ok()
+                .entity("{\"message\": \"Bulk close completed.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+
+
+
+
+
+
+
+
+
     @PUT
     @Path("/close/{evaluationId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -98,6 +141,8 @@ public class EvaluationService {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }
+
+
 
 
 

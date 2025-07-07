@@ -44,6 +44,47 @@ public class EvaluationCycleBean implements Serializable {
         return cycle;
     }
 
+    public void bulkCloseEvaluationsAndCycle() {
+        EvaluationCycleEntity cycle = findActiveCycle();
+        if (cycle == null) {
+            logger.warn("No active cycle found for bulk close.");
+            return;
+        }
+
+
+
+        // close all evaluations in the cycle that are in EVALUATED state
+        for (EvaluationEntity e : cycle.getEvaluations()) {
+            if (e.getState() == EvaluationStateType.EVALUATED) {
+                e.setState(EvaluationStateType.CLOSED);
+                e.setDate(LocalDateTime.now());
+                evaluationDao.save(e);
+            }
+        }
+
+        // checks if every evaluation in the cycle was successfully closed
+        boolean allClosed = true;
+        for (EvaluationEntity e : cycle.getEvaluations()) {
+            if (e.getState() != EvaluationStateType.CLOSED) {
+                allClosed = false;
+                break;
+            }
+        }
+
+        if (allClosed) {
+            cycle.setActive(false);
+            cycle.setEndDate(LocalDateTime.now());
+            evaluationCycleDao.save(cycle);
+            emailManagersAndEvaluatedOfCycleClosure(cycle);
+            logger.info("Cycle ID {} closed after bulk evaluation close.", cycle.getId());
+        }
+    }
+
+
+
+
+
+
 
     public void closeEvaluationAndCheckCycle(EvaluationEntity evaluation) {
         // close the evaluation
