@@ -48,6 +48,60 @@ public class EvaluationService {
     private SessionTokenDao sessionTokenDao;
 
 
+    @PUT
+    @Path("/close/{evaluationId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response closeEvaluation(@PathParam("evaluationId") Long evaluationId,
+                                    @HeaderParam("sessionToken") String token) {
+
+        // validate session
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity currentUser = tokenEntity.getUser();
+
+        // only admins can close evaluations
+        if (!currentUser.getRole().getName().equalsIgnoreCase("admin")) {
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Only admins can close evaluations.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // find the evaluation by ID
+        EvaluationEntity evaluation = evaluationBean.findEvaluationById(evaluationId);
+        if (evaluation == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"message\": \"Evaluation not found.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // verify if the evaluation state is 'EVALUATED'
+        if (evaluation.getState() != EvaluationStateType.EVALUATED) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("{\"message\": \"Only evaluations in 'EVALUATED' state can be closed.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // Close the evaluation and check if the cycle can be closed
+        evaluationCycleBean.closeEvaluationAndCheckCycle(evaluation);
+
+        return Response.ok()
+                .entity("{\"message\": \"Evaluation closed successfully.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+
+
+
 
 
     @GET

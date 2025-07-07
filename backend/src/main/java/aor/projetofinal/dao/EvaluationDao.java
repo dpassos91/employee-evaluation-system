@@ -37,6 +37,26 @@ public class EvaluationDao {
         return count > 0;
     }
 
+
+    public EvaluationEntity findById(Long id) {
+        TypedQuery<EvaluationEntity> query = em.createQuery(
+                "SELECT e FROM EvaluationEntity e WHERE e.id = :id",
+                EvaluationEntity.class
+        );
+        query.setParameter("id", id);
+
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+
+
+
+
+
     public EvaluationEntity findEvaluationByCycleAndUser(EvaluationCycleEntity cycle, UserEntity evaluated) {
         try {
             TypedQuery<EvaluationEntity> query = em.createQuery(

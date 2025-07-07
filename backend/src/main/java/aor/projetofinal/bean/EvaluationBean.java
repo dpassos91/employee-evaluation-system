@@ -37,7 +37,7 @@ public class EvaluationBean implements Serializable {
     //method to list all evaluation options for the dropdown menu in the frontend
     public List<EvaluationOptionsDto> listEvaluationOptions() {
         List<EvaluationOptionsDto> list = new ArrayList<>();
-    //GradeEvaluationType.values returns all the enum values as an array:
+        //GradeEvaluationType.values returns all the enum values as an array:
         for (GradeEvaluationType evaluation : GradeEvaluationType.values()) {
             list.add(new EvaluationOptionsDto(
                     //dto enum name
@@ -50,6 +50,10 @@ public class EvaluationBean implements Serializable {
         }
 
         return list;
+    }
+
+    public EvaluationEntity findEvaluationById(Long id) {
+        return evaluationDao.findById(id);
     }
 
 
@@ -72,10 +76,6 @@ public class EvaluationBean implements Serializable {
 
         return evaluation;
     }
-
-
-
-
 
 
     public UsersWithIncompleteEvaluationsDto listUsersWithIncompleteEvaluationsFromLastCycle() {
@@ -117,14 +117,9 @@ public class EvaluationBean implements Serializable {
     }
 
 
-
-
-
-
     public void updateEvaluationWithGradeAndFeedback(UpdateEvaluationDto updateEvaluationDto,
                                                      EvaluationEntity evaluation,
                                                      UserEntity evaluator) {
-
 
 
         evaluation.setGrade(GradeEvaluationType.getEnumfromGrade(updateEvaluationDto.getGrade()));
@@ -147,14 +142,9 @@ public class EvaluationBean implements Serializable {
     }
 
 
-
     public boolean alreadyEvaluatedAtCurrentCycle(EvaluationCycleEntity cycle, UserEntity evaluated) {
         return evaluationDao.alreadyEvaluatedAtCurrentCycle(cycle, evaluated);
     }
-
-
-
-
 
 
 }

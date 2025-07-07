@@ -42,6 +42,43 @@ public class EvaluationCycleBean implements Serializable {
         return cycle;
     }
 
+
+    public void closeEvaluationAndCheckCycle(EvaluationEntity evaluation) {
+        // close the evaluation
+        evaluation.setState(EvaluationStateType.CLOSED);
+        evaluationDao.save(evaluation);
+        logger.info("Evaluation ID {} closed.", evaluation.getId());
+
+        EvaluationCycleEntity cycle = evaluation.getCycle();
+
+        // verify whether all other evaluations in the cycle are closed
+        boolean allClosed = true;
+        for (EvaluationEntity e : cycle.getEvaluations()) {
+            if (e.getState() != EvaluationStateType.CLOSED) {
+                allClosed = false;
+                break;
+            }
+        }
+        // if all processes are closed, just close the cycle
+
+        if (allClosed) {
+            cycle.setActive(false);
+            cycle.setEndDate(LocalDateTime.now());
+            evaluationCycleDao.save(cycle);
+
+            // set every evaluation date from that cycle to now
+            for (EvaluationEntity e : cycle.getEvaluations()) {
+                e.setDate(LocalDateTime.now());
+                evaluationDao.save(e);
+            }
+
+            logger.info("Cycle ID {} closed. All evaluations marked with date {}.", cycle.getId(), now);
+        }
+
+
+    }
+
+
     public void createCycleAndCreateBlankEvaluations(LocalDate endDate) {
         //creating cycle with the end date provided by the admin from the frontend
 
@@ -98,15 +135,15 @@ public class EvaluationCycleBean implements Serializable {
                 String subject = "Start of a New Evalaution Cycle";
                 //Return a formatted string appplying the format method from String class, %s for any type of data
                 String body = String.format("""
-                    Dear %s,
-
-                    A new evaluation cycle has started, with ending date by %s.
-
-                    Plese, access the platform to verify and evaluate processes under  your responsibility. 
-                   
-                    Thank you for ypour consideration and collaboration,
-                    The board.
-                    """, user.getEmail(), cycle.getEndDate().toLocalDate());
+                        Dear %s,
+                        
+                        A new evaluation cycle has started, with ending date by %s.
+                        
+                        Plese, access the platform to verify and evaluate processes under  your responsibility. 
+                        
+                        Thank you for ypour consideration and collaboration,
+                        The board.
+                        """, user.getEmail(), cycle.getEndDate().toLocalDate());
 
                 EmailUtil.sendEmail(user.getEmail(), subject, body);
             }
@@ -114,13 +151,6 @@ public class EvaluationCycleBean implements Serializable {
 
         logger.info("Admins and managers notified by email about the openning of a new evaluation cycle.");
     }
-
-
-
-
-
-
-
 
 
 }
