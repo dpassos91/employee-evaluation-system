@@ -1,10 +1,8 @@
 package aor.projetofinal.util;
 
 import aor.projetofinal.dao.UserDao;
-import aor.projetofinal.dto.FlatProfileDto;
-import aor.projetofinal.dto.ProfileDto;
-import aor.projetofinal.dto.SessionStatusDto;
-import aor.projetofinal.dto.UserDto;
+import aor.projetofinal.dto.*;
+import aor.projetofinal.entity.EvaluationEntity;
 import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
@@ -13,6 +11,7 @@ import aor.projetofinal.entity.enums.UsualWorkPlaceType;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +51,60 @@ public class JavaConversionUtil {
         }
         return csvBuilder.toString();
     }
+
+    /**
+     * Converts an EvaluationEntity into a FlatEvaluationDto for use in REST API responses.
+     * This method extracts and formats only basic string-based information for display,
+     * avoiding exposure of complex enums or entity references.
+     *
+     * @param evaluation The evaluation entity to convert.
+     * @return A FlatEvaluationDto representing the simplified evaluation data.
+     */
+    public static FlatEvaluationDto convertEvaluationToFlatDto(EvaluationEntity evaluation) {
+        FlatEvaluationDto dto = new FlatEvaluationDto();
+
+        // 1. Evaluated user info
+        UserEntity evaluated = evaluation.getEvaluated();
+        if (evaluated != null) {
+            dto.setEvaluatedEmail(evaluated.getEmail());
+
+            if (evaluated.getProfile() != null) {
+                String fullName = evaluated.getProfile().getFirstName() + " " + evaluated.getProfile().getLastName();
+                dto.setEvaluatedName(fullName);
+                dto.setPhotograph(evaluated.getProfile().getPhotograph());
+            }
+        }
+
+        // 2. Evaluation state (as string, e.g. "IN_EVALUATION")
+        if (evaluation.getState() != null) {
+            dto.setState(evaluation.getState().name());
+        }
+
+        // 3. Grade (converted to string, e.g. "3")
+        if (evaluation.getGrade() != null) {
+            dto.setGrade(String.valueOf(evaluation.getGrade().getGrade()));
+        }
+
+        // 4. Evaluator name
+        UserEntity evaluator = evaluation.getEvaluator();
+        if (evaluator != null && evaluator.getProfile() != null) {
+            String evaluatorName = evaluator.getProfile().getFirstName() + " " + evaluator.getProfile().getLastName();
+            dto.setEvaluatorName(evaluatorName);
+        }
+
+        // 5. Cycle end date (formatted as "yyyy-MM-dd HH:mm")
+        if (evaluation.getCycle() != null && evaluation.getCycle().getEndDate() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            dto.setCycleEndDate(evaluation.getCycle().getEndDate().format(formatter));
+        }
+
+        return dto;
+    }
+
+
+
+
+
 
     /**
      * Converts a list of ProfileEntity to a list of FlatProfileDto.
