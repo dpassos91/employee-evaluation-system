@@ -167,7 +167,7 @@ public class EvaluationService {
     public Response exportEvaluationsToCsv(
             @HeaderParam("sessionToken") String token,
             @QueryParam("name") String name,
-            @QueryParam("state") EvaluationStateType state,
+            @QueryParam("state") EvaluationStateEnum state,
             @QueryParam("grade") Integer grade,
             @QueryParam("cycleEnd") String cycleEndString
     ) {
@@ -261,7 +261,7 @@ public class EvaluationService {
         }
 
         // 3. Validate that it's closed and cycle inactive
-        boolean isClosed = evaluation.getState() == EvaluationStateType.CLOSED;
+        boolean isClosed = evaluation.getState() == EvaluationStateEnum.CLOSED;
         boolean cycleEnded = evaluation.getCycle() != null && !evaluation.getCycle().isActive();
 
         if (!isClosed || !cycleEnded) {
@@ -409,7 +409,7 @@ public class EvaluationService {
     public Response listEvaluationsFiltered(
             @HeaderParam("sessionToken") String token,
             @QueryParam("name") String name,
-            @QueryParam("state") EvaluationStateType state,
+            @QueryParam("state") EvaluationStateEnum state,
             @QueryParam("grade") Integer grade,
             @QueryParam("cycleEnd") String cycleEndString,
             @QueryParam("page") @DefaultValue("1") int page

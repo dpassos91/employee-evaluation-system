@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import aor.projetofinal.entity.enums.CourseCategoryEnum;
+import aor.projetofinal.entity.enums.LanguageEnum;
 
 /**
  * Entity representing a training course available in the system.

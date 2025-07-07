@@ -10,7 +10,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import java.time.LocalDate;
-
+import aor.projetofinal.util.StringUtils;
 
 import java.util.List;
 
@@ -76,7 +76,7 @@ public class EvaluationDao {
      * @return The total number of matching evaluation records
      */
     public long countEvaluationsWithFilters(String name,
-                                            EvaluationStateType state,
+                                            EvaluationStateEnum state,
                                             Integer grade,
                                             LocalDate cycleEnd,
                                             UserEntity requester) {
@@ -234,7 +234,7 @@ public class EvaluationDao {
      * @return A list of EvaluationEntity matching the filters and visibility rules
      */
     public List<EvaluationEntity> findEvaluationsWithFiltersPaginated(String name,
-                                                                      EvaluationStateType state,
+                                                                      EvaluationStateEnum state,
                                                                       Integer grade,
                                                                       LocalDate cycleEnd,
                                                                       UserEntity requester,

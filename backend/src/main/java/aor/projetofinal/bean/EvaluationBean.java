@@ -44,7 +44,7 @@ public class EvaluationBean implements Serializable {
      * @return A PaginatedEvaluationsDto containing results and pagination metadata
      */
     public PaginatedEvaluationsDto findEvaluationsWithFiltersPaginated(String name,
-                                                                       EvaluationStateType state,
+                                                                       EvaluationStateEnum state,
                                                                        Integer grade,
                                                                        LocalDate cycleEnd,
                                                                        UserEntity requester,
@@ -88,7 +88,7 @@ public class EvaluationBean implements Serializable {
 
         List<EvaluationStateDto> states = new ArrayList<>();
 
-        for (EvaluationStateType type : EvaluationStateType.values()) {
+        for (EvaluationStateEnum type : EvaluationStateEnum.values()) {
             String label = switch (type) {
                 case IN_EVALUATION -> "In Evaluation";
                 case EVALUATED     -> "Evaluated";

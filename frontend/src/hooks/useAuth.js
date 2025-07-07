@@ -44,7 +44,7 @@ export function useAuth() {
       sessionStorage.setItem("authToken", data.sessionToken);
 
       // 3. Fetch full profile (contains photograph and other personal info)
-      const profile = await profileAPI.getProfileById(data.id);
+      const profile = await profileAPI.getProfileById(data.id, data.sessionToken, { forceLogoutOn401: false });
 
       // 4. Save authenticated user in userStore, including photograph
       setUser({
@@ -84,7 +84,9 @@ export function useAuth() {
               : field // fallback if translation missing
           )
           .join(", ");
-        navigate("/profile");
+          console.log("Redirecionar para: ", data.profileComplete === false ? `/profile/${data.id}` : "/dashboard");
+        navigate(`/profile/${data.id}`);
+        console.log("navigate chamado para /profile/" + data.id);
       } else {
         navigate("/dashboard");
       }

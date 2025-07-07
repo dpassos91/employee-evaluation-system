@@ -42,12 +42,14 @@ const getProfileByEmail = async (email, sessionToken) => {
  * Fetches the profile of a user by ID.
  * @param {string} id - The user's ID.
  * @param {string} sessionToken - The session token for authorization.
+ * @param {object} extraOptions - Additional options (ex: forceLogoutOn401: false)
  * @returns {Promise<Object>} The user's profile DTO from the backend.
  */
-const getProfileById = async (userId, sessionToken) => {
+const getProfileById = async (userId, sessionToken, extraOptions = {}) => {
   return apiCall(API_ENDPOINTS.profiles.getProfileById(userId), {
     method: 'GET',
     headers: { sessionToken },
+    ...extraOptions, // <-- permite passar forceLogoutOn401
   });
 };
 

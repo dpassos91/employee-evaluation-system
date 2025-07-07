@@ -36,9 +36,9 @@ export function PrivateRoute({ children }) {
 
   // 3. If the profile is incomplete and the current route is not /profile,
   //    redirect to the profile page to force completion before accessing other routes
-  const isProfileRoute = location.pathname === "/profile";
+  const isProfileRoute = location.pathname.startsWith("/profile");
   if (profileComplete === false && !isProfileRoute) {
-    return <Navigate to="/profile" replace />;
+    return <Navigate to={`/profile/${user.id}`} replace />;
   }
 
   // 4. Otherwise, allow access to the requested route/component

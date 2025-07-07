@@ -51,7 +51,8 @@ public class AuthenticationFilter implements Filter {
         path.endsWith("/createUser") || 
         path.contains("/request-reset") || 
         path.contains("/reset-password") || 
-        path.contains("/profiles/photo/")) {
+        path.contains("/profiles/photo/") ||
+        path.contains("/confirmAccount")) {
             logger.info("User: {} | IP: {} - Public endpoint, skipping authentication for path: {}", RequestContext.getAuthor(), RequestContext.getIp(), path);
             chain.doFilter(servletRequest, servletResponse);
             return;
