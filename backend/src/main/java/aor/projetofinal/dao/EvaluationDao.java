@@ -3,7 +3,7 @@ package aor.projetofinal.dao;
 import aor.projetofinal.entity.EvaluationCycleEntity;
 import aor.projetofinal.entity.EvaluationEntity;
 import aor.projetofinal.entity.UserEntity;
-import aor.projetofinal.entity.enums.EvaluationStateType;
+import aor.projetofinal.entity.enums.EvaluationStateEnum;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -93,7 +93,7 @@ public class EvaluationDao {
                 EvaluationEntity.class
         );
         query.setParameter("cycle", cycle);
-        query.setParameter("excludedState", EvaluationStateType.CLOSED);
+        query.setParameter("excludedState", EvaluationStateEnum.CLOSED);
         return query.getResultList();
     }
 

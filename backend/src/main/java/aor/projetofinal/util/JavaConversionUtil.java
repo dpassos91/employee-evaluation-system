@@ -8,7 +8,7 @@ import aor.projetofinal.dto.UserDto;
 import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
-import aor.projetofinal.entity.enums.UsualWorkPlaceType;
+import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -132,7 +132,7 @@ public class JavaConversionUtil {
 
         // Set workplace as string (e.g., "LISBOA")
         if (p.getUsualWorkplace() != null) {
-            profileDto.setUsualWorkplace(UsualWorkPlaceType.transformToString(p.getUsualWorkplace()));
+            profileDto.setUsualWorkplace(UsualWorkPlaceEnum.transformToString(p.getUsualWorkplace()));
         } else {
             profileDto.setUsualWorkplace(null);
         }

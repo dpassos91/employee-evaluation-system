@@ -3,7 +3,7 @@ package aor.projetofinal.dao;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.entity.NotificationEntity;
 import aor.projetofinal.entity.UserEntity;
-import aor.projetofinal.entity.enums.NotificationType;
+import aor.projetofinal.entity.enums.NotificationEnum;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -34,7 +34,7 @@ public class NotificationDao {
      * @param user the user entity to count unread notifications for
      * @return a map of NotificationType to unread count
      */
-    public Map<NotificationType, Integer> countUnreadByType(UserEntity user) {
+    public Map<NotificationEnum, Integer> countUnreadByType(UserEntity user) {
         // JPQL query to group unread notifications by type
         List<Object[]> results = em.createQuery(
                 "SELECT n.type, COUNT(n) FROM NotificationEntity n " +
@@ -43,15 +43,15 @@ public class NotificationDao {
                 .getResultList();
 
         // Use EnumMap for efficient mapping with enums
-        Map<NotificationType, Integer> counts = new EnumMap<>(NotificationType.class);
+        Map<NotificationEnum, Integer> counts = new EnumMap<>(NotificationEnum.class);
 
         // Initialize all types with zero to ensure a consistent response
-        for (NotificationType type : NotificationType.values()) {
+        for (NotificationEnum type : NotificationEnum.values()) {
             counts.put(type, 0);
         }
         // Populate map with actual counts from query
         for (Object[] row : results) {
-            NotificationType type = (NotificationType) row[0];
+            NotificationEnum type = (NotificationEnum) row[0];
             Long count = (Long) row[1];
             counts.put(type, count.intValue());
         }
@@ -71,7 +71,7 @@ public class NotificationDao {
  * @param excludeType the notification type to exclude (e.g., NotificationType.MESSAGE)
  * @return list of unread NotificationEntity objects excluding the specified type
  */
-public List<NotificationEntity> findUnreadByUserExcludingType(UserEntity user, NotificationType excludeType) {
+public List<NotificationEntity> findUnreadByUserExcludingType(UserEntity user, NotificationEnum excludeType) {
     return em.createQuery(
         "SELECT n FROM NotificationEntity n WHERE n.user = :user AND n.read = false AND n.type <> :excludeType ORDER BY n.createdAt DESC",
         NotificationEntity.class
@@ -177,7 +177,7 @@ public int markAllMessageNotificationsAsRead(UserEntity user) {
         "WHERE n.user = :user AND n.read = false AND n.type = :type"
     )
     .setParameter("user", user)
-    .setParameter("type", NotificationType.MESSAGE)
+    .setParameter("type", NotificationEnum.MESSAGE)
     .executeUpdate();
     return updated;
 }

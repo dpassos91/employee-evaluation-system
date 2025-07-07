@@ -6,7 +6,7 @@ import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.entity.EvaluationCycleEntity;
 import aor.projetofinal.entity.EvaluationEntity;
 import aor.projetofinal.entity.UserEntity;
-import aor.projetofinal.entity.enums.EvaluationStateType;
+import aor.projetofinal.entity.enums.EvaluationStateEnum;
 import aor.projetofinal.util.EmailUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -55,8 +55,8 @@ public class EvaluationCycleBean implements Serializable {
 
         // close all evaluations in the cycle that are in EVALUATED state
         for (EvaluationEntity e : cycle.getEvaluations()) {
-            if (e.getState() == EvaluationStateType.EVALUATED) {
-                e.setState(EvaluationStateType.CLOSED);
+            if (e.getState() == EvaluationStateEnum.EVALUATED) {
+                e.setState(EvaluationStateEnum.CLOSED);
                 e.setDate(LocalDateTime.now());
                 evaluationDao.save(e);
             }
@@ -65,7 +65,7 @@ public class EvaluationCycleBean implements Serializable {
         // checks if every evaluation in the cycle was successfully closed
         boolean allClosed = true;
         for (EvaluationEntity e : cycle.getEvaluations()) {
-            if (e.getState() != EvaluationStateType.CLOSED) {
+            if (e.getState() != EvaluationStateEnum.CLOSED) {
                 allClosed = false;
                 break;
             }
@@ -88,7 +88,7 @@ public class EvaluationCycleBean implements Serializable {
 
     public void closeEvaluationAndCheckCycle(EvaluationEntity evaluation) {
         // close the evaluation
-        evaluation.setState(EvaluationStateType.CLOSED);
+        evaluation.setState(EvaluationStateEnum.CLOSED);
         evaluationDao.save(evaluation);
         logger.info("Evaluation ID {} closed.", evaluation.getId());
 
@@ -97,7 +97,7 @@ public class EvaluationCycleBean implements Serializable {
         // verify whether all other evaluations in the cycle are closed
         boolean allClosed = true;
         for (EvaluationEntity e : cycle.getEvaluations()) {
-            if (e.getState() != EvaluationStateType.CLOSED) {
+            if (e.getState() != EvaluationStateEnum.CLOSED) {
                 allClosed = false;
                 break;
             }
@@ -148,7 +148,7 @@ public class EvaluationCycleBean implements Serializable {
                 evaluation.setCycle(newCycle);
                 evaluation.setEvaluated(user);
                 evaluation.setEvaluator(user.getManager());
-                evaluation.setState(EvaluationStateType.IN_EVALUATION);
+                evaluation.setState(EvaluationStateEnum.IN_EVALUATION);
                 evaluation.setDate(null);
                 // grade and feedback also stay at null
 

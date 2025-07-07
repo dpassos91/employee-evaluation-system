@@ -3,7 +3,7 @@ package aor.projetofinal.dao;
 
 import aor.projetofinal.util.StringUtils;
 import aor.projetofinal.entity.ProfileEntity;
-import aor.projetofinal.entity.enums.UsualWorkPlaceType;
+import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -19,7 +19,7 @@ public class ProfileDao {
     @PersistenceContext
     private EntityManager em;
 
-    public long countProfilesWithFilters(String employeeName, UsualWorkPlaceType workplace, String managerEmail) {
+    public long countProfilesWithFilters(String employeeName, UsualWorkPlaceEnum workplace, String managerEmail) {
         StringBuilder jpql = new StringBuilder("SELECT COUNT(p) FROM ProfileEntity p WHERE 1=1");
 
         // Apenas utilizadores com conta confirmada
@@ -65,7 +65,7 @@ public class ProfileDao {
 
     //pretende receber email do gestor do frontend, visto que ppode haver gestores com nomes iguais , e o email é unico
 
-    public List<ProfileEntity> findProfilesWithFiltersPaginated(String employeeName, UsualWorkPlaceType workplace, String managerEmail, int page) {
+    public List<ProfileEntity> findProfilesWithFiltersPaginated(String employeeName, UsualWorkPlaceEnum workplace, String managerEmail, int page) {
         try { //1=1 permite criar uma query onde se previne que adicionar WHERE a meio da query possa dar erro de sintaxe. Também previne começar uma condição com AND sem uma cláusula anterior.
             StringBuilder jpql = new StringBuilder("SELECT p FROM ProfileEntity p WHERE 1=1");
 //StringBuilder acumula as cláusulas WHERE
@@ -125,7 +125,7 @@ public class ProfileDao {
 
 
 //para produzir lista de perfis a exportar por Excel/csv
-    public List<ProfileEntity> findProfilesWithFilters(String employeeName, UsualWorkPlaceType workplace, String managerEmail) {
+    public List<ProfileEntity> findProfilesWithFilters(String employeeName, UsualWorkPlaceEnum workplace, String managerEmail) {
         try { //1=1 permite criar uma query onde se previne que adicionar WHERE a meio da query possa dar erro de sintaxe. Também previne começar uma condição com AND sem uma cláusula anterior.
             StringBuilder jpql = new StringBuilder("SELECT p FROM ProfileEntity p WHERE 1=1");
 //StringBuilder acumula as cláusulas WHERE

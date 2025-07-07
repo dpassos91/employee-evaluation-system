@@ -1,6 +1,6 @@
 package aor.projetofinal.entity.enums;
 
-public enum NotificationType {
+public enum NotificationEnum {
     MESSAGE,
     ALERT,
     SYSTEM,

@@ -6,7 +6,7 @@ import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.NotificationDto;
 import aor.projetofinal.entity.NotificationEntity;
 import aor.projetofinal.entity.UserEntity;
-import aor.projetofinal.entity.enums.NotificationType;
+import aor.projetofinal.entity.enums.NotificationEnum;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class NotificationBean {
      * @param userId the ID of the user
      * @return a map of NotificationType to unread count
      */
-    public Map<NotificationType, Integer> countUnreadNotificationsByType(Integer userId) {
+    public Map<NotificationEnum, Integer> countUnreadNotificationsByType(Integer userId) {
         UserEntity user = userDao.findById(userId);
         if (user == null) {
             // Optionally, you could throw an exception here instead
@@ -73,7 +73,7 @@ public class NotificationBean {
 
             // Handle type conversion
             try {
-                NotificationType notifType = NotificationType.valueOf(type.toUpperCase());
+                NotificationEnum notifType = NotificationEnum.valueOf(type.toUpperCase());
                 notification.setType(notifType);
             } catch (Exception e) {
                 logger.warn("User: {} | IP: {} - Invalid notification type '{}'. Operation aborted.", RequestContext.getAuthor(), RequestContext.getIp(), type);
@@ -122,7 +122,7 @@ public List<NotificationDto> getUnreadNonMessageNotificationsForUser(Integer use
     UserEntity user = userDao.findById(userId);
     if (user == null) return List.of();
     // Delegates to the DAO to fetch unread notifications excluding MESSAGE
-    return notificationDao.findUnreadByUserExcludingType(user, NotificationType.MESSAGE)
+    return notificationDao.findUnreadByUserExcludingType(user, NotificationEnum.MESSAGE)
         .stream()
         .map(this::toDto) // Convert entities to DTOs
         .toList();

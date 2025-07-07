@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import aor.projetofinal.entity.UserEntity;
-import aor.projetofinal.entity.enums.NotificationType;
+import aor.projetofinal.entity.enums.NotificationEnum;
 import java.util.Map;
 
 import java.util.List;
@@ -126,7 +126,7 @@ public Response getMyUnreadNonMessageNotifications() {
                         .build();
             }
             Integer userId = RequestContext.getCurrentUser().getId();
-            Map<NotificationType, Integer> counts = notificationBean.countUnreadNotificationsByType(userId);
+            Map<NotificationEnum, Integer> counts = notificationBean.countUnreadNotificationsByType(userId);
             logger.info("User: {} | IP: {} - Unread notification counts: {}", RequestContext.getAuthor(), RequestContext.getIp(), counts);
             return Response.ok(counts).build();
         } finally {

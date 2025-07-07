@@ -1,6 +1,6 @@
 package aor.projetofinal.dto;
 
-import aor.projetofinal.entity.enums.NotificationType;
+import aor.projetofinal.entity.enums.NotificationEnum;
 
 /**
  * Data Transfer Object for NotificationEntity.
@@ -9,7 +9,7 @@ public class NotificationDto {
     private Integer id;
     private Integer userId;
     private String message;
-    private NotificationType type;
+    private NotificationEnum type;
     private String createdAt;
     private Boolean read;
 
@@ -24,8 +24,8 @@ public class NotificationDto {
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
 
-    public NotificationType getType() { return type; }
-    public void setType(NotificationType type) { this.type = type; }
+    public NotificationEnum getType() { return type; }
+    public void setType(NotificationEnum type) { this.type = type; }
 
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }

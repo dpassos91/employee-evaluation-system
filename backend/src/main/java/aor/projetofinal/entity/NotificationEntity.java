@@ -5,7 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import aor.projetofinal.entity.enums.NotificationType;
+import aor.projetofinal.entity.enums.NotificationEnum;
 
 @Entity
 @Table(name = "notifications")
@@ -34,7 +34,7 @@ public class NotificationEntity implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private NotificationType type;
+    private NotificationEnum type;
 
     // Getters e Setters
 
@@ -67,10 +67,10 @@ public class NotificationEntity implements Serializable {
         this.message = message;
     }
 
-    public NotificationType getType() {
+    public NotificationEnum getType() {
         return type;
     }
-    public void setType(NotificationType type) {
+    public void setType(NotificationEnum type) {
         this.type = type;
     }
 

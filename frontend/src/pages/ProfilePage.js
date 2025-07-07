@@ -291,7 +291,7 @@ const handlePhotoUpload = async () => {
           <h2 className="text-3xl font-bold text-center mb-2 w-full">
             <FormattedMessage id="profile.title" defaultMessage="Profile" />
           </h2>
-<div className="w-28 h-28 rounded-full overflow-hidden border-2 border-[#D41C1C] bg-white flex items-center justify-center">
+<div className="w-28 h-28 rounded-full overflow-hidden border-2 border-[#D41C1C] bg-white flex items-center justify-center mt-10">
             {console.log('profile.photograph:', profile.photograph)}
 
 <img
@@ -311,7 +311,7 @@ const handlePhotoUpload = async () => {
           </div>
 
           {/* Actions */}
-<div className="flex flex-col gap-3 w-full mt-6">
+<div className="flex flex-col gap-3 w-full mt-14">
   {canEdit ? (
     <>
       {/* Hidden file input */}

@@ -8,7 +8,7 @@ import aor.projetofinal.dto.*;
 import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
-import aor.projetofinal.entity.enums.UsualWorkPlaceType;
+import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 import aor.projetofinal.util.JavaConversionUtil;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.ProfileDao;
@@ -60,7 +60,7 @@ public class ProfileService {
     public Response exportUsersToCSV(
             @HeaderParam("sessionToken") String sessionToken,
             @QueryParam("profile-name") String profileName,
-            @QueryParam("usual-work-place") UsualWorkPlaceType usualLocation,
+            @QueryParam("usual-work-place") UsualWorkPlaceEnum usualLocation,
             @QueryParam("manager-email") String managerEmail
     ) {
         // 1. Validate session
@@ -242,7 +242,7 @@ public Response getProfileById(
 public Response listUsersPaginated(
         @HeaderParam("sessionToken") String sessionToken,
         @QueryParam("profile-name") String profileName,
-        @QueryParam("usual-work-place") UsualWorkPlaceType usualLocation,
+        @QueryParam("usual-work-place") UsualWorkPlaceEnum usualLocation,
         @QueryParam("manager-email") String managerEmail,
         @QueryParam("page") @DefaultValue("1") int page
 ) {
@@ -416,7 +416,7 @@ public Response listUsersPaginated(
         logger.info("User: {} | IP: {} - Fetching usual workplace options",
                 RequestContext.getAuthor(), RequestContext.getIp());
 
-        List<String> options = Arrays.stream(UsualWorkPlaceType.values())
+        List<String> options = Arrays.stream(UsualWorkPlaceEnum.values())
                 .map(Enum::name)
                 .collect(Collectors.toList());
 

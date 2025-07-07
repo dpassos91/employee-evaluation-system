@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import aor.projetofinal.entity.enums.UsualWorkPlaceType;
+import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 
 
 @Entity
@@ -50,7 +50,7 @@ public class ProfileEntity implements Serializable  {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "usual_work_place")
-    private UsualWorkPlaceType usualWorkplace;
+    private UsualWorkPlaceEnum usualWorkplace;
 
     public ProfileEntity() {
     }
@@ -128,11 +128,11 @@ public class ProfileEntity implements Serializable  {
         this.bio = bio;
     }
 
-    public UsualWorkPlaceType getUsualWorkplace() {
+    public UsualWorkPlaceEnum getUsualWorkplace() {
     return usualWorkplace;
     }
 
-    public void setUsualWorkplace(UsualWorkPlaceType usualWorkplace) {
+    public void setUsualWorkplace(UsualWorkPlaceEnum usualWorkplace) {
     this.usualWorkplace = usualWorkplace;
     }
 

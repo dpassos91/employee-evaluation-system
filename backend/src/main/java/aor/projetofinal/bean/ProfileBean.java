@@ -7,7 +7,7 @@ import aor.projetofinal.dto.PaginatedProfilesDto;
 import aor.projetofinal.dto.ProfileDto;
 import aor.projetofinal.entity.ProfileEntity;
 import aor.projetofinal.entity.UserEntity;
-import aor.projetofinal.entity.enums.UsualWorkPlaceType;
+import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 import aor.projetofinal.util.JavaConversionUtil;
 import aor.projetofinal.util.PasswordUtil;
 import aor.projetofinal.util.ProfileValidator;
@@ -98,7 +98,7 @@ public class ProfileBean implements Serializable {
      * @param managerEmail Email of the manager to filter (can be null).
      * @return A list of FlatProfileDto objects matching the provided filters.
      */
-    public ArrayList<FlatProfileDto> findProfilesWithFilters(String employeeName, UsualWorkPlaceType workplace, String managerEmail) {
+    public ArrayList<FlatProfileDto> findProfilesWithFilters(String employeeName, UsualWorkPlaceEnum workplace, String managerEmail) {
         logger.info("User: {} | IP: {} | Filters -> Employee Name: {}, Workplace: {}, Manager Email: {} - Searching profiles with filters.",
                 RequestContext.getAuthor(), RequestContext.getIp(),
                 employeeName != null ? employeeName : "none",
@@ -117,7 +117,7 @@ public class ProfileBean implements Serializable {
      * @param page         The page number requested for pagination.
      * @return A PaginatedProfilesDto containing the filtered profiles, total count, total pages, and current page.
      */
-    public PaginatedProfilesDto findProfilesWithFiltersPaginated(String employeeName, UsualWorkPlaceType workplace, String managerEmail, int page) {
+    public PaginatedProfilesDto findProfilesWithFiltersPaginated(String employeeName, UsualWorkPlaceEnum workplace, String managerEmail, int page) {
         logger.info("User: {} | IP: {} | Filters -> Employee Name: {}, Workplace: {}, Manager Email: {} | Page: {} - Searching paginated profiles with filters.",
                 RequestContext.getAuthor(), RequestContext.getIp(),
                 employeeName != null ? employeeName : "none",
@@ -170,7 +170,7 @@ public class ProfileBean implements Serializable {
         String usualWorkplaceString = profileDto.getUsualWorkplace();
         if (usualWorkplaceString != null && !usualWorkplaceString.isBlank()) {
             try {
-                UsualWorkPlaceType type = UsualWorkPlaceType.valueOf(usualWorkplaceString.toUpperCase());
+                UsualWorkPlaceEnum type = UsualWorkPlaceEnum.valueOf(usualWorkplaceString.toUpperCase());
                 profileToUpdate.setUsualWorkplace(type);
             } catch (IllegalArgumentException e) {
                 logger.warn("User: {} | IP: {} | Email: {} | Value: {} - Invalid usualWorkplace value received.",

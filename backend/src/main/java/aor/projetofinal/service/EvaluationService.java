@@ -15,7 +15,7 @@ import aor.projetofinal.entity.EvaluationCycleEntity;
 import aor.projetofinal.entity.EvaluationEntity;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
-import aor.projetofinal.entity.enums.EvaluationStateType;
+import aor.projetofinal.entity.enums.EvaluationStateEnum;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -126,7 +126,7 @@ public class EvaluationService {
         }
 
         // verify if the evaluation state is 'EVALUATED'
-        if (evaluation.getState() != EvaluationStateType.EVALUATED) {
+        if (evaluation.getState() != EvaluationStateEnum.EVALUATED) {
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"message\": \"Only evaluations in 'EVALUATED' state can be closed.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -262,7 +262,7 @@ public class EvaluationService {
         // check if the cycle is close so that the evaluated user can see his evaluation
 
         boolean isEvaluatedUser = evaluated.getEmail().equalsIgnoreCase(evaluator.getEmail());
-        boolean isEvaluationClosed = evaluation.getState() == EvaluationStateType.CLOSED;
+        boolean isEvaluationClosed = evaluation.getState() == EvaluationStateEnum.CLOSED;
         boolean isCycleClosed = !evaluation.getCycle().isActive();
 
         if (isEvaluatedUser && (!isEvaluationClosed || !isCycleClosed)) {
@@ -339,7 +339,7 @@ public class EvaluationService {
         }
 
         // can only open evaluations that are in EVALUATED state
-        if (evaluation.getState() != EvaluationStateType.EVALUATED) {
+        if (evaluation.getState() != EvaluationStateEnum.EVALUATED) {
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"message\": \"Only evaluations in EVALUATED state can be reverted for editing.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -413,7 +413,7 @@ public class EvaluationService {
                     .build();
         }
 
-        if (evaluation.getState() == EvaluationStateType.CLOSED) {
+        if (evaluation.getState() == EvaluationStateEnum.CLOSED) {
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"message\": \"This evaluation is closed and cannot be modified.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -435,7 +435,7 @@ public class EvaluationService {
 
 
 //check if the evaluation is still to fill
-        if (evaluation.getState() != EvaluationStateType.IN_EVALUATION) {
+        if (evaluation.getState() != EvaluationStateEnum.IN_EVALUATION) {
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"message\": \"This evaluation is already completed or closed.\"}")
                     .type(MediaType.APPLICATION_JSON)

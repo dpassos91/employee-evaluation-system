@@ -4,48 +4,85 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
+/**
+ * Entity representing a training course available in the system.
+ * Courses can be assigned to users and are managed exclusively by administrators.
+ * <p>
+ * The course includes metadata such as language and category (stored as enums).
+ * Each course can be assigned to multiple users (see UserCourseEntity).
+ */
 @Entity
 @Table(name = "courses")
 public class CourseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Unique identifier for the course (auto-incremented).
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false, unique = true)
     private int id;
 
+    /**
+     * Name of the course. Required field.
+     */
     @Column(name = "name", nullable = false)
     private String name;
 
+    /**
+     * Total duration of the course in hours. Required field.
+     */
     @Column(name = "time_span", nullable = false)
     private double timeSpan;
 
+    /**
+     * Detailed description of the course content.
+     */
     @Column(name = "description", nullable = false, length = 65535, columnDefinition = "TEXT")
     private String description;
 
+    /**
+     * Link to the course resource or e-learning platform.
+     */
     @Column(name = "link", nullable = false)
     private String link;
 
+    /**
+     * Language in which the course is provided (stored as Enum).
+     */
+    @Enumerated(EnumType.STRING)
     @Column(name = "language", nullable = false)
-    private String language;
+    private LanguageEnum language;
 
+    /**
+     * Course category (area) as defined in the requirements (stored as Enum).
+     */
+    @Enumerated(EnumType.STRING)
     @Column(name = "course_category", nullable = false)
-    private String courseCategory;
+    private CourseCategoryEnum courseCategory;
 
+    /**
+     * Flag indicating whether the course is active.
+     * Inactive courses cannot be assigned to new users, but remain visible in user history.
+     */
     @Column(name = "is_active", nullable = false)
     private boolean active;
 
-    // Relação One to Many com a tabela userCourses
+    /**
+     * One-to-many relationship with UserCourseEntity.
+     * Represents all user enrollments in this course.
+     */
     @OneToMany(mappedBy = "course")
     private List<UserCourseEntity> userCourses;
 
-    // Construtor vazio
+    /** Default constructor. */
     public CourseEntity() {}
 
-    // Getters e Setters
+    // Getters and setters
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -61,41 +98,20 @@ public class CourseEntity implements Serializable {
     public String getLink() { return link; }
     public void setLink(String link) { this.link = link; }
 
-    public String getLanguage() { return language; }
-    public void setLanguage(String language) { this.language = language; }
+    public LanguageEnum getLanguage() { return language; }
+    public void setLanguage(LanguageEnum language) { this.language = language; }
 
-    public String getCourseCategory() { return courseCategory; }
-    public void setCourseCategory(String courseCategory) { this.courseCategory = courseCategory; }
+    public CourseCategoryEnum getCourseCategory() { return courseCategory; }
+    public void setCourseCategory(CourseCategoryEnum courseCategory) { this.courseCategory = courseCategory; }
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
 
-    public List<UserCourseEntity> getUserCourses() {
-        return userCourses;
-    }
-    public void setUserCourses(List<UserCourseEntity> userCourses) {
-        this.userCourses = userCourses;
-    }
+    public List<UserCourseEntity> getUserCourses() { return userCourses; }
+    public void setUserCourses(List<UserCourseEntity> userCourses) { this.userCourses = userCourses; }
 
-    /**
-     * Convenience method to get all users enrolled in this course.
-     * Ignores participation date — use getUserCourses() directly if needed.
-     */
+    // equals and hashCode (based on id)
 
-    /*
-    TODO
-    Propositadamente comentado, ver se nos faz sentido de futuro.
-    O que faz: obtém lista de utilizadores participantes (sem data)
-
-    @Transient
-    public List<UserEntity> getEnrolledUsers() {
-        return userCourses == null ? List.of() :
-                userCourses.stream()
-                        .map(UserCourseEntity::getUser)
-                        .toList();
-    }*/
-
-    // equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -104,24 +120,25 @@ public class CourseEntity implements Serializable {
         return id == that.id;
     }
 
-    // hash
-
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
 
-    // toString
+    // toString for debugging/logging
+
     @Override
     public String toString() {
         return "CourseEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", timeSpan=" + timeSpan +
-                ", courseCategory='" + courseCategory + '\'' +
+                ", courseCategory=" + courseCategory +
+                ", language=" + language +
                 ", active=" + active +
                 '}';
     }
 }
+
 
 

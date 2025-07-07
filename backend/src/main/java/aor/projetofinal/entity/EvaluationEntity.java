@@ -1,7 +1,7 @@
 package aor.projetofinal.entity;
 
-import aor.projetofinal.entity.enums.EvaluationStateType;
-import aor.projetofinal.entity.enums.GradeEvaluationType;
+import aor.projetofinal.entity.enums.EvaluationStateEnum;
+import aor.projetofinal.entity.enums.GradeEvaluationEnum;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -27,7 +27,7 @@ public class EvaluationEntity implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "grade", nullable = true)
-    private GradeEvaluationType grade;
+    private GradeEvaluationEnum grade;
 
     @Column(name = "feedback", nullable = true, columnDefinition = "TEXT")
     private String feedback;
@@ -38,7 +38,7 @@ public class EvaluationEntity implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
-    private EvaluationStateType state;
+    private EvaluationStateEnum state;
 
     // Relação Many to One com ciclos
     @ManyToOne
@@ -68,11 +68,11 @@ public class EvaluationEntity implements Serializable {
         this.id = id;
     }
 
-    public GradeEvaluationType getGrade() {
+    public GradeEvaluationEnum getGrade() {
         return grade;
     }
 
-    public void setGrade(GradeEvaluationType grade) {
+    public void setGrade(GradeEvaluationEnum grade) {
         this.grade = grade;
     }
 
@@ -92,11 +92,11 @@ public class EvaluationEntity implements Serializable {
         this.date = date;
     }
 
-    public EvaluationStateType getState() {
+    public EvaluationStateEnum getState() {
         return state;
     }
 
-    public void setState(EvaluationStateType state) {
+    public void setState(EvaluationStateEnum state) {
         this.state = state;
     }
 

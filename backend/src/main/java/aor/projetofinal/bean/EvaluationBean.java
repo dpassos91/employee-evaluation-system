@@ -9,8 +9,8 @@ import aor.projetofinal.dto.UsersWithIncompleteEvaluationsDto;
 import aor.projetofinal.entity.EvaluationCycleEntity;
 import aor.projetofinal.entity.EvaluationEntity;
 import aor.projetofinal.entity.UserEntity;
-import aor.projetofinal.entity.enums.EvaluationStateType;
-import aor.projetofinal.entity.enums.GradeEvaluationType;
+import aor.projetofinal.entity.enums.EvaluationStateEnum;
+import aor.projetofinal.entity.enums.GradeEvaluationEnum;
 import aor.projetofinal.util.JavaConversionUtil;
 
 import jakarta.ejb.Stateless;
@@ -38,7 +38,7 @@ public class EvaluationBean implements Serializable {
     public List<EvaluationOptionsDto> listEvaluationOptions() {
         List<EvaluationOptionsDto> list = new ArrayList<>();
         //GradeEvaluationType.values returns all the enum values as an array:
-        for (GradeEvaluationType evaluation : GradeEvaluationType.values()) {
+        for (GradeEvaluationEnum evaluation : GradeEvaluationEnum.values()) {
             list.add(new EvaluationOptionsDto(
                     //dto enum name
                     evaluation.name(),
@@ -118,12 +118,12 @@ public class EvaluationBean implements Serializable {
 
 
     public boolean revertEvaluationToInEvaluation(EvaluationEntity evaluation) {
-        if (evaluation.getState() != EvaluationStateType.EVALUATED) {
+        if (evaluation.getState() != EvaluationStateEnum.EVALUATED) {
             logger.warn("Cannot revert evaluation ID {} because it's not in EVALUATED state.", evaluation.getId());
             return false;
         }
 
-        evaluation.setState(EvaluationStateType.IN_EVALUATION);
+        evaluation.setState(EvaluationStateEnum.IN_EVALUATION);
         evaluationDao.save(evaluation);
 
         logger.info("Evaluation ID {} reverted to IN_EVALUATION.", evaluation.getId());
@@ -139,7 +139,7 @@ public class EvaluationBean implements Serializable {
                                                      UserEntity evaluator) {
 
 
-        evaluation.setGrade(GradeEvaluationType.getEnumfromGrade(updateEvaluationDto.getGrade()));
+        evaluation.setGrade(GradeEvaluationEnum.getEnumfromGrade(updateEvaluationDto.getGrade()));
         evaluation.setFeedback(updateEvaluationDto.getFeedback());
         evaluation.setDate(LocalDateTime.now());
         evaluation.setEvaluator(evaluator);
@@ -147,9 +147,9 @@ public class EvaluationBean implements Serializable {
 
         // Update the evaluation state only if feedback was provided
         if (updateEvaluationDto.getFeedback() != null && !updateEvaluationDto.getFeedback().trim().isEmpty()) {
-            evaluation.setState(EvaluationStateType.EVALUATED);
+            evaluation.setState(EvaluationStateEnum.EVALUATED);
         } else {
-            evaluation.setState(EvaluationStateType.IN_EVALUATION);
+            evaluation.setState(EvaluationStateEnum.IN_EVALUATION);
         }
 
         evaluationDao.save(evaluation);
