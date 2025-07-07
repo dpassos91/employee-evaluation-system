@@ -48,6 +48,7 @@ const login = async (credentials) => {
       role: data.role,
       firstName: data.firstName,
       lastName: data.lastName,
+      photograph: data.photograph || null, // Pode ser null se não houver foto
     });
 
     // NOVO: Guarda estado do perfil e campos em falta

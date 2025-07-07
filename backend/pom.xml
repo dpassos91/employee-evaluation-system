@@ -105,6 +105,13 @@
             <version>2.17.1</version>
         </dependency>
 
+        <dependency>
+    <groupId>org.jboss.resteasy</groupId>
+    <artifactId>resteasy-multipart-provider</artifactId>
+    <version>6.2.8.Final</version>
+    <scope>provided</scope>
+</dependency>
+
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>

@@ -82,13 +82,16 @@ notifications: {
 profiles: {
   /** @function Export users to CSV */
   exportUsersCsv: `${API_BASE_URL}/profiles/export-users-csv`,
+  getPhoto: (fileName) => `${API_BASE_URL}/profiles/photo/${fileName}`,
   /** @function Get user profile by email */
   getProfileByEmail: (email) => `${API_BASE_URL}/profiles/${encodeURIComponent(email)}`,
   /** @function Get user profile by ID */
   getProfileById: (userId) => `${API_BASE_URL}/profiles/by-id/${userId}`,
   /** @function List users by filters */
   listUsersByFilters: `${API_BASE_URL}/profiles/list-users-by-filters`,
-    /** @function Update user profile by email */
+  /** @function Upload user profile photo */
+  uploadPhoto: (email) => `${API_BASE_URL}/profiles/${email}/upload-photo`,
+  /** @function Update user profile by email */
   update: (email) => `${API_BASE_URL}/profiles/update/${encodeURIComponent(email)}`,
   /** @type {string} Get list of possible usual workplaces */
   usualWorkplaces: `${API_BASE_URL}/profiles/usualworkplaces`,

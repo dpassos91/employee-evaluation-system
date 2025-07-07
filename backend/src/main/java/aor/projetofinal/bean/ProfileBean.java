@@ -188,4 +188,29 @@ public class ProfileBean implements Serializable {
         return true;
     }
 
+    /**
+ * Updates the user's profile photograph by file name (after upload).
+ * This method ensures the operation occurs in a transactional context.
+ *
+ * @param user        The UserEntity whose profile photo is being updated.
+ * @param photoFileName The name (or relative path) of the new photo file.
+ * @return true if updated successfully, false otherwise.
+ */
+public boolean updateProfilePhoto(UserEntity user, String photoFileName) {
+    String email = user != null ? user.getEmail() : "unknown";
+    if (user == null) {
+        logger.warn("User: {} | IP: {} | Email: {} - Attempted to update photo for null user.", RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return false;
+    }
+    ProfileEntity profile = user.getProfile();
+    if (profile == null) {
+        logger.warn("User: {} | IP: {} | Email: {} - No profile entity found for user.", RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return false;
+    }
+    profile.setPhotograph(photoFileName);
+    profileDao.save(profile); // This is safe here; you're inside a @Stateless bean!
+    logger.info("User: {} | IP: {} | Email: {} - Profile photo updated to '{}'.", RequestContext.getAuthor(), RequestContext.getIp(), email, photoFileName);
+    return true;
+}
+
 }

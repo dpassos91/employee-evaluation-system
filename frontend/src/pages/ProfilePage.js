@@ -54,6 +54,13 @@ export default function ProfilePage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Photo upload states
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isPreviewModalOpen, setPreviewModalOpen] = useState(false);
+  const photoUrl = profileAPI.getPhoto(profile?.photograph);
+
   // True if current user is viewing own profile or is admin (can edit)
   const canEdit = user?.role === "ADMIN" || String(user?.id) === String(userId);
 
@@ -157,6 +164,7 @@ export default function ProfilePage() {
       // Use the profile owner's email if editing another user's profile, otherwise use the logged-in user's email
       const emailToUpdate = profileOwnerEmail || user.email;
       await profileAPI.updateProfile(emailToUpdate, profile, sessionToken);
+      console.log("Profile updated:", profile);
       toast.success(
         formatMessage({
           id: "profile.update.success",
@@ -170,9 +178,9 @@ export default function ProfilePage() {
       if (String(user?.id) === String(userId) && profile) {
         setUser({
           ...user,
-          firstName: profile.firstName, // Update first name
-          lastName: profile.lastName,   // Update last name
-          // Add more fields here if you want other profile info synced to global user state
+          firstName: profile.firstName, 
+          lastName: profile.lastName,   
+          photograph: profile.photograph
         });
       }
     } catch (err) {
@@ -229,6 +237,52 @@ export default function ProfilePage() {
       </PageLayout>
     );
 
+ /**
+ * Handles photo file selection and opens preview modal.
+ * @param {Event} e - Input file change event
+ */
+const handlePhotoChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    setSelectedPhoto(file);
+    setPhotoPreview(URL.createObjectURL(file)); // Show preview
+    setPreviewModalOpen(true); // <-- ABRE MODAL AUTOMATICAMENTE
+  }
+};
+
+/**
+ * Handles uploading the selected photo to the backend server.
+ * Uses FormData to send the file via multipart/form-data POST request.
+ * On success, refreshes the profile to show the new photo.
+ */
+const handlePhotoUpload = async () => {
+  if (!selectedPhoto) {
+    toast.error("Por favor selecione uma foto primeiro.");
+    return;
+  }
+  setIsUploading(true);
+  try {
+    const sessionToken = sessionStorage.getItem("authToken");
+    const emailToUpdate = profileOwnerEmail || user.email;
+    const response = await profileAPI.uploadPhoto(emailToUpdate, selectedPhoto, sessionToken);
+    toast.success("Foto atualizada com sucesso!");
+
+    setUser({
+      ...user,
+      photograph: response.fileName // isto vem do backend no JSON!
+    });
+    
+    setPhotoPreview(null);
+    setSelectedPhoto(null);
+    await fetchProfile(); // Atualiza o perfil com a nova foto
+  } catch (err) {
+    toast.error("Erro ao fazer upload da foto!");
+  } finally {
+    setIsUploading(false);
+  }
+};
+
+
   return (
     <PageLayout>
       <section className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
@@ -237,41 +291,67 @@ export default function ProfilePage() {
           <h2 className="text-3xl font-bold text-center mb-2 w-full">
             <FormattedMessage id="profile.title" defaultMessage="Profile" />
           </h2>
-          <div className="w-28 h-28 rounded-full overflow-hidden mb-8 border-2 border-[#D41C1C] bg-white mx-auto mt-10">
-            <img
-              src={profile.photograph || profilePlaceholder}
-              alt="Profile"
-              className="object-cover w-full h-full"
-            />
+<div className="w-28 h-28 rounded-full overflow-hidden border-2 border-[#D41C1C] bg-white flex items-center justify-center">
+            {console.log('profile.photograph:', profile.photograph)}
+
+<img
+  src={
+    profile.photograph && profile.photograph.trim() !== ""
+      ? photoUrl
+      : profilePlaceholder
+  }
+  alt="Profile"
+      className="w-full h-full object-cover"
+    style={{ display: "block" }}
+  onError={(e) => {
+    e.target.onerror = null; // remove loop
+    e.target.src = profilePlaceholder;
+  }}
+/>
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col gap-3 w-full mt-6">
-            {canEdit ? (
-              <>
-                <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
-                  <FormattedMessage id="profile.changePhoto" defaultMessage="Change Photo" />
-                </AppButton>
-                <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
-                  <FormattedMessage id="profile.trainingHistory" defaultMessage="Training History" />
-                </AppButton>
-                <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
-                  <FormattedMessage id="profile.evaluationHistory" defaultMessage="Evaluation History" />
-                </AppButton>
-              </>
-            ) : (
-              // If not edit, show "Send Message" only
-              <AppButton
-                variant="primary"
-                className="w-full px-3 py-1.5 text-sm justify-center text-center"
-                onClick={handleSendMessage}
-              >
-                <ChatBubbleBottomCenterTextIcon className="w-5 h-5 mr-2" />
-                <FormattedMessage id="profile.message" defaultMessage="Send Message" />
-              </AppButton>
-            )}
-          </div>
-        </div>
+<div className="flex flex-col gap-3 w-full mt-6">
+  {canEdit ? (
+    <>
+      {/* Hidden file input */}
+      <input
+        id="profile-photo-input"
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handlePhotoChange}
+      />
+      {/* Change Photo Button */}
+      <AppButton
+        variant="secondary"
+        className="w-full px-3 py-1.5 text-sm justify-center text-center"
+        onClick={() => document.getElementById("profile-photo-input").click()}
+        disabled={isUploading}
+      >
+        <FormattedMessage id="profile.changePhoto" defaultMessage="Change Photo" />
+      </AppButton>
+
+      <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
+        <FormattedMessage id="profile.trainingHistory" defaultMessage="Training History" />
+      </AppButton>
+      <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
+        <FormattedMessage id="profile.evaluationHistory" defaultMessage="Evaluation History" />
+      </AppButton>
+    </>
+  ) : (
+    // If not edit, show "Send Message" only
+    <AppButton
+      variant="primary"
+      className="w-full px-3 py-1.5 text-sm justify-center text-center"
+      onClick={handleSendMessage}
+    >
+      <ChatBubbleBottomCenterTextIcon className="w-5 h-5 mr-2" />
+      <FormattedMessage id="profile.message" defaultMessage="Send Message" />
+    </AppButton>
+  )}
+</div>
+</div>
 
         {/* Column 2: Form / Info */}
         <div className="flex flex-col w-full pl-12">
@@ -497,6 +577,55 @@ export default function ProfilePage() {
           </Modal>
         </div>
       </section>
+<Modal
+  isOpen={!!photoPreview}
+  onClose={() => {
+    setPhotoPreview(null);
+    setSelectedPhoto(null);
+  }}
+  // Centered title with bold text
+  title={
+    <div className="w-full text-center font-bold">
+      <FormattedMessage id="profile.previewPhoto" defaultMessage="Preview Photo" />
+    </div>
+  }
+>
+  {photoPreview && (
+    <img
+      src={photoPreview}
+      alt="Preview"
+      className="w-48 h-48 rounded-full border-2 object-cover mx-auto my-4"
+    />
+  )}
+
+  {/* Centered buttons */}
+  <div className="flex justify-center gap-3 mt-4">
+    <AppButton
+      variant="secondary"
+      onClick={() => {
+        setPhotoPreview(null);
+        setSelectedPhoto(null);
+      }}
+    >
+      <FormattedMessage id="modal.cancel" defaultMessage="Cancel" />
+    </AppButton>
+    <AppButton
+      variant="secondary"
+      onClick={() => document.getElementById("profile-photo-input").click()}
+    >
+      <FormattedMessage id="profile.chooseOtherPhoto" defaultMessage="Choose Another Photo" />
+    </AppButton>
+    <AppButton
+      variant="primary"
+      onClick={handlePhotoUpload}
+      disabled={isUploading}
+    >
+      {isUploading
+        ? <FormattedMessage id="profile.uploading" defaultMessage="Uploading..." />
+        : <FormattedMessage id="profile.savePhoto" defaultMessage="Save Photo" />}
+    </AppButton>
+  </div>
+</Modal>
     </PageLayout>
   );
 }

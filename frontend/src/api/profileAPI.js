@@ -16,6 +16,16 @@ import { apiConfig } from './apiConfig.js';
 const { apiCall, API_ENDPOINTS } = apiConfig;
 
 /**
+ * Obtém o URL da foto de perfil pelo nome do ficheiro.
+ * @param {string} fileName - O nome do ficheiro da foto.
+ * @returns {string} URL absoluto para a foto.
+ */
+const getPhoto = (fileName) => {
+  if (!fileName || fileName.trim() === "") return null;
+  return `${apiConfig.API_ENDPOINTS.profiles.getPhoto(fileName)}?t=${Date.now()}`;
+};
+
+/**
  * Fetches the profile of a user by email.
  * @param {string} email - The user's email address.
  * @param {string} sessionToken - The session token for authorization.
@@ -73,6 +83,41 @@ const listUsersByFilters = async (filters, sessionToken) => {
 };
 
 /**
+ * Uploads a profile photo for the user.
+ * @param {string} email - The user's email.
+ * @param {File} file - The selected photo file.
+ * @param {string} sessionToken - The session token.
+ * @returns {Promise<Object>} The API response.
+ */
+const uploadPhoto = async (email, file, sessionToken) => {
+  const url = API_ENDPOINTS.profiles.uploadPhoto(email);
+
+  const formData = new FormData();
+  formData.append("photo", file, file.name);      // Nome do campo tem de bater com o backend!
+  formData.append("fileName", file.name);
+
+  // IMPORTANTE: Não definas 'Content-Type', o browser faz isso por ti com FormData!
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      sessionToken,
+      // NÃO ponhas 'Content-Type'
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    // Aqui podes fazer melhor handling de erro se quiseres
+    throw new Error('Failed to upload photo');
+  }
+
+  return await response.json();
+};
+
+
+
+/**
  * Updates the profile for a given user email.
  * @param {string} email - The user's email.
  * @param {Object} profileData - The profile data to update.
@@ -91,9 +136,11 @@ const updateProfile = async (email, profileData, sessionToken) => {
 };
 
 export const profileAPI = {
+  getPhoto,
   getProfileByEmail,
   getProfileById,
   getUsualWorkplaces,
   listUsersByFilters,
   updateProfile,
+  uploadPhoto,
 };

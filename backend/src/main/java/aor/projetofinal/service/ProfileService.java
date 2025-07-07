@@ -11,6 +11,7 @@ import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.UsualWorkPlaceType;
 import aor.projetofinal.util.JavaConversionUtil;
 import aor.projetofinal.context.RequestContext;
+import aor.projetofinal.dao.ProfileDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -424,4 +425,185 @@ public Response listUsersPaginated(
 
         return options;
     }
+
+    /**
+ * Uploads a new profile photo for the specified user.
+ * Accepts a multipart/form-data POST request containing the photo file (as bytes) and its original filename.
+ * The photo is saved to disk with a unique name, and the ProfileEntity is updated with the file path or URL.
+ *
+ * @param email         The email of the user whose profile photo is being updated.
+ * @param sessionToken  The session token for authentication.
+ * @param form          The multipart form containing the photo and original filename.
+ * @return HTTP 200 if upload succeeds, 400/401/403/500 for errors.
+ */
+@POST
+@Path("/{email}/upload-photo")
+@Consumes(MediaType.MULTIPART_FORM_DATA)
+@Produces(MediaType.APPLICATION_JSON)
+public Response uploadProfilePhoto(
+        @PathParam("email") String email,
+        @HeaderParam("sessionToken") String sessionToken,
+        @org.jboss.resteasy.annotations.providers.multipart.MultipartForm PhotoUploadForm form) {
+
+    logger.info("User: {} | IP: {} - Attempting profile photo upload for user '{}'",
+            RequestContext.getAuthor(), RequestContext.getIp(), email);
+
+    // 1. Validate session token
+    SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
+    if (sessionStatusDto == null) {
+        logger.warn("User: {} | IP: {} - Invalid or expired session while uploading photo for '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return Response.status(401)
+                .entity("{\"message\": \"Session expired. Please log in again.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    // 2. Find user
+    UserEntity user = userDao.findByEmail(email);
+    if (user == null) {
+        logger.warn("User: {} | IP: {} - Tried to upload photo for non-existent user: '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return Response.status(404)
+                .entity("{\"message\": \"User not found.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    // 3. Only user themselves or admin can upload photo
+    UserEntity currentUser = sessionTokenDao.findBySessionToken(sessionToken).getUser();
+    if (!(currentUser.getRole().getName().equalsIgnoreCase("admin") ||
+            currentUser.getEmail().equalsIgnoreCase(user.getEmail()))) {
+        logger.warn("User: {} | IP: {} - Not authorized to upload photo for '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return Response.status(403)
+                .entity("{\"message\": \"Not authorized to upload photo for this user.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    // 4. Check if photo data is present
+    byte[] photoBytes = form.getPhoto();
+    String originalFileName = form.getFileName();
+    if (photoBytes == null || photoBytes.length == 0) {
+        logger.warn("User: {} | IP: {} - No photo data received for '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+        return Response.status(400)
+                .entity("{\"message\": \"No photo uploaded.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    try {
+        // 5. Generate unique filename
+        String fileExtension = (originalFileName != null && originalFileName.contains("."))
+                ? originalFileName.substring(originalFileName.lastIndexOf("."))
+                : ".jpg";
+        String newFileName = "profile_" + user.getId() + "_" + System.currentTimeMillis() + fileExtension;
+
+        // 6. Define directory to save photos (e.g., /var/www/app-photos/ or relative to project)
+        String uploadDir = "C:\\Users\\Diogo Passos\\Desktop\\Acertar o Rumo\\ProjectoFinal\\wildfly-35.0.1.Final\\photos";
+        // Ensure the directory exists
+        java.io.File dir = new java.io.File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
+
+        java.nio.file.Path filePath = java.nio.file.Paths.get(uploadDir, newFileName);
+        java.nio.file.Files.write(filePath, photoBytes);
+
+        logger.info("User: {} | IP: {} - Uploaded photo saved as '{}' ({} bytes).",
+                RequestContext.getAuthor(), RequestContext.getIp(), filePath, photoBytes.length);
+
+        // 7. Update ProfileEntity with the path/URL to the photo
+        ProfileEntity profile = user.getProfile();
+        if (profile == null) {
+            logger.warn("User: {} | IP: {} - No profile found for '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), email);
+            return Response.status(404)
+                    .entity("{\"message\": \"Profile not found for this user.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        profileBean.updateProfilePhoto(user, newFileName);
+
+        logger.info("User: {} | IP: {} - Profile photo path updated for '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+
+        return Response.ok("{\"message\": \"Profile photo uploaded successfully!\", \"fileName\": \"" + newFileName + "\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+
+    } catch (Exception e) {
+        logger.error("User: {} | IP: {} - Error saving photo for '{}': {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), email, e.getMessage());
+        return Response.status(500)
+                .entity("{\"message\": \"Error saving photo.\", \"error\": true}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+}
+
+/**
+ * Serves the user's profile photo by file name.
+ * Requires a valid session token (authenticated user).
+ * Automatically refreshes the session token as in other endpoints.
+ *
+ * Example usage:
+ *   GET /rest/profiles/photo/{fileName}
+ *   Header: sessionToken: {token}
+ *
+ * @param fileName The name of the photo file to serve (as saved in the ProfileEntity).
+ * @param sessionToken The session token for authentication (header).
+ * @return HTTP 200 with the image bytes, 401 if not authenticated, or 404 if not found.
+ */
+@GET
+@Path("/photo/{fileName}")
+@Produces({"image/jpeg", "image/png", "image/gif"})
+public Response getProfilePhoto(
+        @PathParam("fileName") String fileName) {
+    logger.info("User: {} | IP: {} - Attempting to fetch profile photo '{}'.",
+            RequestContext.getAuthor(), RequestContext.getIp(), fileName);
+
+
+    // 2. Build absolute file path
+    String uploadDir = "C:\\Users\\Diogo Passos\\Desktop\\Acertar o Rumo\\ProjectoFinal\\wildfly-35.0.1.Final\\photos";
+    java.io.File file = new java.io.File(uploadDir, fileName);
+
+    // 3. Validate file existence
+    if (!file.exists() || !file.isFile()) {
+        logger.warn("User: {} | IP: {} - Profile photo '{}' not found.",
+                RequestContext.getAuthor(), RequestContext.getIp(), fileName);
+        return Response.status(404)
+                .entity("{\"message\": \"Profile photo not found.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+    // 4. Determine image type by extension
+    String contentType = "image/jpeg";
+    if (fileName.toLowerCase().endsWith(".png")) {
+        contentType = "image/png";
+    } else if (fileName.toLowerCase().endsWith(".gif")) {
+        contentType = "image/gif";
+    }
+
+    try {
+        logger.info("User: {} | IP: {} - Serving profile photo '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), fileName);
+
+        // 5. Stream the file to the client
+        return Response.ok(file, contentType)
+                .header("Content-Disposition", "inline; filename=\"" + fileName + "\"")
+                .build();
+    } catch (Exception e) {
+        logger.error("User: {} | IP: {} - Error serving profile photo '{}': {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), fileName, e.getMessage());
+        return Response.status(500)
+                .entity("{\"message\": \"Error serving profile photo.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+}
+
+
 }

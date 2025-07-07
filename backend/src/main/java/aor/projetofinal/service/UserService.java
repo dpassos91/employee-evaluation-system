@@ -30,16 +30,11 @@ public class UserService {
     @Inject
     UserBean userBean;
 
-   // @Inject
-   // EmailUtil emailUtil;
     @Inject
     private SessionTokenDao sessionTokenDao;
+    
     @Inject
     private UserDao userDao;
-
-
-    //@Inject
-    //Notifier notifier;
 
 /**
      * Updates the user's password.
@@ -587,17 +582,5 @@ public Response logoutUser(@HeaderParam("Authorization") String authorization) {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
