@@ -227,6 +227,8 @@ public class EvaluationService {
                     .build();
         }
 
+
+
         // verifies permissions
         boolean isAdmin = evaluator.getRole().getName().equalsIgnoreCase("admin");
         boolean isManager = evaluated.getManager() != null &&
@@ -256,6 +258,24 @@ public class EvaluationService {
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
+
+        // check if the cycle is close so that the evaluated user can see his evaluation
+
+        boolean isEvaluatedUser = evaluated.getEmail().equalsIgnoreCase(evaluator.getEmail());
+        boolean isEvaluationClosed = evaluation.getState() == EvaluationStateType.CLOSED;
+        boolean isCycleClosed = !evaluation.getCycle().isActive();
+
+        if (isEvaluatedUser && (!isEvaluationClosed || !isCycleClosed)) {
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"You can only view your evaluation after the cycle has officially ended.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+
+
+
 
         // build UpdateEvaluationDto to send to the frontend
         UpdateEvaluationDto dto = new UpdateEvaluationDto();
@@ -344,7 +364,7 @@ public class EvaluationService {
     }
 
 
-    
+
 
     @PUT
     @Path("/update-evaluation")
@@ -393,7 +413,12 @@ public class EvaluationService {
                     .build();
         }
 
-
+        if (evaluation.getState() == EvaluationStateType.CLOSED) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("{\"message\": \"This evaluation is closed and cannot be modified.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
 
 
 //verify if the evaluator is allowed to evaluate the evaluated user,
