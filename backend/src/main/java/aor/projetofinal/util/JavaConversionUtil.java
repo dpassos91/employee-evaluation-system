@@ -238,6 +238,34 @@ public class JavaConversionUtil {
     }
 
     /**
+     * Converts a closed EvaluationEntity into a flat DTO for listing in the user's evaluation history.
+     *
+     * @param evaluation The closed evaluation entity.
+     * @return A flat DTO containing cycle number, date, grade, and evaluation ID.
+     */
+    public static FlatEvaluationHistoryDto convertToFlatHistoryDto(EvaluationEntity evaluation) {
+        if (evaluation == null || evaluation.getCycle() == null || evaluation.getGrade() == null) {
+            return null;
+        }
+
+        FlatEvaluationHistoryDto dto = new FlatEvaluationHistoryDto();
+        dto.setEvaluationId(evaluation.getId());
+        dto.setCycleNumber(evaluation.getCycle().getId().intValue());
+
+        if (evaluation.getDate() != null) {
+            dto.setEvaluationDate(evaluation.getDate().toLocalDate().toString()); // yyyy-MM-dd
+        }
+
+        dto.setGrade(evaluation.getGrade().getGrade());
+
+        return dto;
+    }
+
+
+
+
+
+    /**
      * Converts a UserEntity to a UserDto.
      *
      * @param userEntity The UserEntity to convert.

@@ -74,6 +74,31 @@ public class EvaluationBean implements Serializable {
     }
 
 
+    /**
+     * Returns a paginated history of closed evaluations for the given user.
+     * Evaluations are filtered by state CLOSED and cycle inactive, and ordered by date (most recent first).
+     *
+     * @param evaluated The user whose evaluation history is being requested.
+     * @param page      The page number requested (1-based).
+     * @return A PaginatedEvaluationHistoryDto containing evaluations and pagination metadata.
+     */
+    public PaginatedEvaluationHistoryDto getEvaluationHistory(UserEntity evaluated, int page) {
+        int pageSize = 10;
+        int offsetPage = (page < 1) ? 1 : page;
+
+        List<EvaluationEntity> results = evaluationDao.findClosedByEvaluatedPaginated(evaluated, offsetPage, pageSize);
+        long totalCount = evaluationDao.countClosedByEvaluated(evaluated);
+
+        List<FlatEvaluationHistoryDto> dtos = new ArrayList<>();
+        for (EvaluationEntity entity : results) {
+            FlatEvaluationHistoryDto dto = JavaConversionUtil.convertToFlatHistoryDto(entity);
+            if (dto != null) dtos.add(dto);
+        }
+
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+        return new PaginatedEvaluationHistoryDto(dtos, totalCount, totalPages, offsetPage);
+    }
 
 
 

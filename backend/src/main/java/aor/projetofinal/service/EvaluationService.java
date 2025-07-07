@@ -16,6 +16,7 @@ import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.EvaluationStateType;
 import aor.projetofinal.util.JavaConversionUtil;
+import aor.projetofinal.util.PdfExportUtil;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -48,7 +49,7 @@ public class EvaluationService {
 
     @Inject
     private EvaluationDao evaluationDao;
-    
+
 
     @Inject
     private SessionTokenDao sessionTokenDao;
@@ -224,6 +225,143 @@ public class EvaluationService {
     }
 
 
+    /**
+     * Exports a single closed evaluation to a PDF file.
+     * Only accessible to the evaluated user or an admin.
+     *
+     * @param sessionToken The session token of the requester
+     * @param id           The ID of the evaluation to export
+     * @return A PDF file or appropriate error response
+     */
+    @GET
+    @Path("/export-pdf")
+    @Produces("application/pdf")
+    public Response exportEvaluationToPdf(
+            @HeaderParam("sessionToken") String sessionToken,
+            @QueryParam("id") Long id
+    ) {
+        // 1. Validate session
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("Session expired or invalid.")
+                    .build();
+        }
+
+        UserEntity requester = tokenEntity.getUser();
+
+        // 2. Load evaluation
+        EvaluationEntity evaluation = evaluationDao.findById(id);
+        if (evaluation == null) {
+            logger.warn("User: {} | IP: {} - Tried to export non-existent evaluation ID {}.",
+                    requester.getEmail(), RequestContext.getIp(), id);
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Evaluation not found.")
+                    .build();
+        }
+
+        // 3. Validate that it's closed and cycle inactive
+        boolean isClosed = evaluation.getState() == EvaluationStateType.CLOSED;
+        boolean cycleEnded = evaluation.getCycle() != null && !evaluation.getCycle().isActive();
+
+        if (!isClosed || !cycleEnded) {
+            logger.warn("User: {} | IP: {} - Tried to export incomplete evaluation ID {}.",
+                    requester.getEmail(), RequestContext.getIp(), id);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Evaluation is not yet closed.")
+                    .build();
+        }
+
+        // 4. Validate permission: admin or self
+        boolean isAdmin = requester.getRole().getName().equalsIgnoreCase("ADMIN");
+        boolean isSelf = evaluation.getEvaluated().getEmail().equalsIgnoreCase(requester.getEmail());
+
+        if (!isAdmin && !isSelf) {
+            logger.warn("User: {} | IP: {} - Unauthorized export attempt of evaluation ID {}.",
+                    requester.getEmail(), RequestContext.getIp(), id);
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("You are not authorized to access this evaluation.")
+                    .build();
+        }
+
+        // 5. Generate PDF (you will implement this part)
+        byte[] pdfBytes = PdfExportUtil.buildEvaluationPdf(evaluation); // <- implementa isto à parte
+
+        return Response.ok(pdfBytes)
+                .header("Content-Disposition", "attachment; filename=evaluation_" + id + ".pdf")
+                .type("application/pdf")
+                .build();
+    }
+
+
+
+
+
+    /**
+     * Returns the paginated history of closed evaluations for a given user.
+     * Only accessible to the evaluated user themselves, their current manager, or an admin.
+     *
+     * @param sessionToken  The session token of the requester
+     * @param email         The email of the evaluated user (whose history is being requested)
+     * @param page          The page number (default = 1)
+     * @return JSON response with paginated evaluation history or error
+     */
+    @GET
+    @Path("/history")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getEvaluationHistory(
+            @HeaderParam("sessionToken") String sessionToken,
+            @QueryParam("email") String email,
+            @QueryParam("page") @DefaultValue("1") int page
+    ) {
+        // 1. Validate session
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("Unauthorized request to evaluation history.");
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity requester = tokenEntity.getUser();
+
+        // 2. Load evaluated user
+        UserEntity evaluated = userDao.findByEmail(email);
+        if (evaluated == null) {
+            logger.warn("User: {} | IP: {} - Attempted to access history of non-existent user {}.",
+                    requester.getEmail(), RequestContext.getIp(), email);
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"message\": \"Evaluated user not found.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // 3. Check access rights
+        boolean isSelf = evaluated.getEmail().equalsIgnoreCase(requester.getEmail());
+        boolean isAdmin = requester.getRole().getName().equalsIgnoreCase("ADMIN");
+        boolean isManager = evaluated.getManager() != null &&
+                evaluated.getManager().getEmail().equalsIgnoreCase(requester.getEmail());
+
+        if (!isSelf && !isManager && !isAdmin) {
+            logger.warn("User: {} | IP: {} - Access denied to evaluation history of {}.",
+                    requester.getEmail(), RequestContext.getIp(), evaluated.getEmail());
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"You are not allowed to view this user's evaluation history.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // 4. Load paginated history
+        PaginatedEvaluationHistoryDto dto = evaluationBean.getEvaluationHistory(evaluated, page);
+
+        logger.info("User: {} | IP: {} - Accessed evaluation history of {} (Page {}).",
+                requester.getEmail(), RequestContext.getIp(), evaluated.getEmail(), page);
+
+        return Response.ok(dto)
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
 
 
 

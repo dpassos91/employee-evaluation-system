@@ -42,6 +42,30 @@ public class EvaluationDao {
 
 
     /**
+     * Counts the number of closed evaluations for a specific user,
+     * considering only evaluations from inactive cycles.
+     *
+     * @param evaluated The user being evaluated.
+     * @return The total number of evaluations that match the criteria.
+     */
+    public long countClosedByEvaluated(UserEntity evaluated) {
+        TypedQuery<Long> query = em.createQuery(
+                "SELECT COUNT(e) FROM EvaluationEntity e " +
+                        "WHERE e.evaluated = :evaluated " +
+                        "AND e.state = aor.projetofinal.entity.enums.EvaluationStateType.CLOSED " +
+                        "AND e.cycle.active = false",
+                Long.class
+        );
+
+        query.setParameter("evaluated", evaluated);
+        return query.getSingleResult();
+    }
+
+
+
+
+
+    /**
      * Counts the total number of evaluations matching the given filter criteria.
      * Applies the same visibility rules as in paginated queries.
      *
@@ -148,6 +172,35 @@ public class EvaluationDao {
         }
     }
 
+
+
+    /**
+     * Returns a paginated list of evaluations where the given user is the evaluated person,
+     * and the evaluations are CLOSED and from an inactive cycle.
+     *
+     * @param evaluated The user being evaluated.
+     * @param page      Page number (1-based).
+     * @param pageSize  Number of results per page.
+     * @return A list of EvaluationEntity.
+     */
+    public List<EvaluationEntity> findClosedByEvaluatedPaginated(UserEntity evaluated, int page, int pageSize) {
+        TypedQuery<EvaluationEntity> query = em.createQuery(
+                "SELECT e FROM EvaluationEntity e " +
+                        "WHERE e.evaluated = :evaluated " +
+                        "AND e.state = aor.projetofinal.entity.enums.EvaluationStateType.CLOSED " +
+                        "AND e.cycle.active = false " +
+                        "ORDER BY e.date DESC", // most recent evaluations first
+                EvaluationEntity.class
+        );
+
+        query.setParameter("evaluated", evaluated);
+
+        int offset = (page > 0 ? page - 1 : 0) * pageSize;
+        query.setFirstResult(offset);
+        query.setMaxResults(pageSize);
+
+        return query.getResultList();
+    }
 
 
 
