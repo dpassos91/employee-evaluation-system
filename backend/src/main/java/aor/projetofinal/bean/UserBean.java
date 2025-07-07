@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Stateless
@@ -50,7 +51,6 @@ public class UserBean implements Serializable {
 
     @Inject
     private EvaluationCycleDao evaluationCycleDao;
-
 
 
     @EJB
@@ -117,13 +117,101 @@ public class UserBean implements Serializable {
         return true;
     }
 
+    /**
+     * Assigns a random eligible manager to the given user.
+     * Eligible managers are confirmed, active users who are not admins, not the user themselves,
+     * and not the user's current manager.
+     * If no eligible manager is available, the method returns null.
+     * If the selected manager has only USER role, they are promoted to MANAGER automatically.
+     * If the user has an active evaluation, the evaluator is updated accordingly.
+     *
+     * @param userEmail The email of the user to whom a random manager should be assigned.
+     * @return The UserEntity of the newly assigned manager, or null if assignment failed.
+     */
+    public UserEntity assignRandomManagerToUser(String userEmail) {
+        UserEntity user = userDao.findByEmail(userEmail);
+        if (user == null) {
+            logger.warn(
+                    "User: {} | IP: {} - Random manager assignment failed: user {} not found.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    userEmail
+            );
+            return null;
+        }
+
+        UserEntity currentManager = user.getManager();
 
 
+        // Get eligible managers (confirmed, active, non-admin, not the user or current manager)
+        List<UserEntity> eligibleManagers = userDao.findSuitableManager(user, currentManager);
+        if (eligibleManagers.isEmpty()) {
+            logger.warn(
+                    "User: {} | IP: {} - No eligible managers available to assign to user {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    userEmail
+            );
+            return null;
+        }
 
+        // Select a random eligible manager
+        UserEntity chosenManager = eligibleManagers.get(new Random().nextInt(eligibleManagers.size()));
 
+        // Promote to MANAGER if still USER
+        if (chosenManager.getRole().getName().equalsIgnoreCase("user")) {
+            RoleEntity managerRole = roleDao.findByName("MANAGER");
+            if (managerRole != null) {
+                chosenManager.setRole(managerRole);
+                userDao.save(chosenManager);
+                logger.info(
+                        "User: {} | IP: {} - User {} promoted to MANAGER for random assignment.",
+                        RequestContext.getAuthor(),
+                        RequestContext.getIp(),
+                        chosenManager.getEmail()
+                );
+            } else {
+                logger.error(
+                        "User: {} | IP: {} - Role 'MANAGER' not found. Cannot promote {}.",
+                        RequestContext.getAuthor(),
+                        RequestContext.getIp(),
+                        chosenManager.getEmail()
+                );
+                return null;
+            }
+        }
 
+        // Assign manager to user
+        user.setManager(chosenManager);
+        userDao.save(user);
 
+        logger.info(
+                "User: {} | IP: {} - User {} assigned to random manager {}.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                user.getEmail(),
+                chosenManager.getEmail()
+        );
 
+        // Update evaluation if in active cycle
+        EvaluationCycleEntity activeCycle = evaluationCycleDao.findActiveCycle();
+        if (activeCycle != null) {
+            EvaluationEntity evaluation = evaluationDao.findEvaluationByCycleAndUser(activeCycle, user);
+            if (evaluation != null) {
+                evaluation.setEvaluator(chosenManager);
+                evaluationDao.save(evaluation);
+                logger.info(
+                        "User: {} | IP: {} - Evaluation evaluator updated to {} for user {} in active cycle.",
+                        RequestContext.getAuthor(),
+                        RequestContext.getIp(),
+                        chosenManager.getEmail(),
+                        user.getEmail()
+                );
+            }
+        }
+
+        return chosenManager;
+    }
 
 
     /**
@@ -520,13 +608,6 @@ public class UserBean implements Serializable {
     }
 
 
-
-
-
-
-
-
-
     /**
      * Hashes the given plain text password using the BCrypt algorithm.
      * Logs the operation for traceability. The default BCrypt strength is 10 (2^10 = 1024 iterations).
@@ -543,7 +624,6 @@ public class UserBean implements Serializable {
         return BCrypt.hashpw(password, BCrypt.gensalt());
         // default value at gensalt will be 10: it means the cryptography algorithm bcrypt is gonna iterate 2^10 = 1024 times in order to hash
     }
-
 
 
     /**
@@ -595,7 +675,6 @@ public class UserBean implements Serializable {
 
         return user.isConfirmed();
     }
-
 
 
     /**
@@ -718,11 +797,6 @@ public class UserBean implements Serializable {
     }
 
 
-
-
-
-
-
     /**
      * Authenticates a user based on provided login credentials and generates a new session token if successful.
      * Logs every authentication step and outcome for audit and security purposes.
@@ -832,6 +906,114 @@ public class UserBean implements Serializable {
         return false;
     }
 
+
+
+    /**
+     * Promotes a specified user to ADMIN role. This action is restricted to existing admins.
+     * Upon promotion:
+     * - The user's role is updated to ADMIN;
+     * - Any users under their management are reassigned to random eligible managers;
+     * - If the user was being evaluated in the active cycle, that evaluation is deleted.
+     *
+     * @param admin           The admin performing the promotion.
+     * @param emailToPromote  The email of the user to promote to admin.
+     * @return true if promotion was successful or user is already admin, false if validation failed.
+     */
+    public boolean promoteUserToAdmin(UserEntity admin, String emailToPromote) {
+        // Ensure current user has admin privileges
+        if (!admin.getRole().getName().equalsIgnoreCase("admin")) {
+            logger.warn(
+                    "User: {} | IP: {} - Unauthorized attempt to promote {}.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    emailToPromote
+            );
+            return false;
+        }
+
+        // 2. Find the target user
+        UserEntity user = userDao.findByEmail(emailToPromote);
+        if (user == null) {
+            logger.warn(
+                    "User: {} | IP: {} - Promotion failed: user with email {} not found.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    emailToPromote
+            );
+            return false;
+        }
+
+        // Skip if already admin
+        if (user.getRole().getName().equalsIgnoreCase("admin")) {
+            logger.info(
+                    "User: {} | IP: {} - User {} is already an admin. No changes made.",
+                    RequestContext.getAuthor(),
+                    RequestContext.getIp(),
+                    emailToPromote
+            );
+            return true;
+        }
+
+
+        // Promote to ADMIN role
+        user.setRole(roleDao.findByName("ADMIN")); // Assume que tens RoleDao
+        userDao.save(user);
+        logger.info(
+                "User: {} | IP: {} - User {} successfully promoted to ADMIN.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                emailToPromote
+        );
+
+        // Reassign users previously managed by the promoted user
+        List<UserEntity> managedUsers = userDao.findUsersByManager(user);
+        for (UserEntity managed : managedUsers) {
+            UserEntity newManager = assignRandomManagerToUser(managed.getEmail());
+            if (newManager == null) {
+                logger.warn(
+                        "User: {} | IP: {} - Failed to assign new manager to {} after promotion.",
+                        RequestContext.getAuthor(),
+                        RequestContext.getIp(),
+                        managed.getEmail()
+                );
+            } else {
+                logger.info(
+                        "User: {} | IP: {} - User {} reassigned to new manager {}.",
+                        RequestContext.getAuthor(),
+                        RequestContext.getIp(),
+                        managed.getEmail(),
+                        newManager.getEmail()
+                );
+            }
+        }
+        logger.info(
+                "User: {} | IP: {} - {} users were reassigned after {} lost management responsibilities.",
+                RequestContext.getAuthor(),
+                RequestContext.getIp(),
+                managedUsers.size(),
+                emailToPromote
+        );
+
+        // Remove evaluation if user is being evaluated in the active cycle
+        EvaluationCycleEntity activeCycle = evaluationCycleDao.findActiveCycle();
+        if (activeCycle != null) {
+            EvaluationEntity evaluation = evaluationDao.findEvaluationByCycleAndUser(activeCycle, user);
+            if (evaluation != null) {
+                evaluationDao.deleteEvaluation(evaluation);
+                logger.info(
+                        "User: {} | IP: {} - Evaluation of {} in active cycle {} was deleted due to promotion.",
+                        RequestContext.getAuthor(),
+                        RequestContext.getIp(),
+                        emailToPromote,
+                        activeCycle.getId()
+                );
+            }
+        }
+
+        return true;
+    }
+
+
     /**
      * Registers a new user using the provided login credentials.
      * Performs validation against existing emails, assigns the default role, creates a user profile,
@@ -840,7 +1022,7 @@ public class UserBean implements Serializable {
      * @param loginUserDto The user's registration credentials (email and raw password).
      * @return A UserDto representing the newly created user.
      * @throws EmailAlreadyExistsException if the provided email is already associated with an existing user.
-     * @throws IllegalStateException if the default "USER" role is not configured in the system.
+     * @throws IllegalStateException       if the default "USER" role is not configured in the system.
      */
     public UserDto registerUser(LoginUserDto loginUserDto) throws EmailAlreadyExistsException {
         logger.info(
@@ -916,7 +1098,7 @@ public class UserBean implements Serializable {
         return new UserDto(user);
     }
 
-            /**
+    /**
      * Resets the password of the given user profile.
      *
      * @param currentProfile The UserEntity whose password is to be reset.
@@ -944,7 +1126,7 @@ public class UserBean implements Serializable {
      * and clears the recovery token upon success. Logs all outcomes for audit and security.
      *
      * @param forgottenPassToken The password recovery token provided by the user.
-     * @param newPassword The new plain text password to be securely hashed and saved.
+     * @param newPassword        The new plain text password to be securely hashed and saved.
      * @return true if the password was successfully reset; false otherwise.
      */
     public boolean resetPasswordWithToken(String forgottenPassToken, String newPassword) {
@@ -997,7 +1179,6 @@ public class UserBean implements Serializable {
     }
 
 
-
     /**
      * Validates the provided session token and refreshes its expiration if it is still valid.
      * Logs the session validation, expiration checks, and any token refresh activity for auditing purposes.
@@ -1037,7 +1218,6 @@ public class UserBean implements Serializable {
         }
 
 
-
         UserEntity user = sessionTokenEntity.getUser();
         if (user == null || sessionTokenEntity.getExpiryDate() == null || sessionTokenEntity.getExpiryDate().isBefore(LocalDateTime.now()) || !user.isActive()) {
             if (user != null) {
@@ -1069,9 +1249,7 @@ public class UserBean implements Serializable {
                     RequestContext.getIp(),
                     user.getEmail()
             );
-        }
-
-        else {
+        } else {
             logger.info(
                     "User: {} | IP: {} - Session token is still valid for user: {}. No refresh needed.",
                     RequestContext.getAuthor(),
@@ -1084,53 +1262,54 @@ public class UserBean implements Serializable {
     }
 
     /**
- * Finds the user associated with a valid session token.
- * Returns null if token is invalid or user not found.
- */
-public UserEntity findUserBySessionToken(String sessionToken) {
-    if (sessionToken == null || sessionToken.isBlank()) {
-        logger.warn("User: {} | IP: {} - Attempted to find user by null or blank session token.",
-                RequestContext.getAuthor(), RequestContext.getIp());
-        return null;
+     * Finds the user associated with a valid session token.
+     * Returns null if token is invalid or user not found.
+     */
+    public UserEntity findUserBySessionToken(String sessionToken) {
+        if (sessionToken == null || sessionToken.isBlank()) {
+            logger.warn("User: {} | IP: {} - Attempted to find user by null or blank session token.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
+            return null;
+        }
+        UserEntity user = userDao.findBySessionToken(sessionToken);
+        if (user == null) {
+            logger.warn("User: {} | IP: {} - No user found for session token: {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), sessionToken);
+        } else {
+            logger.info("User: {} | IP: {} - User found for session token.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
+        }
+        return user;
     }
-    UserEntity user = userDao.findBySessionToken(sessionToken);
-    if (user == null) {
-        logger.warn("User: {} | IP: {} - No user found for session token: {}.",
-                RequestContext.getAuthor(), RequestContext.getIp(), sessionToken);
-    } else {
-        logger.info("User: {} | IP: {} - User found for session token.",
-                RequestContext.getAuthor(), RequestContext.getIp());
-    }
-    return user;
-}
 
-/**
- * Finds the user ID associated with a valid session token.
- * Returns null if token is invalid or user not found.
- */
-public Integer findUserIdBySessionToken(String sessionToken) {
-    UserEntity user = findUserBySessionToken(sessionToken);
-    if (user != null) {
-        logger.info("User: {} | IP: {} - UserId {} found for session token.", RequestContext.getAuthor(), RequestContext.getIp(), user.getId());
-        return user.getId();
-    } else {
-        logger.warn("User: {} | IP: {} - No UserId found for session token: {}.", RequestContext.getAuthor(), RequestContext.getIp(), sessionToken);
-        return null;
+    /**
+     * Finds the user ID associated with a valid session token.
+     * Returns null if token is invalid or user not found.
+     */
+    public Integer findUserIdBySessionToken(String sessionToken) {
+        UserEntity user = findUserBySessionToken(sessionToken);
+        if (user != null) {
+            logger.info("User: {} | IP: {} - UserId {} found for session token.", RequestContext.getAuthor(), RequestContext.getIp(), user.getId());
+            return user.getId();
+        } else {
+            logger.warn("User: {} | IP: {} - No UserId found for session token: {}.", RequestContext.getAuthor(), RequestContext.getIp(), sessionToken);
+            return null;
+        }
     }
-}
 
-/**
- * Checks if the provided raw password matches the current user's password.
- * @param user The user whose password to check.
- * @param rawPassword The password entered by the user.
- * @return true if the password matches, false otherwise.
- */
-public boolean isPasswordValid(UserEntity user, String rawPassword) {
-    if (user == null || user.getPassword() == null || rawPassword == null) {
-        return false;
+    /**
+     * Checks if the provided raw password matches the current user's password.
+     *
+     * @param user        The user whose password to check.
+     * @param rawPassword The password entered by the user.
+     * @return true if the password matches, false otherwise.
+     */
+    public boolean isPasswordValid(UserEntity user, String rawPassword) {
+        if (user == null || user.getPassword() == null || rawPassword == null) {
+            return false;
+        }
+        return checkPassword(rawPassword, user.getPassword());
     }
-    return checkPassword(rawPassword, user.getPassword());
-}
 
 }
 

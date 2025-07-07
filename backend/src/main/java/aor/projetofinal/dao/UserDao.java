@@ -133,7 +133,29 @@ public UserEntity findBySessionToken(String token) {
         return resultList;
     }
 
+    public List<UserEntity> findSuitableManager(UserEntity excluded, UserEntity formerManager) {
+        TypedQuery<UserEntity> query = em.createQuery(
+                "SELECT u FROM UserEntity u WHERE u.confirmed = true AND u.active = true " +
+                        "AND LOWER(u.role.name) <> 'admin' " +
+                        "AND u.email <> :excludedEmail " +
+                        "AND u.email <> :formerManagerEmail",
+                UserEntity.class
+        );
+        query.setParameter("excludedEmail", excluded.getEmail());
+        query.setParameter("formerManagerEmail", formerManager.getEmail());
+        return query.getResultList();
+    }
 
+    public List<UserEntity> findUsersByManager(UserEntity manager) {
+        TypedQuery<UserEntity> query = em.createQuery(
+                "SELECT u FROM UserEntity u WHERE u.manager = :manager " +
+                        "AND u.confirmed = true AND u.active = true " +
+                        "AND LOWER(u.role.name) <> 'admin'",
+                UserEntity.class
+        );
+        query.setParameter("manager", manager);
+        return query.getResultList();
+    }
 
 
 

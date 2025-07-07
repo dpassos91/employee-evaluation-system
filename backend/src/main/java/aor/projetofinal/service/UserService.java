@@ -454,6 +454,72 @@ public Response logoutUser(@HeaderParam("Authorization") String authorization) {
             .build();
 }
 
+    /**
+     * Promotes a user to ADMIN if the requester has admin privileges.
+     * The user to promote must exist, and must not already be an admin.
+     * On success, the user loses any evaluation-related roles and responsibilities.
+     *
+     * @param targetEmail Email of the user to promote to admin.
+     * @param token       Session token of the authenticated admin.
+     * @return 200 OK if successful, 403 if unauthorized, 401 if session invalid.
+     */
+    @PUT
+    @Path("/promote-to-admin")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response promoteToAdmin(@QueryParam("email") String targetEmail,
+                                   @HeaderParam("sessionToken") String token) {
+
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn(
+                    "User: unknown | IP: {} - Unauthorized attempt to promote {} (invalid session).",
+                    RequestContext.getIp(),
+                    targetEmail
+            );
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity currentUser = tokenEntity.getUser();
+
+        logger.info(
+                "User: {} | IP: {} - Attempting to promote {} to ADMIN.",
+                currentUser.getEmail(),
+                RequestContext.getIp(),
+                targetEmail
+        );
+
+        boolean success = userBean.promoteUserToAdmin(currentUser, targetEmail);
+
+        if (!success) {
+            logger.warn(
+                    "User: {} | IP: {} - Failed to promote {} to ADMIN.",
+                    currentUser.getEmail(),
+                    RequestContext.getIp(),
+                    targetEmail
+            );
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"User could not be promoted. Ensure you are admin and user exists.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        logger.info(
+                "User: {} | IP: {} - Successfully promoted {} to ADMIN.",
+                currentUser.getEmail(),
+                RequestContext.getIp(),
+                targetEmail
+        );
+        return Response.ok()
+                .entity("{\"message\": \"User successfully promoted to admin.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+
+
 
 
     @POST

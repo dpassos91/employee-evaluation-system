@@ -38,6 +38,17 @@ public class EvaluationDao {
     }
 
 
+    public void deleteEvaluation(EvaluationEntity evaluation) {
+        if (em.contains(evaluation)) {
+            em.remove(evaluation);
+        } else {
+            EvaluationEntity attached = em.merge(evaluation);
+            em.remove(attached);
+        }
+    }
+
+
+
     public EvaluationEntity findById(Long id) {
         TypedQuery<EvaluationEntity> query = em.createQuery(
                 "SELECT e FROM EvaluationEntity e WHERE e.id = :id",
