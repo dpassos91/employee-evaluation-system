@@ -33,9 +33,8 @@ const fetchEvaluations = useCallback(async () => {
 
 try {
       const result = await apiConfig.apiCall(
-        `${apiConfig.API_ENDPOINTS.profiles.listUsersByFilters}?${params.toString()}`
-      );// `${apiConfig.API_ENDPOINTS.evaluations.listEvaluationsByFilters}?${params.toString()}`
-
+        `${apiConfig.API_ENDPOINTS.evaluations.listByFilters}?${params.toString()}`
+      );
       // Map evaluation list to expected format for the table
 const mapped = (result.evaluations|| []).map(evaluation => ({
   id: evaluation.evaluationId, 
