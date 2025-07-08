@@ -86,13 +86,18 @@
   
 
   "evaluations.list.title": "List of Evaluations",
-  "evaluations.table.empty": "Not a single evaluation was found applying the selected filters.",
+  "evaluations.table.empty": "Not a single evaluation was found while applying the selected filters.",
   "evaluations.filter.name": "Name",
   "evaluation.state.IN_EVALUATION": "In Evaluation",
   "evaluation.state.EVALUATED": "Evaluated",
   "evaluation.state.CLOSED": "Closed",
   "evaluations.filter.state.state": "State",
-  "evaluations.filter.cycleEnd": "Cycle End Date"
+  "evaluations.filter.cycleEnd": "Cycle End Date",
+  "evaluations.filter.grade": "Grade",
+  "evaluations.table.photo": "Photo",
+  "evaluations.table.evaluated": "Evaluated",
+  "evaluations.table.state": "State",
+  "table.loading": "Loading..."
 
 
 

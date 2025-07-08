@@ -94,7 +94,12 @@
   "evaluation.state.EVALUATED": "Concluído",
   "evaluation.state.CLOSED": "Fechado",
   "evaluations.filter.state.state": "Estado",
-  "evaluations.filter.cycleEnd": "Data fim de ciclo"
+  "evaluations.filter.cycleEnd": "Data fim de ciclo",
+  "evaluations.filter.grade": "Avaliação",
+  "evaluations.table.photo": "Fotografia",
+  "evaluations.table.evaluated": "Avaliado",
+  "evaluations.table.state": "Estado",
+  "table.loading": "A carregar..."
  
 
 

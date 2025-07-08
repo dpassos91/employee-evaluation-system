@@ -111,7 +111,7 @@ const handleExportCSV = async () => {
 </select>
        <div className="flex flex-col items-start">
   <label className="text-sm mb-1 font-medium text-gray-700">
-    <FormattedMessage id="evaluations.filter.grade" defaultMessage="Nota" />
+    <FormattedMessage id="evaluations.filter.grade" defaultMessage="Avaliação" />
   </label>
   <div className="flex items-center gap-1">
     {[1, 2, 3, 4].map((star) => (
@@ -156,7 +156,11 @@ const handleExportCSV = async () => {
 
 
       {/* Loading/Error */}
-      {loading && <div className="py-8 text-center text-gray-500">A carregar...</div>}
+      {loading && (
+  <div className="py-8 text-center text-gray-500">
+    <FormattedMessage id="table.loading" defaultMessage="A carregar..." />
+  </div>
+)}
       {error && <div className="py-8 text-center text-red-600">{error}</div>}
 
 
@@ -165,38 +169,40 @@ const handleExportCSV = async () => {
         <div className="overflow-x-auto w-full">
         <table className="min-w-full text-left border-collapse table-auto">
           <thead>
-            <tr className="bg-gray-200 text-sm">
-              <th className="p-2 w-[180px]">
-                <FormattedMessage id="evaluations.table.photo" defaultMessage="Fotografia" />
-              </th>
-               <th className="p-2">
-        <FormattedMessage id="evaluations.table.name" defaultMessage="Nome" />
-      </th>
-      <th className="p-2">
-        <FormattedMessage id="evaluations.table.state" defaultMessage="Estado" />
-      </th>
-            </tr>
-          </thead>
+  <tr className="bg-gray-200 text-sm">
+    <th className="p-2 w-[100px]">
+      <FormattedMessage id="evaluations.table.photo" defaultMessage="Fotografia" />
+    </th>
+    <th className="p-2">
+      <FormattedMessage id="evaluations.table.evaluated" defaultMessage="Avaliado" />
+    </th>
+    <th className="p-2">
+      <FormattedMessage id="evaluations.table.state" defaultMessage="Estado" />
+    </th>
+  </tr>
+</thead>
+
           <tbody>
-{evaluations.map((evaluation) => (
-      <tr key={evaluation.id} className="border-b hover:bg-gray-50">
-        <td className="p-2">
-          <img
-            src={evaluation.avatar || "/default_avatar.png"}
-            alt={evaluation.evaluated}
-            className="w-8 h-8 rounded-full"
-          />
-        </td>
-        <td className="p-2">{evaluation.evaluated}</td>
-        <td className="p-2">
-          <FormattedMessage
-            id={`evaluation.state.${evaluation.state}`}
-            defaultMessage={evaluation.state}
-          />
-        </td>
-      </tr>
-    ))}
-  </tbody>
+  {evaluations.map((evaluation) => (
+    <tr key={evaluation.id} className="border-b hover:bg-gray-50">
+      <td className="p-2">
+        <img
+          src={evaluation.avatar || "/default_avatar.png"}
+          alt={evaluation.evaluated}
+          className="w-10 h-10 rounded-full object-cover"
+        />
+      </td>
+      <td className="p-2 font-medium">{evaluation.evaluated}</td>
+      <td className="p-2">
+        <FormattedMessage
+          id={`evaluation.state.${evaluation.state}`}
+          defaultMessage={evaluation.state}
+        />
+      </td>
+    </tr>
+  ))}
+</tbody>
+
 </table>      {/* Juntar os botões num só <td> 
       <td className="p-2 text-center pr-8" colSpan={2}>
         <div className="flex flex-row items-center gap-2 justify-center">
