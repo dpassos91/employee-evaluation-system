@@ -29,6 +29,7 @@ import ProfilePage from "./pages/ProfilePage";
 import UsersListPage from "./pages/UsersListPage";
 import ChatPage from "./pages/ChatPage";
 import EvaluationListPage from "./pages/EvaluationListPage"; 
+import CoursesPage from "./pages/CoursesPage";
 
 /**
  * Main App component.
@@ -138,16 +139,22 @@ const handleWebSocketMessage = useCallback((data) => {
               </PrivateRoute>
             }
           />
-
             <Route
-            path="/evaluationlistpage"
+            path="/evaluationlist"
             element={
               <PrivateRoute>
                 <EvaluationListPage />
               </PrivateRoute>
             }
           />
-
+<Route
+            path="/courses"
+            element={
+              <PrivateRoute>
+                <CoursesPage />
+              </PrivateRoute>
+            }
+          />
           {/* Redirect all unknown routes to login */}
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>

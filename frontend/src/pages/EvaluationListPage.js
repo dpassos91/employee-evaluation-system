@@ -20,8 +20,8 @@ export default function EvaluationListPage() {
   const navigate = useNavigate(); 
 
     const filters = useMemo(
-    () => ({ name, evaluationState, grade, page }),
-    [name, evaluationState, grade, page]
+    () => ({ name, evaluationState, grade, cycleEnd, page }),
+    [name, evaluationState, grade, cycleEnd, page]
   );
 
   // Buscar utilizadores com filtros e paginação
@@ -76,9 +76,143 @@ const handleExportCSV = async () => {
 
 
   return (
-    <PageLayout
-       title={<FormattedMessage id="users.list.title" defaultMessage="Listagem de Avaliações" />}
-    >
+    <PageLayout title={<FormattedMessage id="users.list.title" defaultMessage="Listagem de Avaliações" />}>
+      {/* Filtros */}
+<div className="flex gap-4 mb-4">
+        <FormattedMessage id="evaluations.filter.name" defaultMessage="Nome">
+          {(msg) => (
+            <input
+              placeholder={msg}
+              className="border px-2 py-1 rounded"
+              value={name}
+              onChange={handleFilterName}
+            />
+          )}
+        </FormattedMessage>
+        <select
+          className="border px-2 py-1 rounded"
+          value={evaluationState}
+          onChange={handleFilterEvaluationState}
+        >
+          {states.map((statesOption) => (
+            <option key={statesOption} value={statesOption}>
+              {statesOption}
+            </option>
+          ))}
+        </select>
+        <FormattedMessage id="evaluations.filter.grade" defaultMessage="Nota">
+          {(msg) => (
+            <input
+              placeholder={msg}
+              className="border px-2 py-1 rounded"
+              value={grade}
+              onChange={handleFilterGrade}
+            />
+          )}
+        </FormattedMessage>
+        <button className="bg-green-600 text-white px-3 rounded" 
+        onClick={handleExportCSV}
+        >
+          <FormattedMessage id="users.button.excel" defaultMessage="Excel CSV" />
+        </button>
+      </div>
+
+
+
+
+      {/* Loading/Error */}
+      {loading && <div className="py-8 text-center text-gray-500">A carregar...</div>}
+      {error && <div className="py-8 text-center text-red-600">{error}</div>}
+
+
+      {/* Tabela de avaliações */}
+{!loading && evaluations.length > 0 && (
+        <div className="overflow-x-auto w-full">
+        <table className="min-w-full text-left border-collapse table-auto">
+          <thead>
+            <tr className="bg-gray-200 text-sm">
+              <th className="p-2 w-[180px]">
+                <FormattedMessage id="evaluations.table.name" defaultMessage="Nome" />
+              </th>
+              <th className="p-2 w-[140px]">
+                <FormattedMessage id="evaluations.table.state" defaultMessage="Estado" />
+              </th>
+              <th className="p-2 w-[180px]">
+                <FormattedMessage id="users.table.manager" defaultMessage="Gestor" />
+              </th>
+              <th className="p-2 w-[220px]">
+                <FormattedMessage id="users.table.contact" defaultMessage="Contacto" />
+              </th>
+              <th className="p-2 w-[100px]"></th>
+              <th className="p-2 w-[60px]"></th>
+              <th className="p-2 w-[200px]">
+                <FormattedMessage id="users.table.actions" defaultMessage="Ações" />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+  {evaluations.map((evaluation) => (
+    <tr key={evaluation.id} className="border-b hover:bg-gray-50">
+      <td className="p-2">{evaluation.name}</td>
+      <td className="p-2">{evaluation.state}</td>
+      <td className="p-2">{evaluation.photograph}</td>
+    
+      <td className="p-2 pl-20">
+        <img
+          src={evaluation.avatar || "/default_avatar.png"}
+          alt={evaluation.name}
+          className="w-8 h-8 rounded-full"
+        />
+      </td>
+      {/* Juntar os botões num só <td> 
+      <td className="p-2 text-center pr-8" colSpan={2}>
+        <div className="flex flex-row items-center gap-2 justify-center">
+          <MessageUserButton userId={user.id} />
+          <button
+            onClick={() =>
+              navigate(`/profile/${user.id}`, { state: { profileOwnerEmail: user.email } })
+            }
+            className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2"
+          >
+            <FormattedMessage id="users.button.view" defaultMessage="Ver" /> <span>&gt;</span>
+          </button>
+        </div>
+      </td>*/}
+    </tr>
+  ))}
+</tbody>
+        </table>
+        </div>
+      )}
+
+      {/* Paginação real */}
+      {!loading && totalPages > 1 && (
+        <div className="mt-4 flex justify-end gap-2 text-blue-700 text-sm">
+          {Array.from({ length: totalPages }).map((_, idx) => (
+            <button
+              key={idx + 1}
+              className={`hover:underline ${page === idx + 1 ? "font-bold underline" : ""}`}
+              onClick={() => handleGoToPage(idx + 1)}
+            >
+              {idx + 1}
+            </button>
+          ))}
+          {page < totalPages && (
+            <button onClick={() => handleGoToPage(page + 1)}>
+              {">"}
+            </button>
+          )}
+        </div>
+      )}
+      {!loading && evaluations.length === 0 && (
+        <div className="py-8 text-center text-gray-500">
+          <FormattedMessage id="users.table.empty" defaultMessage="Nenhum utilizador encontrado com estes filtros." />
+        </div>
+      )}
+
+
+
+
 
 
 
