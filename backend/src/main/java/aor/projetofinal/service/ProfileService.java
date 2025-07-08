@@ -443,7 +443,7 @@ public Response listUsersPaginated(
 public Response uploadProfilePhoto(
         @PathParam("email") String email,
         @HeaderParam("sessionToken") String sessionToken,
-        @org.jboss.resteasy.annotations.providers.multipart.MultipartForm PhotoUploadForm form) {
+        @org.jboss.resteasy.annotations.providers.multipart.MultipartForm PhotoUploadFormDto form) {
 
     logger.info("User: {} | IP: {} - Attempting profile photo upload for user '{}'",
             RequestContext.getAuthor(), RequestContext.getIp(), email);

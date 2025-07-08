@@ -8,7 +8,7 @@ import jakarta.ws.rs.FormParam;
  * DTO for uploading a photo with a filename.
  * Used in multipart/form-data requests.
  */
-public class PhotoUploadForm {
+public class PhotoUploadFormDto {
     @FormParam("photo")
     @PartType("application/octet-stream")
     private byte[] photo;
