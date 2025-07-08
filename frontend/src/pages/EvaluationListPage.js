@@ -118,6 +118,20 @@ const handleExportCSV = async () => {
             />
           )}
         </FormattedMessage>
+<div className="flex flex-col">
+  <label className="text-sm font-bold text-gray-700 mb-1">
+    <FormattedMessage id="evaluations.filter.cycleEnd" defaultMessage="Data fim de ciclo" />
+  </label>
+  <input
+    type="date"
+    value={cycleEnd || ""}
+    onChange={handleFilterCycleEnd}
+    className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
+  />
+</div>
+
+
+
         <button className="bg-green-600 text-white px-3 rounded" 
         onClick={handleExportCSV}
         >
@@ -210,7 +224,7 @@ const handleExportCSV = async () => {
       )}
       {!loading && evaluations.length === 0 && (
         <div className="py-8 text-center text-gray-500">
-          <FormattedMessage id="users.table.empty" defaultMessage="Nenhuma avaliação encontrada com estes filtros." />
+          <FormattedMessage id="evaluations.table.empty" defaultMessage="Nenhuma avaliação encontrada com estes filtros." />
         </div>
       )}
 

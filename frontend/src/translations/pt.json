@@ -67,7 +67,7 @@
     "users.list.title": "Listagem de Utilizadores",
   "users.filter.name": "Nome",
   "users.filter.manager": "Gestor",
-  "users.button.excel": "Excel",
+  "users.button.excel": "Excel CSV",
   "users.button.view": "Ver",
   "users.table.name": "Nome",
   "users.table.office": "Escritório",
@@ -86,10 +86,15 @@
    "chat.conversations": "Conversas",
 
 
+
+   "evaluations.list.title": "Listagem de Avaliações",
+   "evaluations.table.empty": "Nenhuma avaliação encontrada com estes filtros.",
+   "evaluations.filter.name": "Nome",
    "evaluation.state.IN_EVALUATION": "Em Avaliação",
   "evaluation.state.EVALUATED": "Concluído",
   "evaluation.state.CLOSED": "Fechado",
-  "evaluations.filter.state.state": "Estado"
+  "evaluations.filter.state.state": "Estado",
+  "evaluations.filter.cycleEnd": "Data fim de ciclo"
  
 
 

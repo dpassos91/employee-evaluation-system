@@ -66,7 +66,7 @@
     "users.list.title": "User List",
   "users.filter.name": "Name",
   "users.filter.manager": "Manager",
-  "users.button.excel": "Excel",
+  "users.button.excel": "Excel CSV",
   "users.button.view": "View",
   "users.table.name": "Name",
   "users.table.office": "Office",
@@ -85,10 +85,14 @@
   "chat.conversations": "Conversations",
   
 
+  "evaluations.list.title": "List of Evaluations",
+  "evaluations.table.empty": "Not a single evaluation was found applying the selected filters.",
+  "evaluations.filter.name": "Name",
   "evaluation.state.IN_EVALUATION": "In Evaluation",
   "evaluation.state.EVALUATED": "Evaluated",
   "evaluation.state.CLOSED": "Closed",
-  "evaluations.filter.state.state": "State"
+  "evaluations.filter.state.state": "State",
+  "evaluations.filter.cycleEnd": "Cycle End Date"
 
 
 
