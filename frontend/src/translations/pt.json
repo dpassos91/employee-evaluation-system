@@ -83,6 +83,18 @@
   "chat.title": "Mensagens",
   "chat.subtitle": "O teu histórico de conversas",
   "chat.placeholder": "Escreve uma mensagem...",
-   "chat.conversations": "Conversas"
+   "chat.conversations": "Conversas",
+
+
+   "evaluation.state.IN_EVALUATION": "Em Avaliação",
+  "evaluation.state.EVALUATED": "Concluído",
+  "evaluation.state.CLOSED": "Fechado",
+  "evaluations.filter.state.state": "Estado"
+ 
+
+
+
+
+
 
 }

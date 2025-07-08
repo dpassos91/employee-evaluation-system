@@ -15,12 +15,12 @@ export default function EvaluationListPage() {
   const [name, setName] = useState("");
   const [evaluationState, setEvaluationState] = useState("");
   const [grade, setGrade] = useState("");
-  const [cycleEnd, setcycleEnd] = useState("");
+  const [cycleEnd, setCycleEnd] = useState("");
   const [page, setPage] = useState(1);
   const navigate = useNavigate(); 
 
     const filters = useMemo(
-    () => ({ name, evaluationState, grade, cycleEnd, page }),
+    () => ({ name, evaluationState, grade,  cycleEndDate: cycleEnd, page }),
     [name, evaluationState, grade, cycleEnd, page]
   );
 
@@ -31,21 +31,22 @@ export default function EvaluationListPage() {
   const handleFilterName = (e) => { setName(e.target.value); setPage(1); };
   const handleFilterEvaluationState = (e) => { setEvaluationState(e.target.value); setPage(1); };
   const handleFilterGrade = (e) => { setGrade(e.target.value); setPage(1); };
-  const handleFilterCycleEnd = (e) => { setcycleEnd(e.target.value); setPage(1); };
+  const handleFilterCycleEnd = (e) => { setCycleEnd(e.target.value); setPage(1); };
   const handleGoToPage = (p) => setPage(p);
 
 // Lista de estados de avaliação (pode ser dinâmica!)
-  const states = [
-    "", "In Evaluation", "Evaluated", "Closed"
-  ];
+   const evaluationStates = ["", "IN_EVALUATION", "EVALUATED", "CLOSED"];
+
+
 
 const handleExportCSV = async () => {
   try {
     // Lê filtros do state (name, office, manager)
     const params = new URLSearchParams();
-    if (name) params.append("profile-name", name);
-    if (evaluationState) params.append("evaluation-state", evaluationState);
+    if (name) params.append("name", name); 
+    if (evaluationState) params.append("state", evaluationState);
     if (grade) params.append("grade", grade);
+    if (cycleEnd) params.append("cycleEnd", cycleEnd);
 
     const url = `${apiConfig.API_ENDPOINTS.evaluations.exportCsv}?${params.toString()}`;
 
@@ -76,7 +77,7 @@ const handleExportCSV = async () => {
 
 
   return (
-    <PageLayout title={<FormattedMessage id="users.list.title" defaultMessage="Listagem de Avaliações" />}>
+    <PageLayout title={<FormattedMessage id="evaluations.list.title" defaultMessage="Listagem de Avaliações" />}>
       {/* Filtros */}
 <div className="flex gap-4 mb-4">
         <FormattedMessage id="evaluations.filter.name" defaultMessage="Nome">
@@ -90,16 +91,23 @@ const handleExportCSV = async () => {
           )}
         </FormattedMessage>
         <select
-          className="border px-2 py-1 rounded"
-          value={evaluationState}
-          onChange={handleFilterEvaluationState}
-        >
-          {states.map((statesOption) => (
-            <option key={statesOption} value={statesOption}>
-              {statesOption}
-            </option>
-          ))}
-        </select>
+  className="border px-2 py-1 rounded"
+  value={evaluationState}
+  onChange={handleFilterEvaluationState}
+>
+  <option value="">
+    <FormattedMessage id="evaluations.filter.state.state" defaultMessage="Estado" />
+  </option>
+  <option value="IN_EVALUATION">
+    <FormattedMessage id="evaluation.state.IN_EVALUATION" defaultMessage="Em Avaliação" />
+  </option>
+  <option value="EVALUATED">
+    <FormattedMessage id="evaluation.state.EVALUATED" defaultMessage="Concluído" />
+  </option>
+  <option value="CLOSED">
+    <FormattedMessage id="evaluation.state.CLOSED" defaultMessage="Fechado" />
+  </option>
+</select>
         <FormattedMessage id="evaluations.filter.grade" defaultMessage="Nota">
           {(msg) => (
             <input
@@ -132,39 +140,37 @@ const handleExportCSV = async () => {
           <thead>
             <tr className="bg-gray-200 text-sm">
               <th className="p-2 w-[180px]">
-                <FormattedMessage id="evaluations.table.name" defaultMessage="Nome" />
+                <FormattedMessage id="evaluations.table.photo" defaultMessage="Fotografia" />
               </th>
-              <th className="p-2 w-[140px]">
-                <FormattedMessage id="evaluations.table.state" defaultMessage="Estado" />
-              </th>
-              <th className="p-2 w-[180px]">
-                <FormattedMessage id="users.table.manager" defaultMessage="Gestor" />
-              </th>
-              <th className="p-2 w-[220px]">
-                <FormattedMessage id="users.table.contact" defaultMessage="Contacto" />
-              </th>
-              <th className="p-2 w-[100px]"></th>
-              <th className="p-2 w-[60px]"></th>
-              <th className="p-2 w-[200px]">
-                <FormattedMessage id="users.table.actions" defaultMessage="Ações" />
-              </th>
+               <th className="p-2">
+        <FormattedMessage id="evaluations.table.name" defaultMessage="Nome" />
+      </th>
+      <th className="p-2">
+        <FormattedMessage id="evaluations.table.state" defaultMessage="Estado" />
+      </th>
             </tr>
           </thead>
           <tbody>
-  {evaluations.map((evaluation) => (
-    <tr key={evaluation.id} className="border-b hover:bg-gray-50">
-      <td className="p-2">{evaluation.name}</td>
-      <td className="p-2">{evaluation.state}</td>
-      <td className="p-2">{evaluation.photograph}</td>
-    
-      <td className="p-2 pl-20">
-        <img
-          src={evaluation.avatar || "/default_avatar.png"}
-          alt={evaluation.name}
-          className="w-8 h-8 rounded-full"
-        />
-      </td>
-      {/* Juntar os botões num só <td> 
+{evaluations.map((evaluation) => (
+      <tr key={evaluation.id} className="border-b hover:bg-gray-50">
+        <td className="p-2">
+          <img
+            src={evaluation.avatar || "/default_avatar.png"}
+            alt={evaluation.evaluated}
+            className="w-8 h-8 rounded-full"
+          />
+        </td>
+        <td className="p-2">{evaluation.evaluated}</td>
+        <td className="p-2">
+          <FormattedMessage
+            id={`evaluation.state.${evaluation.state}`}
+            defaultMessage={evaluation.state}
+          />
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>      {/* Juntar os botões num só <td> 
       <td className="p-2 text-center pr-8" colSpan={2}>
         <div className="flex flex-row items-center gap-2 justify-center">
           <MessageUserButton userId={user.id} />
@@ -178,10 +184,8 @@ const handleExportCSV = async () => {
           </button>
         </div>
       </td>*/}
-    </tr>
-  ))}
-</tbody>
-        </table>
+    
+        
         </div>
       )}
 
@@ -206,7 +210,7 @@ const handleExportCSV = async () => {
       )}
       {!loading && evaluations.length === 0 && (
         <div className="py-8 text-center text-gray-500">
-          <FormattedMessage id="users.table.empty" defaultMessage="Nenhum utilizador encontrado com estes filtros." />
+          <FormattedMessage id="users.table.empty" defaultMessage="Nenhuma avaliação encontrada com estes filtros." />
         </div>
       )}
 
