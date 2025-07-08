@@ -97,6 +97,45 @@ profiles: {
   usualWorkplaces: `${API_BASE_URL}/profiles/usualworkplaces`,
 },
 
+/** Evaluation endpoints */
+evaluations: {
+  /** @type {string} List evaluations by filters (paginated) */
+  listByFilters: `${API_BASE_URL}/evaluations/list-by-filters`,
+
+  /** @type {string} Get all evaluation states (e.g., IN_EVALUATION, EVALUATED, CLOSED) */
+  getAllStates: `${API_BASE_URL}/evaluations/states`,
+
+  /** @type {string} Export evaluations to CSV */
+  exportCsv: `${API_BASE_URL}/evaluations/export-csv`,
+
+  /** @function Export a closed evaluation to PDF */
+  exportPdf: (id) => `${API_BASE_URL}/evaluations/export-pdf?id=${id}`,
+
+  /** @function Get evaluation history for a user (paginated) */
+  getHistory: (email, page = 1) => `${API_BASE_URL}/evaluations/history?email=${encodeURIComponent(email)}&page=${page}`,
+
+  /** @type {string} List evaluation grade options (1 to 4) */
+  listGradeOptions: `${API_BASE_URL}/evaluations/list-evaluation-options`,
+
+  /** @function Load an evaluation for a user in the current cycle */
+  load: (email) => `${API_BASE_URL}/evaluations/load-evaluation?email=${encodeURIComponent(email)}`,
+
+  /** @type {string} Update an evaluation with grade and feedback */
+  update: `${API_BASE_URL}/evaluations/update-evaluation`,
+
+  /** @function Reopen an evaluation by ID */
+  reopen: (evaluationId) => `${API_BASE_URL}/evaluations/reopen-for-editing/${evaluationId}`,
+
+  /** @function Close an individual evaluation by ID */
+  close: (evaluationId) => `${API_BASE_URL}/evaluations/close/${evaluationId}`,
+
+  /** @type {string} Close all evaluations in the current cycle (admin only) */
+  bulkClose: `${API_BASE_URL}/evaluations/close-all`,
+},
+
+
+
+
   /** Settings endpoints */
   settings: {
     /** @type {string} Get current settings */
