@@ -16,6 +16,7 @@ export default function EvaluationListPage() {
   const [evaluationState, setEvaluationState] = useState("");
   const [grade, setGrade] = useState("");
   const [cycleEnd, setCycleEnd] = useState("");
+  const [hover, setHover] = useState(null);
   const [page, setPage] = useState(1);
   const navigate = useNavigate(); 
 
@@ -108,16 +109,28 @@ const handleExportCSV = async () => {
     <FormattedMessage id="evaluation.state.CLOSED" defaultMessage="Fechado" />
   </option>
 </select>
-        <FormattedMessage id="evaluations.filter.grade" defaultMessage="Nota">
-          {(msg) => (
-            <input
-              placeholder={msg}
-              className="border px-2 py-1 rounded"
-              value={grade}
-              onChange={handleFilterGrade}
-            />
-          )}
-        </FormattedMessage>
+       <div className="flex flex-col items-start">
+  <label className="text-sm mb-1 font-medium text-gray-700">
+    <FormattedMessage id="evaluations.filter.grade" defaultMessage="Nota" />
+  </label>
+  <div className="flex items-center gap-1">
+    {[1, 2, 3, 4].map((star) => (
+      <button
+        key={star}
+        type="button"
+        onClick={() => {
+          setGrade(grade === String(star) ? "" : String(star));
+          setPage(1);
+        }}
+        onMouseEnter={() => setHover(star)}
+        onMouseLeave={() => setHover(null)}
+        className="text-yellow-500 text-xl focus:outline-none"
+      >
+        {star <= (hover ?? parseInt(grade)) ? "★" : "☆"}
+      </button>
+    ))}
+  </div>
+</div>
 <div className="flex flex-col">
   <label className="text-sm font-bold text-gray-700 mb-1">
     <FormattedMessage id="evaluations.filter.cycleEnd" defaultMessage="Data fim de ciclo" />
