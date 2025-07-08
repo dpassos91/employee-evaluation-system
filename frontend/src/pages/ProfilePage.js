@@ -20,6 +20,7 @@ import { authAPI } from "../api/authAPI";
 import { fieldLabelKeys } from "../utils/fieldLabels";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Modal from "../components/Modal";
+import AppForm from "../components/AppForm";
 
 export default function ProfilePage() {
   /**
@@ -524,57 +525,64 @@ const handlePhotoUpload = async () => {
           </form>
           {/* Password Modal */}
           <Modal
-            isOpen={isPasswordModalOpen}
-            onClose={() => setPasswordModalOpen(false)}
-            title={formatMessage({ id: "profile.changePassword", defaultMessage: "Alterar password" })}
-            actions={[
-              <AppButton key="cancel" variant="secondary" onClick={() => setPasswordModalOpen(false)}>
-                <FormattedMessage id="modal.cancel" defaultMessage="Cancelar" />
-              </AppButton>,
-              <AppButton key="save" variant="primary" type="submit" onClick={handleChangePassword}>
-                <FormattedMessage id="modal.save" defaultMessage="Guardar" />
-              </AppButton>,
-            ]}
-          >
-            <form onSubmit={handleChangePassword}>
-              <div className="mb-3">
-                <label className="block text-sm font-medium mb-1">
-                  <FormattedMessage id="profile.currentPassword" defaultMessage="Password atual" />
-                </label>
-                <input
-                  type="password"
-                  className="border px-2 py-1 rounded w-full"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label className="block text-sm font-medium mb-1">
-                  <FormattedMessage id="profile.newPassword" defaultMessage="Nova password" />
-                </label>
-                <input
-                  type="password"
-                  className="border px-2 py-1 rounded w-full"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label className="block text-sm font-medium mb-1">
-                  <FormattedMessage id="profile.confirmPassword" defaultMessage="Confirmar password" />
-                </label>
-                <input
-                  type="password"
-                  className="border px-2 py-1 rounded w-full"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-              </div>
-            </form>
-          </Modal>
+  isOpen={isPasswordModalOpen}
+  onClose={() => setPasswordModalOpen(false)}
+  title={formatMessage({ id: "profile.changePassword", defaultMessage: "Alterar password" })}
+  actions={[
+    {
+      label: <FormattedMessage id="modal.cancel" defaultMessage="Cancelar" />,
+      variant: "secondary",
+      onClick: () => setPasswordModalOpen(false)
+    },
+    {
+      label: <FormattedMessage id="modal.save" defaultMessage="Guardar" />,
+      variant: "primary",
+      type: "submit", // garante submit se for <button> no AppForm
+      // não precisas de onClick aqui se o submit do form já faz handleChangePassword
+    }
+  ]}
+>
+  <AppForm onSubmit={handleChangePassword}>
+    <div className="mb-3">
+      <label className="block text-sm font-medium mb-1">
+        <FormattedMessage id="profile.currentPassword" defaultMessage="Password atual" />
+      </label>
+      <input
+        type="password"
+        className="border px-2 py-1 rounded w-full"
+        value={currentPassword}
+        onChange={(e) => setCurrentPassword(e.target.value)}
+        required
+      />
+    </div>
+    <div className="mb-3">
+      <label className="block text-sm font-medium mb-1">
+        <FormattedMessage id="profile.newPassword" defaultMessage="Nova password" />
+      </label>
+      <input
+        type="password"
+        className="border px-2 py-1 rounded w-full"
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+        required
+      />
+    </div>
+    <div className="mb-3">
+      <label className="block text-sm font-medium mb-1">
+        <FormattedMessage id="profile.confirmPassword" defaultMessage="Confirmar password" />
+      </label>
+      <input
+        type="password"
+        className="border px-2 py-1 rounded w-full"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        required
+      />
+    </div>
+    {/* Podes adicionar aqui erro global, se quiseres, usando o prop error no AppForm */}
+  </AppForm>
+</Modal>
+
         </div>
       </section>
 <Modal
@@ -583,12 +591,34 @@ const handlePhotoUpload = async () => {
     setPhotoPreview(null);
     setSelectedPhoto(null);
   }}
-  // Centered title with bold text
   title={
     <div className="w-full text-center font-bold">
       <FormattedMessage id="profile.previewPhoto" defaultMessage="Preview Photo" />
     </div>
   }
+  actions={[
+    {
+      label: <FormattedMessage id="modal.cancel" defaultMessage="Cancel" />,
+      variant: "secondary",
+      onClick: () => {
+        setPhotoPreview(null);
+        setSelectedPhoto(null);
+      }
+    },
+    {
+      label: <FormattedMessage id="profile.chooseOtherPhoto" defaultMessage="Choose Another Photo" />,
+      variant: "secondary",
+      onClick: () => document.getElementById("profile-photo-input").click()
+    },
+    {
+      label: isUploading
+        ? <FormattedMessage id="profile.uploading" defaultMessage="Uploading..." />
+        : <FormattedMessage id="profile.savePhoto" defaultMessage="Save Photo" />,
+      variant: "primary",
+      onClick: handlePhotoUpload,
+      disabled: isUploading
+    }
+  ]}
 >
   {photoPreview && (
     <img
@@ -597,35 +627,8 @@ const handlePhotoUpload = async () => {
       className="w-48 h-48 rounded-full border-2 object-cover mx-auto my-4"
     />
   )}
-
-  {/* Centered buttons */}
-  <div className="flex justify-center gap-3 mt-4">
-    <AppButton
-      variant="secondary"
-      onClick={() => {
-        setPhotoPreview(null);
-        setSelectedPhoto(null);
-      }}
-    >
-      <FormattedMessage id="modal.cancel" defaultMessage="Cancel" />
-    </AppButton>
-    <AppButton
-      variant="secondary"
-      onClick={() => document.getElementById("profile-photo-input").click()}
-    >
-      <FormattedMessage id="profile.chooseOtherPhoto" defaultMessage="Choose Another Photo" />
-    </AppButton>
-    <AppButton
-      variant="primary"
-      onClick={handlePhotoUpload}
-      disabled={isUploading}
-    >
-      {isUploading
-        ? <FormattedMessage id="profile.uploading" defaultMessage="Uploading..." />
-        : <FormattedMessage id="profile.savePhoto" defaultMessage="Save Photo" />}
-    </AppButton>
-  </div>
 </Modal>
+
     </PageLayout>
   );
 }

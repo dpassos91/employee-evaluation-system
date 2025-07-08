@@ -37,18 +37,63 @@ const API_ENDPOINTS = {
     validateSession: `${API_BASE_URL}/users/validate-session`
   },
 
-  /** Course endpoints (to be filled in) */
+  /** Course endpoints*/
   courses: {
-    // e.g.: list: `${API_BASE_URL}/courses`,
+    /** @type {string} List all courses (with filters as query params) */
+    list: `${API_BASE_URL}/courses`,
+    /** @function Get course details by ID */
+    get: (id) => `${API_BASE_URL}/courses/${id}`,
+    /** @type {string} Create a new course */
+    create: `${API_BASE_URL}/courses`,
+    /** @function Update a course by ID */
+    update: (id) => `${API_BASE_URL}/courses/${id}`,
+    /** @function Deactivate (soft delete) a course by ID */
+    deactivate: (id) => `${API_BASE_URL}/courses/${id}`,
+    /** @type {string} Export the list of courses to CSV */
+    export: `${API_BASE_URL}/courses/export/csv`,
+    /** @type {string} Register user participation in a course */
+
+    // Associations course-user
+
+    assignToUser: `${API_BASE_URL}/user-courses`,
+    /** @function Get a user's training history */
+    userHistory: (userId) => `${API_BASE_URL}/user-courses/user/${userId}`,
+    /** @function Export a user's training history to CSV */
+    userHistoryExport: (userId) => `${API_BASE_URL}/user-courses/user/${userId}/export/csv`,
+    /** @function Get a user's training history for a specific year */
+    userHistoryYear: (userId, year) => `${API_BASE_URL}/user-courses/user/${userId}/year/${year}`,
+    /** @function Export a user's training history for a specific year to CSV */
+    userHistoryYearExport: (userId, year) => `${API_BASE_URL}/user-courses/user/${userId}/year/${year}/export/csv`
   },
 
   /** Dashboard endpoint */
   dashboardOverview: `${API_BASE_URL}/dashboard/overview`,
 
-  /** Evaluation endpoints (to be filled in) */
-  evaluations: {
-    // e.g.: list: `${API_BASE_URL}/evaluations`,
-  },
+/** Evaluation endpoints */
+evaluations: {
+  /** @type {string} List evaluations by filters (paginated) */
+  listByFilters: `${API_BASE_URL}/evaluations/list-by-filters`,
+  /** @type {string} Get all evaluation states (e.g., IN_EVALUATION, EVALUATED, CLOSED) */
+  getAllStates: `${API_BASE_URL}/evaluations/states`,
+  /** @type {string} Export evaluations to CSV */
+  exportCsv: `${API_BASE_URL}/evaluations/export-csv`,
+  /** @function Export a closed evaluation to PDF */
+  exportPdf: (id) => `${API_BASE_URL}/evaluations/export-pdf?id=${id}`,
+  /** @function Get evaluation history for a user (paginated) */
+  getHistory: (email, page = 1) => `${API_BASE_URL}/evaluations/history?email=${encodeURIComponent(email)}&page=${page}`,
+  /** @type {string} List evaluation grade options (1 to 4) */
+  listGradeOptions: `${API_BASE_URL}/evaluations/list-evaluation-options`,
+  /** @function Load an evaluation for a user in the current cycle */
+  load: (email) => `${API_BASE_URL}/evaluations/load-evaluation?email=${encodeURIComponent(email)}`,
+  /** @type {string} Update an evaluation with grade and feedback */
+  update: `${API_BASE_URL}/evaluations/update-evaluation`,
+  /** @function Reopen an evaluation by ID */
+  reopen: (evaluationId) => `${API_BASE_URL}/evaluations/reopen-for-editing/${evaluationId}`,
+  /** @function Close an individual evaluation by ID */
+  close: (evaluationId) => `${API_BASE_URL}/evaluations/close/${evaluationId}`,
+  /** @type {string} Close all evaluations in the current cycle (admin only) */
+  bulkClose: `${API_BASE_URL}/evaluations/close-all`,
+},
 
   /** Message endpoints*/
  messages: {
@@ -96,45 +141,6 @@ profiles: {
   /** @type {string} Get list of possible usual workplaces */
   usualWorkplaces: `${API_BASE_URL}/profiles/usualworkplaces`,
 },
-
-/** Evaluation endpoints */
-evaluations: {
-  /** @type {string} List evaluations by filters (paginated) */
-  listByFilters: `${API_BASE_URL}/evaluations/list-by-filters`,
-
-  /** @type {string} Get all evaluation states (e.g., IN_EVALUATION, EVALUATED, CLOSED) */
-  getAllStates: `${API_BASE_URL}/evaluations/states`,
-
-  /** @type {string} Export evaluations to CSV */
-  exportCsv: `${API_BASE_URL}/evaluations/export-csv`,
-
-  /** @function Export a closed evaluation to PDF */
-  exportPdf: (id) => `${API_BASE_URL}/evaluations/export-pdf?id=${id}`,
-
-  /** @function Get evaluation history for a user (paginated) */
-  getHistory: (email, page = 1) => `${API_BASE_URL}/evaluations/history?email=${encodeURIComponent(email)}&page=${page}`,
-
-  /** @type {string} List evaluation grade options (1 to 4) */
-  listGradeOptions: `${API_BASE_URL}/evaluations/list-evaluation-options`,
-
-  /** @function Load an evaluation for a user in the current cycle */
-  load: (email) => `${API_BASE_URL}/evaluations/load-evaluation?email=${encodeURIComponent(email)}`,
-
-  /** @type {string} Update an evaluation with grade and feedback */
-  update: `${API_BASE_URL}/evaluations/update-evaluation`,
-
-  /** @function Reopen an evaluation by ID */
-  reopen: (evaluationId) => `${API_BASE_URL}/evaluations/reopen-for-editing/${evaluationId}`,
-
-  /** @function Close an individual evaluation by ID */
-  close: (evaluationId) => `${API_BASE_URL}/evaluations/close/${evaluationId}`,
-
-  /** @type {string} Close all evaluations in the current cycle (admin only) */
-  bulkClose: `${API_BASE_URL}/evaluations/close-all`,
-},
-
-
-
 
   /** Settings endpoints */
   settings: {
