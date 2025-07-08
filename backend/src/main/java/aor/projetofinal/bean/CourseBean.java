@@ -4,9 +4,9 @@ import aor.projetofinal.dao.CourseDao;
 import aor.projetofinal.dto.CourseDto;
 import aor.projetofinal.dto.CreateCourseDto;
 import aor.projetofinal.dto.UpdateCourseDto;
-import aor.projetofinal.entity.CourseCategoryEnum;
+import aor.projetofinal.entity.enums.CourseCategoryEnum;
 import aor.projetofinal.entity.CourseEntity;
-import aor.projetofinal.entity.LanguageEnum;
+import aor.projetofinal.entity.enums.LanguageEnum;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
