@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
 import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
-import MessageUserButton from "../components/MessageUserButton";
 import { useUsersEvaluationList } from "../hooks/useUsersEvaluationList"; 
 import { userStore } from "../stores/userStore";
 import { apiConfig } from "../api/apiConfig";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 
@@ -35,7 +36,7 @@ export default function EvaluationListPage() {
   );
 
   // Buscar utilizadores com filtros e paginação
-    const { evaluations, totalPages, loading, error } = useUsersEvaluationList(filters);
+    const { evaluations, totalPages, loading, error, refetch  } = useUsersEvaluationList(filters);
 
  // Funções para lidar com filtros
   const handleFilterName = (e) => { setName(e.target.value); setPage(1); };
@@ -55,10 +56,10 @@ const handleCloseEvaluation = async (id) => {
     await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.close(id), {
       method: "POST",
     });
-    alert("Avaliação fechada com sucesso.");
-    window.location.reload(); // ou chama refetch()
+    toast.success("Avaliação fechada com sucesso.");
+    refetch();
   } catch (err) {
-    alert("Erro ao fechar avaliação.");
+    toast.error("Erro ao fechar avaliação.");
   }
 };
 
@@ -67,10 +68,24 @@ const handleReopenEvaluation = async (id) => {
     await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.reopen(id), {
       method: "POST",
     });
-    alert("Avaliação reaberta com sucesso.");
-    window.location.reload();
+    toast.success("Avaliação reaberta com sucesso.");
+    refetch();
   } catch (err) {
-    alert("Erro ao reabrir avaliação.");
+    toast.error("Erro ao reabrir avaliação.");
+  }
+};
+
+const handleCloseAllEvaluations = async () => {
+  if (!window.confirm("Tens a certeza que queres fechar todos os processos?")) return;
+
+  try {
+    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.closeAll, {
+      method: "POST",
+    });
+    toast.success("Todos os processos foram fechados com sucesso.");
+    refetch();
+  } catch (err) {
+    toast.error("Erro ao fechar os processos.");
   }
 };
 
@@ -81,19 +96,6 @@ const handleFillEvaluation = (id, email) => {
 };
 
 
-const handleCloseAllEvaluations = async () => {
-  if (!window.confirm("Tens a certeza que queres fechar todos os processos?")) return;
-
-  try {
-    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.closeAll, {
-      method: "POST",
-    });
-    alert("Todos os processos foram fechados com sucesso.");
-    window.location.reload(); // ou chama refetch()
-  } catch (err) {
-    alert("Erro ao fechar os processos.");
-  }
-};
 
 
 const handleExportCSV = async () => {
@@ -350,7 +352,7 @@ const handleExportCSV = async () => {
 )}
 
 
-
+<ToastContainer position="top-center" autoClose={3000} />
 
 
           </PageLayout>
