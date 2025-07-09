@@ -103,14 +103,7 @@
   "evaluation.button.close": "Close",
   "evaluation.button.revert": "Revert",
   "evaluations.button.closeAll": "Close all processes",
-  "evaluations.form.title": "Evaluation Form"
-
-
-
-
-
-
-  "chat.conversations": "Conversations",
+  "evaluations.form.title": "Evaluation Form",
 
 "accessDenied.title": "Access restricted",
 "accessDenied.message": "You do not have permission to access this page.\nYou will be redirected to the dashboard.",

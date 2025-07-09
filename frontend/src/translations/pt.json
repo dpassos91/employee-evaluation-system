@@ -105,16 +105,10 @@
   "evaluation.button.close": "Fechar",
   "evaluation.button.revert": "Reverter",
   "evaluations.button.closeAll": "Fechar todas os processos",
-  "evaluations.form.title": "Formulário de Avaliação"
- 
+  "evaluations.form.title": "Formulário de Avaliação",
 
 
-
-
-
-   "chat.conversations": "Conversas",
-
-   "accessDenied.title": "Acesso restrito",
+"accessDenied.title": "Acesso restrito",
 "accessDenied.message": "Não tens permissão para aceder a esta página.\nSerás redirecionado para o dashboard.",
 "accessDenied.redirecting": "A redirecionar..."
 
