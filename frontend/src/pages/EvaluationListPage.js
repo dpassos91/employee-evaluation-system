@@ -131,7 +131,7 @@ const handleExportCSV = async () => {
   }
 };
 
-// botão para Fechar avaliações em bulk se for um admin
+
 
 
 

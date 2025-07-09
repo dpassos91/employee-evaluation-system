@@ -104,7 +104,8 @@
   "evaluation.button.fill": "Preencher",
   "evaluation.button.close": "Fechar",
   "evaluation.button.revert": "Reverter",
-  "evaluations.button.closeAll": "Fechar todas os processos"
+  "evaluations.button.closeAll": "Fechar todas os processos",
+  "evaluations.form.title": "Formulário de Avaliação"
  
 
 
