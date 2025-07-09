@@ -97,7 +97,12 @@
   "evaluations.table.photo": "Photo",
   "evaluations.table.evaluated": "Evaluated",
   "evaluations.table.state": "State",
-  "table.loading": "Loading..."
+  "table.loading": "Loading...",
+  "evaluation.button.view": "Open",
+  "evaluation.button.fill": "Fill",
+  "evaluation.button.close": "Close",
+  "evaluation.button.revert": "Revert",
+  "evaluations.button.closeAll": "Close all processes"
 
 
 

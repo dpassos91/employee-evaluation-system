@@ -99,7 +99,12 @@
   "evaluations.table.photo": "Fotografia",
   "evaluations.table.evaluated": "Avaliado",
   "evaluations.table.state": "Estado",
-  "table.loading": "A carregar..."
+  "table.loading": "A carregar...",
+  "evaluation.button.view": "Ver",
+  "evaluation.button.fill": "Preencher",
+  "evaluation.button.close": "Fechar",
+  "evaluation.button.revert": "Reverter",
+  "evaluations.button.closeAll": "Fechar todas os processos"
  
 
 

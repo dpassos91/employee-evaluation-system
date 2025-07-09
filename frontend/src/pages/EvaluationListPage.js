@@ -3,7 +3,7 @@ import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
 import MessageUserButton from "../components/MessageUserButton";
 import { useUsersEvaluationList } from "../hooks/useUsersEvaluationList"; 
-
+import { userStore } from "../stores/userStore";
 import { apiConfig } from "../api/apiConfig";
 import { useNavigate } from "react-router-dom";
 
@@ -19,6 +19,15 @@ export default function EvaluationListPage() {
   const [hover, setHover] = useState(null);
   const [page, setPage] = useState(1);
   const navigate = useNavigate(); 
+
+
+/**
+   * Authenticated user info from Zustand store.
+   */
+  const user = userStore((state) => state.user);
+
+  // Checks if the current user is an admin
+  const isAdmin = user?.role === "ADMIN";
 
     const filters = useMemo(
     () => ({ name, evaluationState, grade,  cycleEndDate: cycleEnd, page }),
@@ -38,6 +47,53 @@ export default function EvaluationListPage() {
 // Lista de estados de avaliação (pode ser dinâmica!)
    const evaluationStates = ["", "IN_EVALUATION", "EVALUATED", "CLOSED"];
 
+
+// Functions to change evaluation states and lead to the evaluation page
+
+const handleCloseEvaluation = async (id) => {
+  try {
+    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.close(id), {
+      method: "POST",
+    });
+    alert("Avaliação fechada com sucesso.");
+    window.location.reload(); // ou chama refetch()
+  } catch (err) {
+    alert("Erro ao fechar avaliação.");
+  }
+};
+
+const handleReopenEvaluation = async (id) => {
+  try {
+    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.reopen(id), {
+      method: "POST",
+    });
+    alert("Avaliação reaberta com sucesso.");
+    window.location.reload();
+  } catch (err) {
+    alert("Erro ao reabrir avaliação.");
+  }
+};
+
+const handleFillEvaluation = (id, email) => {
+  navigate(`/evaluations/fill/${id}`, {
+    state: { evaluatedEmail: email },
+  });
+};
+
+
+const handleCloseAllEvaluations = async () => {
+  if (!window.confirm("Tens a certeza que queres fechar todos os processos?")) return;
+
+  try {
+    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.closeAll, {
+      method: "POST",
+    });
+    alert("Todos os processos foram fechados com sucesso.");
+    window.location.reload(); // ou chama refetch()
+  } catch (err) {
+    alert("Erro ao fechar os processos.");
+  }
+};
 
 
 const handleExportCSV = async () => {
@@ -115,20 +171,21 @@ const handleExportCSV = async () => {
   </label>
   <div className="flex items-center gap-1">
     {[1, 2, 3, 4].map((star) => (
-      <button
-        key={star}
-        type="button"
-        onClick={() => {
-          setGrade(grade === String(star) ? "" : String(star));
-          setPage(1);
-        }}
-        onMouseEnter={() => setHover(star)}
-        onMouseLeave={() => setHover(null)}
-        className="text-yellow-500 text-xl focus:outline-none"
-      >
-        {star <= (hover ?? parseInt(grade)) ? "★" : "☆"}
-      </button>
-    ))}
+  <button
+    key={star}
+    type="button"
+    onClick={() => {
+      setGrade(grade === String(star) ? "" : String(star));
+      setPage(1);
+    }}
+    onMouseEnter={() => setHover(star)}
+    onMouseLeave={() => setHover(null)}
+    className="text-yellow-500 text-xl focus:outline-none"
+    aria-label={`Nota ${star}`}
+  >
+    {star <= ((hover ?? Number(grade)) || 0) ? "★" : "☆"}
+  </button>
+))}
   </div>
 </div>
 <div className="flex flex-col">
@@ -199,25 +256,56 @@ const handleExportCSV = async () => {
           defaultMessage={evaluation.state}
         />
       </td>
+
+      {/* AÇÕES */}
+      <td className="p-2 text-center">
+        <div className="flex flex-row gap-2 justify-center">
+  {/* Mostrar "Preencher" apenas se IN_EVALUATION */}
+  {evaluation.state === "IN_EVALUATION" ? (
+    <button
+      onClick={() => handleFillEvaluation(evaluation.id, evaluation.email)}
+      className="bg-[#D41C1C] text-white px-3 py-1 rounded"
+    >
+      <FormattedMessage id="evaluation.button.fill" defaultMessage="Preencher" />
+    </button>
+  ) : (
+    <>
+      {/* Ver só se não está em IN_EVALUATION */}
+      <button
+        onClick={() => navigate(`/evaluations/${evaluation.id}`)}
+        className="bg-[#D41C1C] text-white px-3 py-1 rounded"
+      >
+        <FormattedMessage id="evaluation.button.view" defaultMessage="Ver" /> <span>&gt;</span>
+      </button>
+
+      {/* Fechar se em EVALUATED */}
+      {evaluation.state === "EVALUATED" && (
+        <button
+          onClick={() => handleCloseEvaluation(evaluation.id)}
+          className="bg-[#D41C1C] text-white px-3 py-1 rounded"
+        >
+          <FormattedMessage id="evaluation.button.close" defaultMessage="Fechar" />
+        </button>
+      )}
+
+      {/* Reverter se em CLOSED */}
+      {evaluation.state === "CLOSED" && (
+        <button
+          onClick={() => handleReopenEvaluation(evaluation.id)}
+          className="bg-[#D41C1C] text-white px-3 py-1 rounded"
+        >
+          <FormattedMessage id="evaluation.button.revert" defaultMessage="Reverter" />
+        </button>
+      )}
+    </>
+  )}
+</div>
+      </td>
     </tr>
   ))}
 </tbody>
 
-</table>      {/* Juntar os botões num só <td> 
-      <td className="p-2 text-center pr-8" colSpan={2}>
-        <div className="flex flex-row items-center gap-2 justify-center">
-          <MessageUserButton userId={user.id} />
-          <button
-            onClick={() =>
-              navigate(`/profile/${user.id}`, { state: { profileOwnerEmail: user.email } })
-            }
-            className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2"
-          >
-            <FormattedMessage id="users.button.view" defaultMessage="Ver" /> <span>&gt;</span>
-          </button>
-        </div>
-      </td>*/}
-    
+</table>      
         
         </div>
       )}
@@ -247,8 +335,19 @@ const handleExportCSV = async () => {
         </div>
       )}
 
-
-
+{isAdmin && (
+  <div className="flex justify-center mt-10">
+    <button
+      onClick={handleCloseAllEvaluations}
+      className="bg-[#D41C1C] text-white font-bold px-6 py-3 rounded shadow hover:shadow-md transition"
+    >
+      <FormattedMessage
+        id="evaluations.button.closeAll"
+        defaultMessage="Fechar Todos os Processos"
+      />
+    </button>
+  </div>
+)}
 
 
 
