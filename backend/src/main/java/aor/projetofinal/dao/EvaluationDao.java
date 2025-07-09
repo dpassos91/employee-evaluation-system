@@ -4,6 +4,7 @@ import aor.projetofinal.entity.EvaluationCycleEntity;
 import aor.projetofinal.entity.EvaluationEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.EvaluationStateEnum;
+import aor.projetofinal.entity.enums.GradeEvaluationEnum;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -51,7 +52,7 @@ public class EvaluationDao {
         TypedQuery<Long> query = em.createQuery(
                 "SELECT COUNT(e) FROM EvaluationEntity e " +
                         "WHERE e.evaluated = :evaluated " +
-                        "AND e.state = aor.projetofinal.entity.enums.EvaluationStateType.CLOSED " +
+                        "AND e.state = aor.projetofinal.entity.enums.EvaluationStateEnum.CLOSED " +
                         "AND e.cycle.active = false",
                 Long.class
         );
@@ -98,12 +99,13 @@ public class EvaluationDao {
 
         // Grade filter
         if (grade != null) {
-            jpql.append(" AND e.grade.grade = :grade");
+            jpql.append(" AND e.grade = :gradeEnum");
         }
 
         // Cycle end date filter
         if (cycleEnd != null) {
-            jpql.append(" AND DATE(e.cycle.endDate) = :cycleEnd");
+            jpql.append(" AND e.cycle.endDate >= :cycleStartOfDay AND e.cycle.endDate < :cycleNextDay");
+
         }
 
         // Restrict visibility if not admin
@@ -125,11 +127,13 @@ public class EvaluationDao {
         }
 
         if (grade != null) {
-            query.setParameter("grade", grade);
+            GradeEvaluationEnum gradeEnum = GradeEvaluationEnum.getEnumfromGrade(grade);
+            query.setParameter("gradeEnum", gradeEnum);
         }
 
         if (cycleEnd != null) {
-            query.setParameter("cycleEnd", cycleEnd);
+            query.setParameter("cycleStartOfDay", cycleEnd.atStartOfDay());
+            query.setParameter("cycleNextDay", cycleEnd.plusDays(1).atStartOfDay());
         }
 
         if (!isAdmin) {
@@ -186,7 +190,7 @@ public class EvaluationDao {
         TypedQuery<EvaluationEntity> query = em.createQuery(
                 "SELECT e FROM EvaluationEntity e " +
                         "WHERE e.evaluated = :evaluated " +
-                        "AND e.state = aor.projetofinal.entity.enums.EvaluationStateType.CLOSED " +
+                        "AND e.state = aor.projetofinal.entity.enums.EvaluationStateEnum.CLOSED " +
                         "AND e.cycle.active = false " +
                         "ORDER BY e.date DESC", // most recent evaluations first
                 EvaluationEntity.class
@@ -258,12 +262,13 @@ public class EvaluationDao {
 
         // Filter by grade (1–4)
         if (grade != null) {
-            jpql.append(" AND e.grade.grade = :grade");
+            jpql.append(" AND e.grade = :gradeEnum");
         }
 
         // Filter by cycle end date
         if (cycleEnd != null) {
-            jpql.append(" AND DATE(e.cycle.endDate) = :cycleEnd");
+            jpql.append(" AND e.cycle.endDate >= :cycleStartOfDay AND e.cycle.endDate < :cycleNextDay");
+
         }
 
         // Restrict access based on role
@@ -289,11 +294,13 @@ public class EvaluationDao {
         }
 
         if (grade != null) {
-            query.setParameter("grade", grade);
+            GradeEvaluationEnum gradeEnum = GradeEvaluationEnum.getEnumfromGrade(grade);
+            query.setParameter("gradeEnum", gradeEnum);
         }
 
         if (cycleEnd != null) {
-            query.setParameter("cycleEnd", cycleEnd);
+            query.setParameter("cycleStartOfDay", cycleEnd.atStartOfDay());
+            query.setParameter("cycleNextDay", cycleEnd.plusDays(1).atStartOfDay());
         }
 
         if (!isAdmin) {

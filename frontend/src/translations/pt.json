@@ -67,7 +67,7 @@
   "users.list.title": "Listagem de Utilizadores",
   "users.filter.name": "Nome",
   "users.filter.manager": "Gestor",
-  "users.button.excel": "Excel",
+  "users.button.excel": "Excel CSV",
   "users.button.view": "Ver",
   "users.table.name": "Nome",
   "users.table.office": "Escritório",
@@ -83,6 +83,35 @@
   "chat.title": "Mensagens",
   "chat.subtitle": "O teu histórico de conversas",
   "chat.placeholder": "Escreve uma mensagem...",
+   "chat.conversations": "Conversas",
+
+
+
+   "evaluations.list.title": "Listagem de Avaliações",
+   "evaluations.table.empty": "Nenhuma avaliação encontrada com estes filtros.",
+   "evaluations.filter.name": "Nome",
+   "evaluation.state.IN_EVALUATION": "Em Avaliação",
+  "evaluation.state.EVALUATED": "Concluído",
+  "evaluation.state.CLOSED": "Fechado",
+  "evaluations.filter.state.state": "Estado",
+  "evaluations.filter.cycleEnd": "Data fim de ciclo",
+  "evaluations.filter.grade": "Avaliação",
+  "evaluations.table.photo": "Fotografia",
+  "evaluations.table.evaluated": "Avaliado",
+  "evaluations.table.state": "Estado",
+  "table.loading": "A carregar...",
+  "evaluation.button.view": "Ver",
+  "evaluation.button.fill": "Preencher",
+  "evaluation.button.close": "Fechar",
+  "evaluation.button.revert": "Reverter",
+  "evaluations.button.closeAll": "Fechar todas os processos",
+  "evaluations.form.title": "Formulário de Avaliação"
+ 
+
+
+
+
+
    "chat.conversations": "Conversas",
 
    "accessDenied.title": "Acesso restrito",

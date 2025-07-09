@@ -30,6 +30,9 @@ import ProfilePage from "./pages/ProfilePage";
 import UsersListPage from "./pages/UsersListPage";
 import ChatPage from "./pages/ChatPage";
 import EvaluationListPage from "./pages/EvaluationListPage"; 
+import EvaluationFormPage from "./pages/EvaluationFormPage";
+import EvaluationHistoryPage from "./pages/EvaluationHistoryPage";
+import NewEvaluationCyclePage from "./pages/NewEvaluationCyclePage";
 import CoursesPage from "./pages/CoursesPage";
 
 /**
@@ -141,13 +144,41 @@ const handleWebSocketMessage = useCallback((data) => {
             }
           />
             <Route
-            path="/evaluationlist"
+            path="/evaluations/fill/:email"
             element={
               <PrivateRoute>
                 <EvaluationListPage />
               </PrivateRoute>
             }
           />
+<Route
+            path="/evaluationlist"
+            element={
+              <PrivateRoute>
+                <EvaluationFormPage />
+              </PrivateRoute>
+            }
+          />
+
+<Route
+  path="/profile/:email/history"
+  element={
+    <PrivateRoute>
+      <EvaluationHistoryPage />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/newevaluationcycle"
+  element={
+    <PrivateRoute>
+      <NewEvaluationCyclePage />
+    </PrivateRoute>
+  }
+/>
+
+
 <Route
             path="/courses"
             element={
