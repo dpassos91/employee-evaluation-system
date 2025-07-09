@@ -82,6 +82,11 @@
   "chat.title": "Messages",
   "chat.subtitle": "Your conversation history",
   "chat.placeholder": "Type a message...",
-  "chat.conversations": "Conversations"
+  "chat.conversations": "Conversations",
+
+"accessDenied.title": "Access restricted",
+"accessDenied.message": "You do not have permission to access this page.\nYou will be redirected to the dashboard.",
+"accessDenied.redirecting": "Redirecting..."
+
   
 }

@@ -4,6 +4,8 @@ import Modal from "../components/Modal";
 import { FormattedMessage } from "react-intl";
 import { courseAPI } from "../api/courseAPI";
 import { useNavigate } from "react-router-dom";
+import AppForm from "../components/AppForm";
+import AppButton from "../components/AppButton";
 
 export default function CoursesPage() {
   // Filtros
@@ -15,10 +17,12 @@ export default function CoursesPage() {
   const [active, setActive] = useState("");
   const [page, setPage] = useState(1);
 
-  // Estado do modal de criação
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  // Estado único para modal e modo (criar/editar)
+  const [modalOpen, setModalOpen] = useState(false);
+  const [isCreateMode, setIsCreateMode] = useState(true);
+  const [editingCourseId, setEditingCourseId] = useState(null);
 
-  // Estado do formulário de criação de formação
+  // Estado do formulário (partilhado)
   const [form, setForm] = useState({
     name: "",
     timeSpan: "",
@@ -54,8 +58,8 @@ export default function CoursesPage() {
     setError("");
     courseAPI.listCourses(filters)
       .then(data => {
-        setCourses(data); // Adapta se tiveres paginação real
-        setTotalPages(1); // Adapta se tiveres paginação real
+        setCourses(data);
+        setTotalPages(1);
         setLoading(false);
       })
       .catch(err => {
@@ -80,7 +84,7 @@ export default function CoursesPage() {
     }
   };
 
-  // Atualiza campos do formulário de criação
+  // Atualiza campos do formulário
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({
@@ -89,11 +93,49 @@ export default function CoursesPage() {
     }));
   };
 
-  // Salvar nova formação
-  const handleCreate = async () => {
+  // Abrir modal em modo criação
+  const openCreateModal = () => {
+    setIsCreateMode(true);
+    setForm({
+      name: "",
+      timeSpan: "",
+      description: "",
+      link: "",
+      language: "",
+      courseCategory: "",
+      active: true
+    });
+    setEditingCourseId(null);
+    setModalOpen(true);
+  };
+
+  // Abrir modal em modo edição
+  const openEditModal = (course) => {
+    setIsCreateMode(false);
+    setEditingCourseId(course.id);
+    setForm({
+      name: course.name,
+      timeSpan: course.timeSpan,
+      description: course.description,
+      link: course.link,
+      language: course.language,
+      courseCategory: course.courseCategory,
+      active: course.active
+    });
+    setModalOpen(true);
+  };
+
+  // Handler universal submit
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
     try {
-      await courseAPI.createCourse(form);
-      setShowCreateModal(false);
+      if (isCreateMode) {
+        await courseAPI.createCourse(form);
+      } else {
+        await courseAPI.updateCourse(editingCourseId, form);
+      }
+      setModalOpen(false);
+      setEditingCourseId(null);
       setForm({
         name: "",
         timeSpan: "",
@@ -103,22 +145,22 @@ export default function CoursesPage() {
         courseCategory: "",
         active: true
       });
-      // Reload da lista de cursos
       courseAPI.listCourses(filters).then(setCourses);
     } catch (err) {
-      alert("Erro ao criar formação.");
+      alert(isCreateMode ? "Erro ao criar formação." : "Erro ao atualizar formação.");
     }
   };
 
-  // Actions do modal
-  const createActions = [
-    <button key="cancel" onClick={() => setShowCreateModal(false)} className="bg-gray-200 px-4 py-2 rounded">
-      <FormattedMessage id="common.cancel" defaultMessage="Cancelar" />
-    </button>,
-    <button key="save" type="submit" onClick={handleCreate} className="bg-blue-600 text-white px-4 py-2 rounded">
-      <FormattedMessage id="courses.create.save" defaultMessage="Salvar" />
-    </button>
-  ];
+  // Handler para desativar curso
+  const handleDeactivate = async (courseId) => {
+    if (!window.confirm("Tens a certeza que queres desativar esta formação?")) return;
+    try {
+      await courseAPI.deactivateCourse(courseId);
+      courseAPI.listCourses(filters).then(setCourses);
+    } catch (err) {
+      alert("Erro ao desativar formação.");
+    }
+  };
 
   return (
     <PageLayout title={<FormattedMessage id="courses.list.title" defaultMessage="Listagem de Formações" />}>
@@ -127,11 +169,11 @@ export default function CoursesPage() {
         {/* Botão Criar Formação */}
         <button
           className="bg-green-600 text-white px-4 py-2 rounded"
-          onClick={() => setShowCreateModal(true)}
+          onClick={openCreateModal}
         >
           <FormattedMessage id="courses.create.button" defaultMessage="Criar Formação" />
         </button>
-        {/* Filtros (exemplo, completa conforme preferires) */}
+        {/* Filtros */}
         <div className="flex gap-2">
           <input
             className="border px-2 py-1 rounded"
@@ -188,10 +230,21 @@ export default function CoursesPage() {
                   <td className="p-2">{course.language}</td>
                   <td className="p-2">{course.courseCategory}</td>
                   <td className="p-2">{course.active ? "Sim" : "Não"}</td>
-                  <td className="p-2">
-                    {/* Aqui podes pôr botões Editar, Desativar, etc */}
-                    <button className="bg-blue-600 text-white px-2 py-1 rounded mr-2">Editar</button>
-                    <button className="bg-red-600 text-white px-2 py-1 rounded">Desativar</button>
+                  <td className="p-2 flex gap-2">
+                    <AppButton
+                      variant="primary"
+                      className="px-2 py-1"
+                      onClick={() => openEditModal(course)}
+                    >
+                      <FormattedMessage id="courses.button.edit" defaultMessage="Editar" />
+                    </AppButton>
+                    <AppButton
+                      variant="secondary"
+                      className="px-2 py-1 bg-red-600 text-white hover:bg-red-700"
+                      onClick={() => handleDeactivate(course.id)}
+                    >
+                      <FormattedMessage id="courses.button.deactivate" defaultMessage="Desativar" />
+                    </AppButton>
                   </td>
                 </tr>
               ))}
@@ -200,142 +253,147 @@ export default function CoursesPage() {
         </div>
       )}
 
-      {/* Modal de criação */}
+      {/* Modal único para criar/editar */}
       <Modal
-  isOpen={showCreateModal}
-  onClose={() => setShowCreateModal(false)}
-  title={<FormattedMessage id="courses.create.title" defaultMessage="Nova Formação" />}
-  actions={[
-    {
-      label: <FormattedMessage id="modal.cancel" defaultMessage="Cancelar" />,
-      variant: "secondary",
-      onClick: () => setShowCreateModal(false)
-    },
-    {
-      label: <FormattedMessage id="modal.save" defaultMessage="Guardar" />,
-      variant: "primary",
-      type: "submit",
-      onClick: handleCreate
-    }
-  ]}
->
-  <form onSubmit={e => { e.preventDefault(); handleCreate(); }}>
-    {/* Nome */}
-    <div className="mb-3">
-      <label className="block text-sm font-medium mb-1">
-        <FormattedMessage id="courses.field.name" defaultMessage="Nome" />
-      </label>
-      <input
-        name="name"
-        className="border px-2 py-1 rounded w-full"
-        value={form.name}
-        onChange={handleFormChange}
-        required
-      />
-    </div>
-
-    {/* Duração */}
-    <div className="mb-3">
-      <label className="block text-sm font-medium mb-1">
-        <FormattedMessage id="courses.field.timeSpan" defaultMessage="Duração (horas)" />
-      </label>
-      <input
-        name="timeSpan"
-        type="number"
-        min={0}
-        step={0.1}
-        className="border px-2 py-1 rounded w-full"
-        value={form.timeSpan}
-        onChange={handleFormChange}
-        required
-      />
-    </div>
-
-    {/* Descrição */}
-    <div className="mb-3">
-      <label className="block text-sm font-medium mb-1">
-        <FormattedMessage id="courses.field.description" defaultMessage="Descrição" />
-      </label>
-      <textarea
-        name="description"
-        className="border px-2 py-1 rounded w-full"
-        value={form.description}
-        onChange={handleFormChange}
-        required
-      />
-    </div>
-
-    {/* Link */}
-    <div className="mb-3">
-      <label className="block text-sm font-medium mb-1">
-        <FormattedMessage id="courses.field.link" defaultMessage="Link" />
-      </label>
-      <input
-        name="link"
-        className="border px-2 py-1 rounded w-full"
-        value={form.link}
-        onChange={handleFormChange}
-        required
-      />
-    </div>
-
-    {/* Idioma */}
-    <div className="mb-3">
-      <label className="block text-sm font-medium mb-1">
-        <FormattedMessage id="courses.field.language" defaultMessage="Idioma" />
-      </label>
-      <select
-        name="language"
-        className="border px-2 py-1 rounded w-full"
-        value={form.language}
-        onChange={handleFormChange}
-        required
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={
+          isCreateMode
+            ? <FormattedMessage id="courses.create.title" defaultMessage="Nova Formação" />
+            : <FormattedMessage id="courses.edit.title" defaultMessage="Editar Formação" />
+        }
       >
-        <option value="">--</option>
-        <option value="PT">Português</option>
-        <option value="EN">Inglês</option>
-        <option value="IT">Italiano</option>
-        <option value="FR">Francês</option>
-        <option value="ES">Espanhol</option>
-      </select>
-    </div>
-
-    {/* Área */}
-    <div className="mb-3">
-      <label className="block text-sm font-medium mb-1">
-        <FormattedMessage id="courses.field.category" defaultMessage="Área" />
-      </label>
-      <select
-        name="courseCategory"
-        className="border px-2 py-1 rounded w-full"
-        value={form.courseCategory}
-        onChange={handleFormChange}
-        required
-      >
-        <option value="">--</option>
-        <option value="FRONTEND">Frontend</option>
-        <option value="BACKEND">Backend</option>
-        <option value="INFRAESTRUTURA">Infraestrutura</option>
-        <option value="UX_UI">UX/UI</option>
-      </select>
-    </div>
-
-    {/* Ativo */}
-    <div className="mb-3 flex items-center">
-      <input
-        id="active"
-        name="active"
-        type="checkbox"
-        className="mr-2"
-        checked={form.active}
-        onChange={handleFormChange}
-      />
-      <label htmlFor="active" className="text-sm font-medium">
-        <FormattedMessage id="courses.field.active" defaultMessage="Ativo" />
-      </label>
-    </div>
-  </form>
-</Modal>
+        <AppForm onSubmit={handleSubmit}>
+          {/* Nome */}
+          <div className="mb-3">
+            <label className="block text-sm font-medium mb-1">
+              <FormattedMessage id="courses.field.name" defaultMessage="Nome" />
+            </label>
+            <input
+              name="name"
+              className="border px-2 py-1 rounded w-full"
+              value={form.name}
+              onChange={handleFormChange}
+              required
+            />
+          </div>
+          {/* Duração */}
+          <div className="mb-3">
+            <label className="block text-sm font-medium mb-1">
+              <FormattedMessage id="courses.field.timeSpan" defaultMessage="Duração (horas)" />
+            </label>
+            <input
+              name="timeSpan"
+              type="number"
+              min={0}
+              step={0.1}
+              className="border px-2 py-1 rounded w-full"
+              value={form.timeSpan}
+              onChange={handleFormChange}
+              required
+            />
+          </div>
+          {/* Descrição */}
+          <div className="mb-3">
+            <label className="block text-sm font-medium mb-1">
+              <FormattedMessage id="courses.field.description" defaultMessage="Descrição" />
+            </label>
+            <textarea
+              name="description"
+              className="border px-2 py-1 rounded w-full"
+              value={form.description}
+              onChange={handleFormChange}
+              required
+            />
+          </div>
+          {/* Link */}
+          <div className="mb-3">
+            <label className="block text-sm font-medium mb-1">
+              <FormattedMessage id="courses.field.link" defaultMessage="Link" />
+            </label>
+            <input
+              name="link"
+              className="border px-2 py-1 rounded w-full"
+              value={form.link}
+              onChange={handleFormChange}
+              required
+            />
+          </div>
+          {/* Idioma */}
+          <div className="mb-3">
+            <label className="block text-sm font-medium mb-1">
+              <FormattedMessage id="courses.field.language" defaultMessage="Idioma" />
+            </label>
+            <select
+              name="language"
+              className="border px-2 py-1 rounded w-full"
+              value={form.language}
+              onChange={handleFormChange}
+              required
+            >
+              <option value="">--</option>
+              <option value="PT">Português</option>
+              <option value="EN">Inglês</option>
+              <option value="IT">Italiano</option>
+              <option value="FR">Francês</option>
+              <option value="ES">Espanhol</option>
+            </select>
+          </div>
+          {/* Área */}
+          <div className="mb-3">
+            <label className="block text-sm font-medium mb-1">
+              <FormattedMessage id="courses.field.category" defaultMessage="Área" />
+            </label>
+            <select
+              name="courseCategory"
+              className="border px-2 py-1 rounded w-full"
+              value={form.courseCategory}
+              onChange={handleFormChange}
+              required
+            >
+              <option value="">--</option>
+              <option value="FRONTEND">Frontend</option>
+              <option value="BACKEND">Backend</option>
+              <option value="INFRAESTRUTURA">Infraestrutura</option>
+              <option value="UX_UI">UX/UI</option>
+            </select>
+          </div>
+          {/* Ativo */}
+          <div className="mb-3 flex items-center">
+            <input
+              id="active"
+              name="active"
+              type="checkbox"
+              className={`mr-2 ${isCreateMode ? "cursor-not-allowed opacity-60" : ""}`}
+              checked={form.active}
+              disabled={isCreateMode}
+              onChange={handleFormChange}
+            />
+            <label htmlFor="active" className="text-sm font-medium">
+              <FormattedMessage id="courses.field.active" defaultMessage="Ativo" />
+            </label>
+          </div>
+          {/* Botões */}
+          <div className="flex gap-2 justify-end mt-4">
+            <AppButton
+              variant="secondary"
+              type="button"
+              onClick={() => setModalOpen(false)}
+            >
+              <FormattedMessage id="modal.cancel" defaultMessage="Cancelar" />
+            </AppButton>
+            <AppButton
+              variant="primary"
+              type="submit"
+            >
+              <FormattedMessage
+                id={isCreateMode ? "modal.save" : "modal.save"}
+                defaultMessage="Guardar"
+              />
+            </AppButton>
+          </div>
+        </AppForm>
+      </Modal>
 
       {/* Empty/Paginação pode ser igual ao UsersPage */}
       {!loading && courses.length === 0 && (
@@ -346,4 +404,3 @@ export default function CoursesPage() {
     </PageLayout>
   );
 }
-

@@ -18,7 +18,7 @@ import { userStore } from "../stores/userStore";
  * @param {React.ReactNode} props.children - The component(s) to render if access is allowed
  * @returns {React.ReactNode} Either the children or a <Navigate> component for redirection
  */
-export function PrivateRoute({ children }) {
+export default function PrivateRoute({ children }) {
   // Get authentication and profile state from user store
   const { user, profileComplete } = userStore();
   const location = useLocation();

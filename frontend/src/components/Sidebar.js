@@ -6,6 +6,7 @@ import profileIcon from "../images/profile_icon.png";
 import dashboardIcon from "../images/dashboard_icon.png";
 import miniprofileIcon from "../images/miniprofile_icon.png";
 import usersIcon from "../images/users_icon.png";
+import coursesIcon from "../images/courses_icon.png";
 import { FaSignOutAlt } from "react-icons/fa";
 import { useAuth } from "../hooks/useAuth";
 import { userStore } from "../stores/userStore";
@@ -18,6 +19,8 @@ export default function Sidebar() {
 
   // Responsividade: sidebar aberta só em desktop por defeito
   const [isOpen, setIsOpen] = useState(window.innerWidth >= 1024);
+  const isAdmin = user?.role === "admin";
+  const isManager = user?.role === "manager";
 
   useEffect(() => {
     const handleResize = () => {
@@ -32,6 +35,14 @@ export default function Sidebar() {
     { id: "sidebar.profile", icon: miniprofileIcon, path: `/profile/${user.id}` },
     { id: "sidebar.users", icon: usersIcon, path: "/userslist" },
   ];
+
+  if (isAdmin) { 
+  menuItems.push({
+    id: "sidebar.courses",
+    icon: coursesIcon,
+    path: "/courses"
+  });
+}
 
   // Novo: calcula o url da foto só a partir do user global
   const photoUrl = user?.photograph && user.photograph.trim() !== ""

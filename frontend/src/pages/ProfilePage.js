@@ -579,7 +579,6 @@ const handlePhotoUpload = async () => {
         required
       />
     </div>
-    {/* Podes adicionar aqui erro global, se quiseres, usando o prop error no AppForm */}
   </AppForm>
 </Modal>
 

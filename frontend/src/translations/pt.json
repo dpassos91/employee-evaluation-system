@@ -64,7 +64,7 @@
   "profile.update.error": "Erro ao atualizar o perfil.",
   "profile.fetch.error": "Erro ao obter os dados do perfil.",
 
-    "users.list.title": "Listagem de Utilizadores",
+  "users.list.title": "Listagem de Utilizadores",
   "users.filter.name": "Nome",
   "users.filter.manager": "Gestor",
   "users.button.excel": "Excel",
@@ -83,6 +83,10 @@
   "chat.title": "Mensagens",
   "chat.subtitle": "O teu histórico de conversas",
   "chat.placeholder": "Escreve uma mensagem...",
-   "chat.conversations": "Conversas"
+   "chat.conversations": "Conversas",
+
+   "accessDenied.title": "Acesso restrito",
+"accessDenied.message": "Não tens permissão para aceder a esta página.\nSerás redirecionado para o dashboard.",
+"accessDenied.redirecting": "A redirecionar..."
 
 }

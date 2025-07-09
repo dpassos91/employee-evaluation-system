@@ -11,7 +11,8 @@ import { useEffect, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { IntlProvider } from "react-intl";
 
-import { PrivateRoute } from "./components/PrivateRoute";
+import PrivateRoute from "./components/PrivateRoute";
+import RoleRoute from "./components/RoleRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -150,9 +151,9 @@ const handleWebSocketMessage = useCallback((data) => {
 <Route
             path="/courses"
             element={
-              <PrivateRoute>
+              <RoleRoute allowedRoles={["admin", "manager"]}>
                 <CoursesPage />
-              </PrivateRoute>
+              </RoleRoute>
             }
           />
           {/* Redirect all unknown routes to login */}

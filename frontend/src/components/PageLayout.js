@@ -3,7 +3,18 @@ import NotificationIcon from "../components/NotificationIcon";
 import MessageIcon from "../components/MessageIcon";
 import LanguageIcon from "../components/LanguageIcon";
 import { userStore } from "../stores/userStore";
+import PageFadeIn from "../components/PageFadeIn"; // importa aqui!
 
+/**
+ * PageLayout
+ * Layout wrapper for all main app pages.
+ * Applies sidebar, top icons, header, and fade-in animation to content.
+ *
+ * Props:
+ * - title: string or ReactNode (page title)
+ * - subtitle: string or ReactNode (optional subtitle)
+ * - children: ReactNode (page content)
+ */
 export default function PageLayout({ title, subtitle, children }) {
   const { user } = userStore();
 
@@ -40,7 +51,11 @@ export default function PageLayout({ title, subtitle, children }) {
             {subtitle && <p className="text-gray-600">{subtitle}</p>}
           </div>
         </div>
-        {children}
+
+        {/* Fade-in animado para o conteúdo principal */}
+        <PageFadeIn>
+          {children}
+        </PageFadeIn>
       </main>
     </div>
   );
