@@ -1,11 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
 import MessageUserButton from "../components/MessageUserButton";
-import { useUsersList } from "../hooks/useUsersList"; 
+import { useUsersList } from "../hooks/useUsersList";
 import { formatWorkplace } from "../utils/formatWorkplace";
 import { apiConfig } from "../api/apiConfig";
 import { useNavigate } from "react-router-dom";
+import { AppTable } from "../components/AppTable";
+import { profileAPI } from "../api/profileAPI";
+import profileIcon from "../images/profile_icon.png";
 
 export default function UsersPage() {
   // Filtros e página
@@ -13,15 +16,81 @@ export default function UsersPage() {
   const [office, setOffice] = useState("");
   const [manager, setManager] = useState("");
   const [page, setPage] = useState(1);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-    const filters = useMemo(
+  const filters = useMemo(
     () => ({ name, office, manager, page }),
     [name, office, manager, page]
   );
 
   // Buscar utilizadores com filtros e paginação
   const { users, totalPages, loading, error } = useUsersList(filters);
+  console.log("UsersPage renderizou!", { name, office, manager, page });
+
+  function AvatarCell({ avatar, name }) {
+    const [src, setSrc] = useState(
+      avatar && avatar.trim() !== ""
+        ? profileAPI.getPhoto(avatar)
+        : profileIcon
+    );
+  
+    return (
+      <img
+        src={src}
+        alt={name}
+        className="w-8 h-8 rounded-full object-cover ml-16"
+        onError={() => setSrc("/default_avatar.png")}
+      />
+    );
+  }
+
+  // Definição das colunas para a tabela
+  const columns = [
+    {
+      header: <FormattedMessage id="users.table.name" defaultMessage="Nome" />,
+      accessor: "name",
+      className: "w-[180px]",
+    },
+    {
+      header: <FormattedMessage id="users.table.office" defaultMessage="Escritório" />,
+      accessor: (u) => formatWorkplace(u.office),
+      className: "w-[140px]",
+    },
+    {
+      header: <FormattedMessage id="users.table.manager" defaultMessage="Gestor" />,
+      accessor: "manager",
+      className: "w-[180px]",
+    },
+    {
+      header: <FormattedMessage id="users.table.contact" defaultMessage="Contacto" />,
+      accessor: "email",
+      className: "w-[220px] truncate",
+    },
+{
+  header: "",
+  accessor: (u) => <AvatarCell avatar={u.avatar} name={u.name} />,
+  className: "w-[100px] flex items-center",
+},
+    {
+      header: <FormattedMessage id="users.table.actions" defaultMessage="Ações" />,
+      accessor: null,
+      render: (user) => (
+        <div className="flex flex-row items-center gap-2 justify-center">
+          <MessageUserButton userId={user.id} />
+          <button
+            onClick={() =>
+              navigate(`/profile/${user.id}`, { state: { profileOwnerEmail: user.email } })
+            }
+            className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2"
+          >
+            <FormattedMessage id="users.button.view" defaultMessage="Ver" /> <span>&gt;</span>
+          </button>
+        </div>
+      ),
+      className: "w-[200px] text-center pr-8",
+      colSpan: 2, // Podes remover se não estiveres a usar colSpan na tabela base
+    },
+  ];
 
   // Funções para lidar com filtros
   const handleFilterName = (e) => { setName(e.target.value); setPage(1); };
@@ -35,37 +104,36 @@ export default function UsersPage() {
   ];
 
   const handleExportCSV = async () => {
-  try {
-    // Lê filtros do state (name, office, manager)
-    const params = new URLSearchParams();
-    if (name) params.append("profile-name", name);
-    if (office) params.append("usual-work-place", office);
-    if (manager) params.append("manager-email", manager);
+    try {
+      // Lê filtros do state (name, office, manager)
+      const params = new URLSearchParams();
+      if (name) params.append("profile-name", name);
+      if (office) params.append("usual-work-place", office);
+      if (manager) params.append("manager-email", manager);
 
-    const url = `${apiConfig.API_ENDPOINTS.profiles.exportUsersCsv}?${params.toString()}`;
+      const url = `${apiConfig.API_ENDPOINTS.profiles.exportUsersCsv}?${params.toString()}`;
 
-    const token = sessionStorage.getItem("authToken");
+      const token = sessionStorage.getItem("authToken");
 
-    // Usa fetch diretamente para blobs
-    const response = await fetch(url, {
-      headers: {
-        sessionToken: token,
-        token,
-      },
-    });
-    if (!response.ok) throw new Error("Erro ao exportar CSV");
-    const blob = await response.blob();
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "users_export.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch (err) {
-    alert("Erro ao exportar ficheiro.");
-  }
-};
-
+      // Usa fetch diretamente para blobs
+      const response = await fetch(url, {
+        headers: {
+          sessionToken: token,
+          token,
+        },
+      });
+      if (!response.ok) throw new Error("Erro ao exportar CSV");
+      const blob = await response.blob();
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "users_export.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      alert("Erro ao exportar ficheiro.");
+    }
+  };
 
   return (
     <PageLayout title={<FormattedMessage id="users.list.title" defaultMessage="Listagem de Utilizadores" />}>
@@ -102,8 +170,8 @@ export default function UsersPage() {
             />
           )}
         </FormattedMessage>
-        <button className="bg-green-600 text-white px-3 rounded" 
-        onClick={handleExportCSV}
+        <button className="bg-green-600 text-white px-3 rounded"
+          onClick={handleExportCSV}
         >
           <FormattedMessage id="users.button.excel" defaultMessage="Excel" />
         </button>
@@ -115,61 +183,13 @@ export default function UsersPage() {
 
       {/* Tabela */}
       {!loading && users.length > 0 && (
-        <div className="overflow-x-auto w-full">
-        <table className="min-w-full text-left border-collapse table-auto">
-          <thead>
-            <tr className="bg-gray-200 text-sm">
-              <th className="p-2 w-[180px]">
-                <FormattedMessage id="users.table.name" defaultMessage="Nome" />
-              </th>
-              <th className="p-2 w-[140px]">
-                <FormattedMessage id="users.table.office" defaultMessage="Escritório" />
-              </th>
-              <th className="p-2 w-[180px]">
-                <FormattedMessage id="users.table.manager" defaultMessage="Gestor" />
-              </th>
-              <th className="p-2 w-[220px]">
-                <FormattedMessage id="users.table.contact" defaultMessage="Contacto" />
-              </th>
-              <th className="p-2 w-[100px]"></th>
-              <th className="p-2 w-[60px]"></th>
-              <th className="p-2 w-[200px]">
-                <FormattedMessage id="users.table.actions" defaultMessage="Ações" />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-  {users.map((user) => (
-    <tr key={user.id} className="border-b hover:bg-gray-50">
-      <td className="p-2">{user.name}</td>
-      <td className="p-2">{formatWorkplace(user.office)}</td>
-      <td className="p-2">{user.manager}</td>
-      <td className="p-2 truncate">{user.email}</td>
-      <td className="p-2 pl-20">
-        <img
-          src={user.avatar || "/default_avatar.png"}
-          alt={user.name}
-          className="w-8 h-8 rounded-full"
-        />
-      </td>
-      {/* Juntar os botões num só <td> */}
-      <td className="p-2 text-center pr-8" colSpan={2}>
-        <div className="flex flex-row items-center gap-2 justify-center">
-          <MessageUserButton userId={user.id} />
-          <button
-            onClick={() =>
-              navigate(`/profile/${user.id}`, { state: { profileOwnerEmail: user.email } })
-            }
-            className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2"
-          >
-            <FormattedMessage id="users.button.view" defaultMessage="Ver" /> <span>&gt;</span>
-          </button>
-        </div>
-      </td>
-    </tr>
-  ))}
-</tbody>
-        </table>
+        <div>
+          <AppTable
+            columns={columns}
+            data={users}
+            loading={loading}
+            emptyMessage={<FormattedMessage id="users.table.noResults" defaultMessage="Nenhum utilizador encontrado." />}
+          />
         </div>
       )}
 
@@ -200,4 +220,5 @@ export default function UsersPage() {
     </PageLayout>
   );
 }
+
 

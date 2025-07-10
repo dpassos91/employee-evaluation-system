@@ -12,7 +12,7 @@ export function useUsersList(filters) {
   const [users, setUsers] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -45,7 +45,6 @@ const mapped = (result.profiles || []).map(profile => ({
       setUsers(mapped);
       setTotalPages(result.totalPages || 1);
       setTotalCount(result.totalCount || 0);
-      setCurrentPage(result.currentPage || filters.page || 1);
     } catch (err) {
       setError(err.message || "Erro ao obter utilizadores");
       setUsers([]);
@@ -54,16 +53,17 @@ const mapped = (result.profiles || []).map(profile => ({
     }
   }, [filters]);
 
+  console.log("useUsersList: fetch triggered", filters);
+
   // Refetch whenever filters change
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]);
+  }, [filters]);
 
   return {
     users,
     totalPages,
     totalCount,
-    currentPage,
     loading,
     error,
     refetch: fetchUsers,
