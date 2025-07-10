@@ -10,6 +10,7 @@ import aor.projetofinal.entity.enums.EvaluationStateEnum;
 import aor.projetofinal.util.EmailUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -123,7 +124,7 @@ public class EvaluationCycleBean implements Serializable {
 
     }
 
-
+    @Transactional
     public void createCycleAndCreateBlankEvaluations(LocalDate endDate) {
         //creating cycle with the end date provided by the admin from the frontend
 

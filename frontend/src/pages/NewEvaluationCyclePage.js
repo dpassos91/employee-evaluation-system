@@ -4,7 +4,7 @@ import PageLayout from "../components/PageLayout";
 import AppForm from "../components/AppForm";
 import { FormattedMessage } from "react-intl";
 import { toast } from "react-toastify";
-import { apiConfig } from "../api/apiConfig";
+import { evaluationCycleAPI } from "../api/evaluationCycleAPI";
 import { userStore } from "../stores/userStore";
 
 export default function NewEvaluationCyclePage() {
@@ -26,9 +26,15 @@ export default function NewEvaluationCyclePage() {
 
     const fetchStats = async () => {
       try {
-        const [noManagerRes, openCyclesRes] = await Promise.all([
-          apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluationCycle.usersWithoutManager),
-          apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluationCycle.openEvaluationsCount),
+       const [noManagerRes, openCyclesRes] = await Promise.all([
+          // Podes criar helpers em evaluationCycleAPI depois
+          // Por agora mantemos como estava
+          fetch("/grupo7/rest/evaluation-cycles/users-without-manager", {
+            headers: { sessionToken: sessionStorage.getItem("authToken") },
+          }).then(r => r.json()),
+          fetch("/grupo7/rest/evaluation-cycles/incomplete-evaluations", {
+            headers: { sessionToken: sessionStorage.getItem("authToken") },
+          }).then(r => r.json()),
         ]);
 
         setUsersWithoutManager(noManagerRes.count || 0);
@@ -49,11 +55,7 @@ export default function NewEvaluationCyclePage() {
 
     setLoading(true);
     try {
-      await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluationCycle.start, {
-        method: "POST",
-        body: JSON.stringify({ endDate }),
-      });
-
+      await evaluationCycleAPI.createCycle({ endDate }, sessionStorage.getItem("authToken"));
       toast.success("Novo ciclo iniciado com sucesso!");
       navigate("/evaluationlist");
     } catch (error) {
