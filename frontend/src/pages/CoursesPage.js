@@ -6,6 +6,7 @@ import { courseAPI } from "../api/courseAPI";
 import { useNavigate } from "react-router-dom";
 import AppForm from "../components/AppForm";
 import AppButton from "../components/AppButton";
+import { AppTable } from "../components/AppTable";
 
 export default function CoursesPage() {
   // Filtros
@@ -45,12 +46,11 @@ export default function CoursesPage() {
   const filters = useMemo(() => ({
     ...(name && { name }),
     ...(minTimeSpan && { minTimeSpan }),
-    ...(maxTimeSpan && { maxTimeSpan }),
     ...(language && { language }),
     ...(category && { category }),
     ...(active !== "" && { active }),
     page,
-  }), [name, minTimeSpan, maxTimeSpan, language, category, active, page]);
+  }), [name, minTimeSpan, language, category, active, page]);
 
   // Carregar cursos
   useEffect(() => {
@@ -162,47 +162,149 @@ export default function CoursesPage() {
     }
   };
 
-  return (
-    <PageLayout title={<FormattedMessage id="courses.list.title" defaultMessage="Listagem de Formações" />}>
-      {/* Topo: botão criar formação e filtros */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-        {/* Botão Criar Formação */}
-        <button
-          className="bg-green-600 text-white px-4 py-2 rounded"
-          onClick={openCreateModal}
+  const LANGUAGE_OPTIONS = [
+  { value: "", label: <FormattedMessage id="courses.language.any" defaultMessage="Idioma" /> },
+  { value: "PT", label: <FormattedMessage id="courses.language.PT" defaultMessage="Português" /> },
+  { value: "EN", label: <FormattedMessage id="courses.language.EN" defaultMessage="Inglês" /> },
+  { value: "IT", label: <FormattedMessage id="courses.language.IT" defaultMessage="Italiano" /> },
+  { value: "FR", label: <FormattedMessage id="courses.language.FR" defaultMessage="Francês" /> },
+  { value: "ES", label: <FormattedMessage id="courses.language.ES" defaultMessage="Espanhol" /> },
+];
+
+const CATEGORY_OPTIONS = [
+  { value: "", label: <FormattedMessage id="courses.category.any" defaultMessage="Área" /> },
+  { value: "FRONTEND", label: <FormattedMessage id="courses.category.FRONTEND" defaultMessage="Frontend" /> },
+  { value: "BACKEND", label: <FormattedMessage id="courses.category.BACKEND" defaultMessage="Backend" /> },
+  { value: "INFRAESTRUTURA", label: <FormattedMessage id="courses.category.INFRAESTRUTURA" defaultMessage="Infraestrutura" /> },
+  { value: "UX_UI", label: <FormattedMessage id="courses.category.UX_UI" defaultMessage="UX/UI" /> },
+];
+
+
+  const columns = [
+  {
+    header: <FormattedMessage id="courses.table.name" defaultMessage="Nome" />,
+    accessor: "name",
+    className: "w-[180px]",
+  },
+  {
+    header: <FormattedMessage id="courses.table.timeSpan" defaultMessage="Duração (horas)" />,
+    accessor: "timeSpan",
+    className: "w-[100px]",
+  },
+  {
+    header: <FormattedMessage id="courses.table.language" defaultMessage="Idioma" />,
+    accessor: "language",
+    className: "w-[120px]",
+  },
+  {
+    header: <FormattedMessage id="courses.table.category" defaultMessage="Área" />,
+    accessor: "courseCategory",
+    className: "w-[150px]",
+  },
+  {
+    header: <FormattedMessage id="courses.table.active" defaultMessage="Ativo" />,
+    accessor: (c) => c.active ? "Sim" : "Não",
+    className: "w-[80px]",
+  },
+  {
+    header: <FormattedMessage id="courses.table.actions" defaultMessage="Ações" />,
+    accessor: null,
+    render: (course) => (
+      <div className="flex gap-2">
+        <AppButton
+          variant="primary"
+          className="px-2 py-1"
+          onClick={() => openEditModal(course)}
         >
-          <FormattedMessage id="courses.create.button" defaultMessage="Criar Formação" />
-        </button>
-        {/* Filtros */}
-        <div className="flex gap-2">
-          <input
-            className="border px-2 py-1 rounded"
-            placeholder="Nome"
-            value={name}
-            onChange={e => { setName(e.target.value); setPage(1); }}
-          />
-          <input
-            className="border px-2 py-1 rounded"
-            placeholder="Duração min"
-            type="number"
-            min={0}
-            value={minTimeSpan}
-            onChange={e => { setMinTimeSpan(e.target.value); setPage(1); }}
-          />
-          <input
-            className="border px-2 py-1 rounded"
-            placeholder="Duração max"
-            type="number"
-            min={0}
-            value={maxTimeSpan}
-            onChange={e => { setMaxTimeSpan(e.target.value); setPage(1); }}
-          />
-          {/* Aqui depois selects para idioma, categoria, ativo */}
-          <button className="bg-green-600 text-white px-3 rounded" onClick={handleExportCSV}>
-            <FormattedMessage id="courses.button.excel" defaultMessage="Excel" />
-          </button>
-        </div>
+          <FormattedMessage id="courses.button.edit" defaultMessage="Editar" />
+        </AppButton>
+        <AppButton
+          variant="secondary"
+          className="px-2 py-1"
+          onClick={() => handleDeactivate(course.id)}
+        >
+          <FormattedMessage id="courses.button.deactivate" defaultMessage="Desativar" />
+        </AppButton>
       </div>
+    ),
+    className: "w-[200px]",
+  },
+];
+
+
+  return (
+<PageLayout title={<FormattedMessage id="courses.list.title" defaultMessage="Listagem de Formações" />}>
+  {/* Linha 1: Botão Criar Formação */}
+  <div className="mb-4">
+    <AppButton
+      variant="primary"
+      onClick={openCreateModal}
+    >
+      <FormattedMessage id="courses.create.button" defaultMessage="Criar Formação" />
+    </AppButton>
+  </div>
+  {/* Linha 2: Filtros + botão Excel */}
+  <div className="flex gap-4 mb-4">
+  {/* Nome */}
+  <FormattedMessage id="courses.filter.name" defaultMessage="Nome">
+    {msg => (
+      <input
+        className="border px-2 py-1 rounded"
+        placeholder={msg}
+        value={name}
+        onChange={e => { setName(e.target.value); setPage(1); }}
+      />
+    )}
+  </FormattedMessage>
+
+  {/* Duração mínima */}
+  <FormattedMessage id="courses.filter.duration" defaultMessage="Duração (horas)">
+    {msg => (
+      <input
+        className="border px-2 py-1 rounded"
+        placeholder={msg}
+        type="number"
+        min={0}
+        value={minTimeSpan}
+        onChange={e => { setMinTimeSpan(e.target.value); setPage(1); }}
+      />
+    )}
+  </FormattedMessage>
+
+  {/* Idioma (select) */}
+  <select
+    name="language"
+    className="border px-2 py-1 rounded"
+    value={language}
+    onChange={e => { setLanguage(e.target.value); setPage(1); }}
+  >
+    {LANGUAGE_OPTIONS.map(opt => (
+      <option key={opt.value} value={opt.value}>
+        {opt.label}
+      </option>
+    ))}
+  </select>
+
+  {/* Área/Categoria (select) */}
+  <select
+    name="category"
+    className="border px-2 py-1 rounded"
+    value={category}
+    onChange={e => { setCategory(e.target.value); setPage(1); }}
+  >
+    {CATEGORY_OPTIONS.map(opt => (
+      <option key={opt.value} value={opt.value}>
+        {opt.label}
+      </option>
+    ))}
+  </select>
+    {/* Outros filtros, selects, etc */}
+    <AppButton 
+     variant="excel" 
+     onClick={handleExportCSV}>
+      <FormattedMessage id="courses.button.excel" defaultMessage="Excel CSV" />
+    </AppButton>
+  </div>
 
       {/* Loading/Error */}
       {loading && <div className="py-8 text-center text-gray-500">A carregar...</div>}
@@ -210,48 +312,16 @@ export default function CoursesPage() {
 
       {/* Tabela cursos */}
       {!loading && courses.length > 0 && (
-        <div className="overflow-x-auto w-full">
-          <table className="min-w-full text-left border-collapse table-auto">
-            <thead>
-              <tr className="bg-gray-200 text-sm">
-                <th className="p-2"><FormattedMessage id="courses.table.name" defaultMessage="Nome" /></th>
-                <th className="p-2"><FormattedMessage id="courses.table.timeSpan" defaultMessage="Duração" /></th>
-                <th className="p-2"><FormattedMessage id="courses.table.language" defaultMessage="Idioma" /></th>
-                <th className="p-2"><FormattedMessage id="courses.table.category" defaultMessage="Área" /></th>
-                <th className="p-2"><FormattedMessage id="courses.table.active" defaultMessage="Ativo" /></th>
-                <th className="p-2"><FormattedMessage id="courses.table.actions" defaultMessage="Ações" /></th>
-              </tr>
-            </thead>
-            <tbody>
-              {courses.map((course) => (
-                <tr key={course.id} className="border-b hover:bg-gray-50">
-                  <td className="p-2">{course.name}</td>
-                  <td className="p-2">{course.timeSpan}</td>
-                  <td className="p-2">{course.language}</td>
-                  <td className="p-2">{course.courseCategory}</td>
-                  <td className="p-2">{course.active ? "Sim" : "Não"}</td>
-                  <td className="p-2 flex gap-2">
-                    <AppButton
-                      variant="primary"
-                      className="px-2 py-1"
-                      onClick={() => openEditModal(course)}
-                    >
-                      <FormattedMessage id="courses.button.edit" defaultMessage="Editar" />
-                    </AppButton>
-                    <AppButton
-                      variant="secondary"
-                      className="px-2 py-1 bg-red-600 text-white hover:bg-red-700"
-                      onClick={() => handleDeactivate(course.id)}
-                    >
-                      <FormattedMessage id="courses.button.deactivate" defaultMessage="Desativar" />
-                    </AppButton>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+  <AppTable
+    columns={columns}
+    data={courses}
+    loading={loading}
+    emptyMessage={
+      <FormattedMessage id="courses.table.empty" defaultMessage="Nenhuma formação encontrada com estes filtros." />
+    }
+  />
+)}
+
 
       {/* Modal único para criar/editar */}
       <Modal

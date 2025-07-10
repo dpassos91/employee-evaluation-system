@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { AppTable } from "../components/AppTable";
 import { profileAPI } from "../api/profileAPI";
 import profileIcon from "../images/profile_icon.png";
+import AppButton from "../components/AppButton";
 
 export default function UsersPage() {
   // Filtros e página
@@ -170,11 +171,12 @@ export default function UsersPage() {
             />
           )}
         </FormattedMessage>
-        <button className="bg-green-600 text-white px-3 rounded"
+        <AppButton
+          variant="excel"
           onClick={handleExportCSV}
         >
           <FormattedMessage id="users.button.excel" defaultMessage="Excel" />
-        </button>
+        </AppButton>
       </div>
 
       {/* Loading/Error */}

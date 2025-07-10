@@ -111,6 +111,16 @@
 
 "accessDenied.title": "Acesso restrito",
 "accessDenied.message": "Não tens permissão para aceder a esta página.\nSerás redirecionado para o dashboard.",
-"accessDenied.redirecting": "A redirecionar..."
+"accessDenied.redirecting": "A redirecionar...",
+
+"courses.language.PT": "Português",
+"courses.language.EN": "Inglês",
+"courses.language.IT": "Italiano",
+"courses.language.FR": "Francês",
+"courses.language.ES": "Espanhol",
+"courses.category.FRONTEND": "Frontend",
+"courses.category.BACKEND": "Backend",
+"courses.category.INFRAESTRUTURA": "Infraestrutura",
+"courses.category.UX_UI": "UX/UI"
 
 }
