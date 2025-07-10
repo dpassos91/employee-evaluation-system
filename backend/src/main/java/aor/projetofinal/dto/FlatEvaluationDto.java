@@ -7,6 +7,7 @@ import java.io.Serializable;
  * It avoids exposing complex entity or enum types.
  */
 public class FlatEvaluationDto implements Serializable {
+    private Long evaluationId;
     private String evaluatedName;
     private String evaluatedEmail;
     private String photograph;
@@ -18,6 +19,16 @@ public class FlatEvaluationDto implements Serializable {
     public FlatEvaluationDto() {}
 
     // Getters and setters
+
+    public Long getEvaluationId() {
+        return evaluationId;
+    }
+
+    public void setEvaluationId(Long evaluationId) {
+        this.evaluationId = evaluationId;
+    }
+
+
     public String getEvaluatedName() {
         return evaluatedName;
     }

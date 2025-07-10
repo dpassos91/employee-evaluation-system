@@ -54,7 +54,7 @@ export default function EvaluationListPage() {
 const handleCloseEvaluation = async (id) => {
   try {
     await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.close(id), {
-      method: "POST",
+      method: "PUT",
     });
     toast.success("Avaliação fechada com sucesso.");
     refetch();
@@ -66,7 +66,7 @@ const handleCloseEvaluation = async (id) => {
 const handleReopenEvaluation = async (id) => {
   try {
     await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.reopen(id), {
-      method: "POST",
+      method: "PUT",
     });
     toast.success("Avaliação reaberta com sucesso.");
     refetch();
@@ -89,10 +89,8 @@ const handleCloseAllEvaluations = async () => {
   }
 };
 
-const handleFillEvaluation = (id, email) => {
-  navigate(`/evaluations/fill/${id}`, {
-    state: { evaluatedEmail: email },
-  });
+const handleFillEvaluation = (email) => {
+  navigate(`/evaluationform/${email}`);
 };
 
 
@@ -265,7 +263,7 @@ const handleExportCSV = async () => {
   {/* Mostrar "Preencher" apenas se IN_EVALUATION */}
   {evaluation.state === "IN_EVALUATION" ? (
     <button
-      onClick={() => handleFillEvaluation(evaluation.id, evaluation.email)}
+      onClick={() => handleFillEvaluation(evaluation.email)}
       className="bg-[#D41C1C] text-white px-3 py-1 rounded"
     >
       <FormattedMessage id="evaluation.button.fill" defaultMessage="Preencher" />
@@ -274,7 +272,7 @@ const handleExportCSV = async () => {
     <>
       {/* Ver só se não está em IN_EVALUATION */}
       <button
-        onClick={() => navigate(`/evaluations/${evaluation.id}`)}
+        onClick={() => navigate(`/evaluationform/${evaluation.email}`)}
         className="bg-[#D41C1C] text-white px-3 py-1 rounded"
       >
         <FormattedMessage id="evaluation.button.view" defaultMessage="Ver" /> <span>&gt;</span>

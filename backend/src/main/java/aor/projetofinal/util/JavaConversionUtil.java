@@ -92,6 +92,10 @@ public class JavaConversionUtil {
     public static FlatEvaluationDto convertEvaluationToFlatDto(EvaluationEntity evaluation) {
         FlatEvaluationDto dto = new FlatEvaluationDto();
 
+        if (evaluation.getId() != null) {
+            dto.setEvaluationId(evaluation.getId());
+        }
+
         // 1. Evaluated user info
         UserEntity evaluated = evaluation.getEvaluated();
         if (evaluated != null) {

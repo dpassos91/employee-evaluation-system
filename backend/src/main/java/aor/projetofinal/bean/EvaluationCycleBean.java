@@ -8,7 +8,7 @@ import aor.projetofinal.entity.EvaluationEntity;
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.entity.enums.EvaluationStateEnum;
 import aor.projetofinal.util.EmailUtil;
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@ApplicationScoped
+@Stateless
 public class EvaluationCycleBean implements Serializable {
 
     @Inject
@@ -124,7 +124,7 @@ public class EvaluationCycleBean implements Serializable {
 
     }
 
-    @Transactional
+
     public void createCycleAndCreateBlankEvaluations(LocalDate endDate) {
         //creating cycle with the end date provided by the admin from the frontend
 
