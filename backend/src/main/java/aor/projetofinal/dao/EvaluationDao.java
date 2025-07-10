@@ -87,6 +87,9 @@ public class EvaluationDao {
         // Only confirmed & active evaluated users
         jpql.append(" AND e.evaluated.confirmed = true AND e.evaluated.active = true");
 
+        // Only evalautions from active cycles should be returned
+        jpql.append(" AND e.cycle.active = true");
+
         // Name filter
         if (name != null && !name.isBlank()) {
             jpql.append(" AND CONCAT(' ', LOWER(e.evaluated.profile.normalizedFirstName), ' ', LOWER(e.evaluated.profile.normalizedLastName), ' ') LIKE CONCAT('% ', :name, ' %')");
@@ -160,10 +163,15 @@ public class EvaluationDao {
     }
 
 
-
+    // This version eagerly fetches the evaluation cycle and its evaluations
     public EvaluationEntity findById(Long id) {
+
+        //avoids LazyInitializationException
         TypedQuery<EvaluationEntity> query = em.createQuery(
-                "SELECT e FROM EvaluationEntity e WHERE e.id = :id",
+                "SELECT e FROM EvaluationEntity e " +
+                        "JOIN FETCH e.cycle " +
+                        "LEFT JOIN FETCH e.cycle.evaluationEntities " +
+                        "WHERE e.id = :id",
                 EvaluationEntity.class
         );
         query.setParameter("id", id);
@@ -249,6 +257,9 @@ public class EvaluationDao {
 
         // Only confirmed & active evaluated users
         jpql.append(" AND e.evaluated.confirmed = true AND e.evaluated.active = true");
+
+        // Only evalautions from active cycles should be returned
+        jpql.append(" AND e.cycle.active = true");
 
         // Filter by name (normalized, case-insensitive, partial match)
         if (name != null && !name.isBlank()) {
