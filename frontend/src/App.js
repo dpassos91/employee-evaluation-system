@@ -151,8 +151,20 @@ const handleWebSocketMessage = useCallback((data) => {
               </PrivateRoute>
             }
           />
+
+
 <Route
             path="/evaluationlist"
+            element={
+              <PrivateRoute>
+                <EvaluationListPage />
+              </PrivateRoute>
+            }
+          />
+
+
+<Route
+            path="/evaluationform/:email"
             element={
               <PrivateRoute>
                 <EvaluationFormPage />
