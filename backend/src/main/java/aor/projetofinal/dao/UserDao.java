@@ -103,11 +103,13 @@ public UserEntity findBySessionToken(String token) {
 
     public List<UserEntity> findConfirmedUsersWithoutManager() {
         TypedQuery<UserEntity> query = em.createQuery(
-                "SELECT u FROM UserEntity u WHERE u.confirmed = true AND u.manager IS NULL",
+                "SELECT u FROM UserEntity u " +
+                        "WHERE u.confirmed = true AND u.manager IS NULL AND LOWER(u.role.name) <> 'admin'",
                 UserEntity.class
         );
         return query.getResultList();
     }
+
 
     /**
      * Retrieves all users who are active, confirmed, and not assigned the ADMIN role.

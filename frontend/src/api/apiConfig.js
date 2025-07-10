@@ -93,7 +93,17 @@ evaluations: {
   close: (evaluationId) => `${API_BASE_URL}/evaluations/close/${evaluationId}`,
   /** @type {string} Close all evaluations in the current cycle (admin only) */
   bulkClose: `${API_BASE_URL}/evaluations/close-all`,
+
+// Associations evaluations-user
+
 },
+
+/** Evaluation cycle endpoints */
+evaluationCycles: {
+  /** @type {string} Create a new evaluation cycle */
+  create: `${API_BASE_URL}/evaluations-cycles/create-cycle`,
+},
+
 
   /** Message endpoints*/
  messages: {
