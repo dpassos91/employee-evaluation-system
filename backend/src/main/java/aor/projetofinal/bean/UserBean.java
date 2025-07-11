@@ -1353,6 +1353,16 @@ public void updateRoleAndManager(int userId, String newRoleName, Integer newMana
             RequestContext.getAuthor(), RequestContext.getIp(), userId, newRoleName, newManagerId);
 }
 
+/**
+ * Retrieves all users who have the "MANAGER" role, are active and confirmed.
+ * This is useful for populating manager selection dropdowns or for assignments.
+ *
+ * @return List of UserEntity objects representing all active, confirmed managers.
+ */
+public List<UserEntity> listManagers() {
+    return userDao.findUsersByRole("MANAGER");
+}
+
 
 }
 

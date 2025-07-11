@@ -13,6 +13,8 @@ import aor.projetofinal.entity.ProfileEntity;
 
 import aor.projetofinal.entity.UserEntity;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import jakarta.inject.Inject;
 
 import jakarta.ws.rs.*;
@@ -699,5 +701,32 @@ public Response updateUserRoleAndManager(
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }
+
+/**
+ * REST endpoint to retrieve all active and confirmed users with the "MANAGER" role.
+ * The returned list is converted to UsersDropdownMenuDto for UI dropdowns.
+ *
+ * @return HTTP 200 with a JSON array of UsersDropdownMenuDto representing managers.
+ */
+@GET
+@Path("/managers")
+@Produces(MediaType.APPLICATION_JSON)
+public Response getManagers() {
+    // Get the list of managers from the bean
+    List<UserEntity> managers = userBean.listManagers();
+
+    // Convert UserEntity list to UsersDropdownMenuDto (contains only needed fields)
+    List<UsersDropdownMenuDto> dtos = managers.stream()
+        .map(u -> new UsersDropdownMenuDto(
+            u.getId(),
+            u.getEmail(),
+            u.getProfile() != null ? u.getProfile().getFirstName() : "",
+            u.getProfile() != null ? u.getProfile().getLastName() : ""
+        ))
+        .collect(Collectors.toList());
+
+    // Return as JSON response
+    return Response.ok(dtos).build();
+}
 
 }

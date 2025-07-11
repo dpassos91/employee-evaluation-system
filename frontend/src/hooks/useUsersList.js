@@ -40,7 +40,7 @@ const mapped = (result.profiles || []).map(profile => ({
   manager: profile.managerName || "",
   email: profile.email,
   avatar: profile.photograph,
-  role: (profile.role || "user").toLowerCase(),
+  role: profile.role,
   managerId: profile.managerId || ""
 }));
 
