@@ -32,6 +32,28 @@ public class EvaluationBean implements Serializable {
     private EvaluationCycleBean evaluationCycleBean;
 
 
+    /**
+     * Checks whether all evaluations in the active cycle are in EVALUATED state.
+     *
+     * @return true if all evaluations are EVALUATED, false otherwise.
+     */
+    public boolean areAllEvaluationsInActiveCycleEvaluated() {
+        EvaluationCycleEntity activeCycle = evaluationCycleBean.findActiveCycle();
+        if (activeCycle == null) {
+            logger.warn("User: {} | IP: {} - No active cycle found during evaluation state check.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
+            return false;
+        }
+
+        List<EvaluationEntity> evaluations = evaluationDao.findAllEvaluationsByCycle(activeCycle);
+        boolean allEvaluated = evaluations.stream()
+                .allMatch(e -> e.getState() == EvaluationStateEnum.EVALUATED);
+
+        logger.info("User: {} | IP: {} - All evaluations in cycle ID {} evaluated: {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), activeCycle.getId(), allEvaluated);
+
+        return allEvaluated;
+    }
 
 
     /**

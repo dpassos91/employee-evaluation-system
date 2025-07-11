@@ -80,7 +80,16 @@ public class EvaluationService {
                     .build();
         }
 
-        // 3. close in bulk all evaluations in the current cycle
+        // Validate if all evaluations are EVALUATED
+        if (!evaluationBean.areAllEvaluationsInActiveCycleEvaluated()) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("{\"message\": \"Not all evaluations are in EVALUATED state. Cannot proceed with bulk close.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+        //  close in bulk all evaluations in the current cycle
         evaluationCycleBean.bulkCloseEvaluationsAndCycle();
 
         return Response.ok()
