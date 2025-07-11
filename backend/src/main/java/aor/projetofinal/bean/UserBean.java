@@ -594,6 +594,7 @@ public class UserBean implements Serializable {
         for (UserEntity user : users) {
             if (user.getProfile() != null) {
                 dropdownMenuList.add(new UsersDropdownMenuDto(
+                        user.getId(),
                         user.getEmail(),
                         user.getProfile().getFirstName(),
                         user.getProfile().getLastName()

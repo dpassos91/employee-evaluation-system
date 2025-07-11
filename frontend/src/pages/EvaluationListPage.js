@@ -52,40 +52,80 @@ export default function EvaluationListPage() {
 // Functions to change evaluation states and lead to the evaluation page
 
 const handleCloseEvaluation = async (id) => {
+  const toastId = toast.loading("A fechar avaliação...");
   try {
     await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.close(id), {
       method: "PUT",
     });
-    toast.success("Avaliação fechada com sucesso.");
+
+    toast.update(toastId, {
+      render: "Avaliação fechada com sucesso.",
+      type: "success",
+      isLoading: false,
+      autoClose: 3000,
+    });
+
     refetch();
   } catch (err) {
-    toast.error("Erro ao fechar avaliação.");
+    toast.update(toastId, {
+      render: "Erro ao fechar avaliação.",
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   }
 };
 
 const handleReopenEvaluation = async (id) => {
+  const toastId = toast.loading("A reabrir avaliação...");
   try {
     await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.reopen(id), {
       method: "PUT",
     });
-    toast.success("Avaliação reaberta com sucesso.");
+
+    toast.update(toastId, {
+      render: "Avaliação reaberta com sucesso.",
+      type: "success",
+      isLoading: false,
+      autoClose: 3000,
+    });
+
     refetch();
   } catch (err) {
-    toast.error("Erro ao reabrir avaliação.");
+    toast.update(toastId, {
+      render: "Erro ao reabrir avaliação.",
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   }
 };
 
 const handleCloseAllEvaluations = async () => {
   if (!window.confirm("Tens a certeza que queres fechar todos os processos?")) return;
 
+  const toastId = toast.loading("A fechar todos os processos...");
+
   try {
-    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.closeAll, {
-      method: "POST",
+    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.bulkClose, {
+      method: "PUT",
     });
-    toast.success("Todos os processos foram fechados com sucesso.");
+
+    toast.update(toastId, {
+      render: "Todos os processos foram fechados com sucesso.",
+      type: "success",
+      isLoading: false,
+      autoClose: 3000,
+    });
+
     refetch();
   } catch (err) {
-    toast.error("Erro ao fechar os processos.");
+    toast.update(toastId, {
+      render: "Erro ao fechar os processos.",
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   }
 };
 
@@ -288,8 +328,8 @@ const handleExportCSV = async () => {
         </button>
       )}
 
-      {/* Reverter se em CLOSED */}
-      {evaluation.state === "CLOSED" && (
+      {/* Reverter se em EVALUATED */}
+      {evaluation.state === "EVALUATED" && (
         <button
           onClick={() => handleReopenEvaluation(evaluation.id)}
           className="bg-[#D41C1C] text-white px-3 py-1 rounded"
@@ -335,7 +375,9 @@ const handleExportCSV = async () => {
         </div>
       )}
 
-{isAdmin && (
+
+{/*  show the bulk close button only if the user is admin and all evaluations are at evaluated-state*/}
+{isAdmin && evaluations.length > 0 && evaluations.every((e) => e.state === "EVALUATED") && (
   <div className="flex justify-center mt-10">
     <button
       onClick={handleCloseAllEvaluations}

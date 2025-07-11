@@ -80,7 +80,16 @@ public class EvaluationService {
                     .build();
         }
 
-        // 3. close in bulk all evaluations in the current cycle
+        // Validate if all evaluations are EVALUATED
+        if (!evaluationBean.areAllEvaluationsInActiveCycleEvaluated()) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("{\"message\": \"Not all evaluations are in EVALUATED state. Cannot proceed with bulk close.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+        //  close in bulk all evaluations in the current cycle
         evaluationCycleBean.bulkCloseEvaluationsAndCycle();
 
         return Response.ok()
@@ -571,6 +580,10 @@ public class EvaluationService {
                     .build();
         }
 
+        logger.info("User: {} | IP: {} - Loading evaluation for user {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluatedEmail);
+
+
         // gets the correct evaluation to load
         EvaluationEntity evaluation = evaluationBean.findEvaluationByCycleAndUser(cycle, evaluated);
         if (evaluation == null) {
@@ -594,35 +607,22 @@ public class EvaluationService {
         }
 
 
-
-
-
-
         // build UpdateEvaluationDto to send to the frontend
-        UpdateEvaluationDto dto = new UpdateEvaluationDto();
-        dto.setEvaluatedEmail(evaluated.getEmail());
 
-        // name comes from the profile
-        if (evaluated.getProfile() != null) {
-            dto.setEvaluatedName(evaluated.getProfile().getFirstName() + " " + evaluated.getProfile().getLastName());
-        }
+        UpdateEvaluationDto dto = evaluationBean.buildEvaluationDtoCorrespondingToTheEvaluation(evaluation);
 
-        if (evaluation.getGrade() != null) {
-            dto.setGrade(evaluation.getGrade().getGrade());
-        }
+        logger.info("User: {} | IP: {} - Evaluation loaded successfully for user {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluatedEmail);
 
-        if (evaluation.getFeedback() != null) {
-            dto.setFeedback(evaluation.getFeedback());
-        }
 
         return Response.ok()
-                // building a response Map<String, DTO Object>
                 .entity(Map.of(
                         "message", "Evaluation data loaded successfully.",
                         "evaluation", dto
                 ))
                 .type(MediaType.APPLICATION_JSON)
                 .build();
+
     }
 
     @PUT

@@ -1,13 +1,19 @@
 package aor.projetofinal.dao;
 
+import aor.projetofinal.bean.EvaluationBean;
+import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.entity.EvaluationCycleEntity;
 import aor.projetofinal.entity.EvaluationEntity;
+import aor.projetofinal.entity.enums.EvaluationStateEnum;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.util.Collections;
 import java.util.List;
 
 @ApplicationScoped
@@ -15,6 +21,9 @@ public class EvaluationCycleDao {
 
     @PersistenceContext
     private EntityManager em;
+
+
+    private static final Logger logger = LogManager.getLogger(EvaluationCycleDao.class);
 
     public EvaluationCycleEntity findActiveCycle() {
         try {
@@ -27,6 +36,11 @@ public class EvaluationCycleDao {
             return null;
         }
     }
+
+
+
+
+
 
 
     public boolean isThereAnActiveCycle() {
