@@ -6,6 +6,7 @@ import { FormattedMessage } from "react-intl";
 import { apiConfig } from "../api/apiConfig";
 import { toast } from "react-toastify";
 import { userStore } from "../stores/userStore";
+import profileIcon from "../images/profile_icon.png";
 
 export default function EvaluationFormPage() {
   const { email } = useParams();
@@ -55,7 +56,7 @@ export default function EvaluationFormPage() {
     const fetchDropdownUsers = async () => {
       if (!isAdmin) return;
       try {
-        const result = await apiConfig.apiCall(apiConfig.API_ENDPOINTS.users.managerDropdown);
+        const result = await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.managerDropdown);
         setDropdownUsers(result);
       } catch (err) {
         toast.error("Erro ao carregar lista de gestores disponíveis.");
@@ -86,7 +87,7 @@ export default function EvaluationFormPage() {
     if (!selectedManager || selectedManager === managerEmail) return;
     setUpdatingManager(true);
     try {
-      await apiConfig.apiCall(apiConfig.API_ENDPOINTS.users.assignManager, {
+      await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.assignManager, {
         method: "POST",
         body: JSON.stringify({
           userEmail: email,
@@ -105,37 +106,25 @@ export default function EvaluationFormPage() {
   };
 
   return (
-    <PageLayout title={<FormattedMessage id="evaluations.form.title" defaultMessage="Formulário de Avaliação" />}>
-      {loading ? (
-        <div className="text-gray-500">
-          <FormattedMessage id="loading" defaultMessage="A carregar..." />
+  <PageLayout title={<FormattedMessage id="evaluations.form.title" defaultMessage="Formulário de Avaliação" />}>
+    {loading ? (
+      <div className="text-gray-500">
+        <FormattedMessage id="loading" defaultMessage="A carregar..." />
+      </div>
+    ) : (
+      <div className="flex items-start gap-10 px-10 pt-6">
+        {/* Avatar à esquerda */}
+        <div className="flex-shrink-0">
+          <img
+            src={photo || profileIcon}
+            alt="avatar"
+            className="w-28 h-28 rounded-full object-cover border"
+          />
         </div>
-      ) : (
-        <AppForm
-          onSubmit={handleSubmit}
-          actions={[
-            {
-              label: <FormattedMessage id="button.cancel" defaultMessage="Cancelar" />,
-              onClick: () => navigate("/evaluationlist"),
-              variant: "secondary",
-            },
-            {
-              label: <FormattedMessage id="button.save" defaultMessage="Salvar" />,
-              type: "submit",
-              loading: loading,
-            },
-          ]}
-        >
-          {photo && (
-            <div className="flex justify-center mb-4">
-              <img
-                src={photo}
-                alt="avatar"
-                className="w-24 h-24 rounded-full object-cover"
-              />
-            </div>
-          )}
 
+        {/* Formulário à direita */}
+        <div className="flex flex-col gap-4 max-w-md w-full">
+          {/* Nome */}
           <div>
             <label className="block text-sm font-bold mb-1">
               <FormattedMessage id="evaluations.form.name" defaultMessage="Nome" />
@@ -148,7 +137,7 @@ export default function EvaluationFormPage() {
             />
           </div>
 
-          {/* GESTOR */}
+          {/* Gestor */}
           <div>
             <label className="block text-sm font-bold mb-1">
               <FormattedMessage id="evaluations.form.manager" defaultMessage="Gestor" />
@@ -158,7 +147,7 @@ export default function EvaluationFormPage() {
                 <select
                   value={selectedManager}
                   onChange={(e) => setSelectedManager(e.target.value)}
-                  className="border px-2 py-1 rounded"
+                  className="border px-2 py-1 rounded w-full"
                 >
                   {dropdownUsers.map((u) => (
                     <option key={u.email} value={u.email}>
@@ -185,7 +174,7 @@ export default function EvaluationFormPage() {
             )}
           </div>
 
-          {/* Grade */}
+          {/* Avaliação */}
           <div>
             <label className="block text-sm font-bold mb-1">
               <FormattedMessage id="evaluations.form.grade" defaultMessage="Avaliação" />
@@ -212,12 +201,32 @@ export default function EvaluationFormPage() {
             <textarea
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              rows={5}
+              rows={4}
               className="w-full border rounded px-2 py-1"
             />
           </div>
-        </AppForm>
-      )}
-    </PageLayout>
-  );
+
+          {/* Botões alinhados abaixo dos campos */}
+          <div className="flex justify-center gap-4 pt-4">
+            <button
+              type="button"
+              onClick={() => navigate("/evaluationlist")}
+              className="bg-gray-300 text-black px-4 py-2 rounded"
+            >
+              <FormattedMessage id="button.cancel" defaultMessage="Cancelar" />
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="bg-red-600 text-white px-4 py-2 rounded"
+            >
+              <FormattedMessage id="button.save" defaultMessage="Salvar" />
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </PageLayout>
+);
+
 }

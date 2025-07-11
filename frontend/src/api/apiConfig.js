@@ -95,7 +95,8 @@ evaluations: {
   bulkClose: `${API_BASE_URL}/evaluations/close-all`,
 
 // Associations evaluations-user
-
+managerDropdown: `${API_BASE_URL}/users/manager-dropdown`,
+assignManager: `${API_BASE_URL}/users/assign-manager`,
 },
 
 /** Evaluation cycle endpoints */
