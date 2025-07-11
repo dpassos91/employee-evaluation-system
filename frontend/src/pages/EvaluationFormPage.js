@@ -30,7 +30,7 @@ export default function EvaluationFormPage() {
     const fetchEvaluation = async () => {
       try {
         const result = await apiConfig.apiCall(
-          `${apiConfig.API_ENDPOINTS.evaluations.load}?email=${email}`
+          apiConfig.API_ENDPOINTS.evaluations.load(email)
         );
         const evaluation = result.evaluation;
 

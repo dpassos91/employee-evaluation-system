@@ -65,12 +65,15 @@ const handleCloseEvaluation = async (id) => {
 
 const handleReopenEvaluation = async (id) => {
   try {
+    // Dismiss any existing toast notifications on the screen
+    toast.dismiss();
     await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.reopen(id), {
       method: "PUT",
     });
     toast.success("Avaliação reaberta com sucesso.");
     refetch();
   } catch (err) {
+    toast.dismiss();
     toast.error("Erro ao reabrir avaliação.");
   }
 };
@@ -79,9 +82,9 @@ const handleCloseAllEvaluations = async () => {
   if (!window.confirm("Tens a certeza que queres fechar todos os processos?")) return;
 
   try {
-    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.closeAll, {
-      method: "POST",
-    });
+    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.bulkClose, {
+  method: "PUT",
+});
     toast.success("Todos os processos foram fechados com sucesso.");
     refetch();
   } catch (err) {
@@ -288,8 +291,8 @@ const handleExportCSV = async () => {
         </button>
       )}
 
-      {/* Reverter se em CLOSED */}
-      {evaluation.state === "CLOSED" && (
+      {/* Reverter se em EVALUATED */}
+      {evaluation.state === "EVALUATED" && (
         <button
           onClick={() => handleReopenEvaluation(evaluation.id)}
           className="bg-[#D41C1C] text-white px-3 py-1 rounded"

@@ -6,6 +6,10 @@ public class UpdateEvaluationDto {
     private String evaluatedEmail;   // evaluated user's email
     private String evaluatedName;
 
+    private String photograph;
+    private String evaluatorName;
+    private String evaluatorEmail;
+
     public int getGrade() { return grade; }
     public void setGrade(int grade) { this.grade = grade; }
 
@@ -17,4 +21,14 @@ public class UpdateEvaluationDto {
 
     public String getEvaluatedName() { return evaluatedName; }
     public void setEvaluatedName(String evaluatedName) { this.evaluatedName = evaluatedName; }
+
+    public String getPhotograph() { return photograph; }
+    public void setPhotograph(String photograph) { this.photograph = photograph; }
+
+    public String getEvaluatorName() { return evaluatorName; }
+    public void setEvaluatorName(String evaluatorName) { this.evaluatorName = evaluatorName; }
+
+    public String getEvaluatorEmail() { return evaluatorEmail; }
+    public void setEvaluatorEmail(String evaluatorEmail) { this.evaluatorEmail = evaluatorEmail; }
+
 }

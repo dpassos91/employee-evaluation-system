@@ -31,6 +31,69 @@ public class EvaluationBean implements Serializable {
     @Inject
     private EvaluationCycleBean evaluationCycleBean;
 
+
+
+
+    /**
+     * Builds an UpdateEvaluationDto object from a given EvaluationEntity.
+     * This DTO includes all relevant data (evaluated user, evaluator, grade, feedback, photo, etc.)
+     * that should be sent to the frontend when loading an evaluation.
+     *
+     * @param evaluation The evaluation entity to convert.
+     * @return A pre-filled UpdateEvaluationDto with evaluation data.
+     */
+    public UpdateEvaluationDto buildEvaluationDtoCorrespondingToTheEvaluation(EvaluationEntity evaluation) {
+        logger.info("User: {} | IP: {} - Building UpdateEvaluationDto from evaluation ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluation.getId());
+
+        UpdateEvaluationDto dto = new UpdateEvaluationDto();
+
+        // Evaluated user info
+        UserEntity evaluated = evaluation.getEvaluated();
+        if (evaluated != null) {
+            dto.setEvaluatedEmail(evaluated.getEmail());
+
+            if (evaluated.getProfile() != null) {
+                dto.setEvaluatedName(evaluated.getProfile().getFirstName() + " " +
+                        evaluated.getProfile().getLastName());
+                dto.setPhotograph(evaluated.getProfile().getPhotograph());
+            }
+        }
+
+        // Evaluation content
+        if (evaluation.getGrade() != null) {
+            dto.setGrade(evaluation.getGrade().getGrade());
+        }
+
+        if (evaluation.getFeedback() != null) {
+            dto.setFeedback(evaluation.getFeedback());
+        }
+
+        // Evaluator info
+        UserEntity evaluator = evaluation.getEvaluator();
+        if (evaluator != null && evaluator.getProfile() != null) {
+            dto.setEvaluatorEmail(evaluator.getEmail());
+            dto.setEvaluatorName(evaluator.getProfile().getFirstName() + " " +
+                    evaluator.getProfile().getLastName());
+        }
+
+        logger.info("User: {} | IP: {} - DTO built successfully from evaluation ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluation.getId());
+
+        return dto;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * Returns a paginated list of evaluations matching the provided filters,
      * converted into flat DTOs for list display.

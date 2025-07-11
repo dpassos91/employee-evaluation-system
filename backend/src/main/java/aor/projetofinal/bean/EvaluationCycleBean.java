@@ -1,5 +1,6 @@
 package aor.projetofinal.bean;
 
+import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.EvaluationCycleDao;
 import aor.projetofinal.dao.EvaluationDao;
 import aor.projetofinal.dao.UserDao;
@@ -52,20 +53,29 @@ public class EvaluationCycleBean implements Serializable {
             return;
         }
 
+        logger.info("User: {} | IP: {} - Starting bulk close of evaluations for active cycle (ID: {}).",
+                RequestContext.getAuthor(), RequestContext.getIp(), cycle.getId());
 
 
-        // close all evaluations in the cycle that are in EVALUATED state
-        for (EvaluationEntity e : cycle.getEvaluations()) {
-            if (e.getState() == EvaluationStateEnum.EVALUATED) {
-                e.setState(EvaluationStateEnum.CLOSED);
-                e.setDate(LocalDateTime.now());
-                evaluationDao.save(e);
-            }
+
+        // close all evaluations in the cycle that are in EVALUATED
+        List<EvaluationEntity> evaluationsToClose = evaluationDao.findEvaluatedEvaluationsInActiveCycle();
+
+        for (EvaluationEntity e : evaluationsToClose) {
+            e.setState(EvaluationStateEnum.CLOSED);
+            e.setDate(LocalDateTime.now());
+            evaluationDao.save(e);
         }
 
+        logger.info("User: {} | IP: {} - {} evaluations closed successfully.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluationsToClose.size());
+
+
         // checks if every evaluation in the cycle was successfully closed
+        List<EvaluationEntity> allEvaluationsInCycle = evaluationDao.findAllEvaluationsByCycle(cycle);
+
         boolean allClosed = true;
-        for (EvaluationEntity e : cycle.getEvaluations()) {
+        for (EvaluationEntity e : allEvaluationsInCycle ) {
             if (e.getState() != EvaluationStateEnum.CLOSED) {
                 allClosed = false;
                 break;
@@ -77,11 +87,13 @@ public class EvaluationCycleBean implements Serializable {
             cycle.setEndDate(LocalDateTime.now());
             evaluationCycleDao.save(cycle);
             emailManagersAndEvaluatedOfCycleClosure(cycle);
-            logger.info("Cycle ID {} closed after bulk evaluation close.", cycle.getId());
+            logger.info("User: {} | IP: {} - Cycle ID {} has been closed and deactivated.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), cycle.getId());
+        } else {
+            logger.warn("User: {} | IP: {} - Not all evaluations are closed. Cycle ID {} remains active.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), cycle.getId());
         }
     }
-
-
 
 
 
