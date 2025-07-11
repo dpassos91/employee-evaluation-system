@@ -161,41 +161,53 @@ public class JavaConversionUtil {
      * @param profile The ProfileEntity to convert.
      * @return A FlatProfileDto populated with simple fields, or null if profile/user is null.
      */
-    public static FlatProfileDto convertProfileEntityToFlatProfileDto(ProfileEntity profile) {
-        if (profile == null || profile.getUser() == null) {
-            return null;
-        }
-
-        UserEntity user = profile.getUser();
-        UserEntity manager = user.getManager();
-
-        // Compute manager's display name (first + last or email, or empty)
-        String managerName = "";
-        if (manager != null && manager.getProfile() != null) {
-            String mFirst = manager.getProfile().getFirstName() != null ? manager.getProfile().getFirstName() : "";
-            String mLast = manager.getProfile().getLastName() != null ? manager.getProfile().getLastName() : "";
-            managerName = (mFirst + " " + mLast).trim();
-            if (managerName.isEmpty() && manager.getEmail() != null) {
-                managerName = manager.getEmail();
-            }
-        }
-
-        // UsualWorkplace as String (Enum to String, or empty)
-        String usualWorkplace = profile.getUsualWorkplace() != null
-                ? profile.getUsualWorkplace().name()
-                : "";
-
-        FlatProfileDto flat = new FlatProfileDto();
-        flat.setUserId(Long.valueOf(user.getId()));
-        flat.setFirstName(profile.getFirstName());
-        flat.setLastName(profile.getLastName());
-        flat.setEmail(user.getEmail());
-        flat.setUsualWorkplace(usualWorkplace);
-        flat.setManagerName(managerName);
-        flat.setPhotograph(profile.getPhotograph());
-
-        return flat;
+public static FlatProfileDto convertProfileEntityToFlatProfileDto(ProfileEntity profile) {
+    if (profile == null || profile.getUser() == null) {
+        return null;
     }
+
+    UserEntity user = profile.getUser();
+    UserEntity manager = user.getManager();
+
+    // Compute manager's display name (first + last or email, or empty)
+    String managerName = "";
+    if (manager != null && manager.getProfile() != null) {
+        String mFirst = manager.getProfile().getFirstName() != null ? manager.getProfile().getFirstName() : "";
+        String mLast = manager.getProfile().getLastName() != null ? manager.getProfile().getLastName() : "";
+        managerName = (mFirst + " " + mLast).trim();
+        if (managerName.isEmpty() && manager.getEmail() != null) {
+            managerName = manager.getEmail();
+        }
+    }
+
+    // UsualWorkplace as String (Enum to String, or empty)
+    String usualWorkplace = profile.getUsualWorkplace() != null
+            ? profile.getUsualWorkplace().name()
+            : "";
+
+    // Get the user's role name (e.g. "USER", "MANAGER", "ADMIN")
+    String roleName = (user.getRole() != null && user.getRole().getName() != null)
+            ? user.getRole().getName()
+            : "USER";
+
+    // Get the managerId if exists
+    Long managerId = (manager != null) ? Long.valueOf(manager.getId()) : null;
+
+    // Now use the updated constructor (or setters)
+    FlatProfileDto flat = new FlatProfileDto();
+    flat.setUserId(Long.valueOf(user.getId()));
+    flat.setFirstName(profile.getFirstName());
+    flat.setLastName(profile.getLastName());
+    flat.setEmail(user.getEmail());
+    flat.setUsualWorkplace(usualWorkplace);
+    flat.setManagerName(managerName);
+    flat.setManagerId(managerId);
+    flat.setPhotograph(profile.getPhotograph());
+    flat.setRole(roleName);
+
+    return flat;
+}
+
 
     /**
      * Converts a ProfileEntity to a ProfileDto (includes user reference).

@@ -7,6 +7,7 @@ import dashboardIcon from "../images/dashboard_icon.png";
 import miniprofileIcon from "../images/miniprofile_icon.png";
 import usersIcon from "../images/users_icon.png";
 import coursesIcon from "../images/courses_icon.png";
+import evaluationsIcon from "../images/evaluations_icon.png"
 import { FaSignOutAlt } from "react-icons/fa";
 import { useAuth } from "../hooks/useAuth";
 import { userStore } from "../stores/userStore";
@@ -36,13 +37,21 @@ export default function Sidebar() {
     { id: "sidebar.users", icon: usersIcon, path: "/userslist" },
   ];
 
-  if (isAdmin) { 
-  menuItems.push({
-    id: "sidebar.courses",
-    icon: coursesIcon,
-    path: "/courses"
-  });
+if (isAdmin) {
+  menuItems.push(
+    {
+      id: "sidebar.courses",
+      icon: coursesIcon,
+      path: "/courses"
+    },
+    {
+      id: "sidebar.evaluations",
+      icon: evaluationsIcon,
+      path: "/evaluations"
+    }
+  );
 }
+
 
   // Novo: calcula o url da foto só a partir do user global
   const photoUrl = user?.photograph && user.photograph.trim() !== ""

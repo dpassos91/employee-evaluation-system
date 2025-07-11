@@ -518,9 +518,60 @@ public Response logoutUser(@HeaderParam("Authorization") String authorization) {
                 .build();
     }
 
+    /**
+ * Updates the role and manager of a user.
+ * Only administrators can perform this operation.
+ *
+ * @param userId The ID of the user to update.
+ * @param dto    The DTO containing the new role and managerId.
+ * @param token  The session token for authorization.
+ * @return HTTP 200 if successful, 401/403/400 otherwise.
+ */
+@PUT
+@Path("/{id}/role-manager")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public Response updateUserRoleAndManager(
+        @PathParam("id") int userId,
+        RoleUpdaterDto dto,
+        @HeaderParam("sessionToken") String token
+) {
+    // Validate session and authorization
+    SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+    if (tokenEntity == null || tokenEntity.getUser() == null) {
+        logger.warn("User: unknown | IP: {} - Unauthorized attempt to update userId={}.", RequestContext.getIp(), userId);
+        return Response.status(Response.Status.UNAUTHORIZED)
+                .entity("{\"message\": \"Invalid or expired session.\"}").build();
+    }
 
+    UserEntity currentUser = tokenEntity.getUser();
 
+    // Only allow admins to update roles/managers
+    if (!currentUser.getRole().getName().equals("ADMIN")) {
+        logger.warn("User: {} | IP: {} - Unauthorized attempt to update userId={} (not admin).",
+                currentUser.getEmail(), RequestContext.getIp(), userId);
+        return Response.status(Response.Status.FORBIDDEN)
+                .entity("{\"message\": \"Only administrators can update users.\"}").build();
+    }
 
+    logger.info("User: {} | IP: {} - Attempting to update userId={} to role '{}' and managerId={}.",
+            currentUser.getEmail(), RequestContext.getIp(), userId, dto.getRole(), dto.getManagerId());
+
+    try {
+        userBean.updateRoleAndManager(userId, dto.getRole(), dto.getManagerId());
+        logger.info("User: {} | IP: {} - Successfully updated userId={}.",
+                currentUser.getEmail(), RequestContext.getIp(), userId);
+        return Response.ok()
+                .entity("{\"message\": \"User successfully updated.\"}")
+                .build();
+    } catch (Exception ex) {
+        logger.error("User: {} | IP: {} - Error updating userId={}: {}",
+                currentUser.getEmail(), RequestContext.getIp(), userId, ex.getMessage());
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("{\"message\": \"Failed to update user: " + ex.getMessage() + "\"}")
+                .build();
+    }
+}
 
     @POST
     @Path("/request-reset")

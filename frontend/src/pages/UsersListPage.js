@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
 import MessageUserButton from "../components/MessageUserButton";
@@ -10,6 +10,10 @@ import { AppTable } from "../components/AppTable";
 import { profileAPI } from "../api/profileAPI";
 import profileIcon from "../images/profile_icon.png";
 import AppButton from "../components/AppButton";
+import { userStore } from "../stores/userStore";
+import { FiSettings } from "react-icons/fi";
+import Modal from "../components/Modal"; // Certifica-te que o teu Modal está importado
+import { authAPI } from "../api/authAPI";
 
 export default function UsersPage() {
   // Filtros e página
@@ -18,6 +22,12 @@ export default function UsersPage() {
   const [manager, setManager] = useState("");
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
+  const [editingUser, setEditingUser] = useState(null);
+  const [editRole, setEditRole] = useState("");
+  const [editManagerId, setEditManagerId] = useState("");
+
+  const user = userStore((state) => state.user);
+  const isAdmin = user?.role === "ADMIN";
 
   const filters = useMemo(
     () => ({ name, office, manager, page }),
@@ -25,8 +35,7 @@ export default function UsersPage() {
   );
 
   // Buscar utilizadores com filtros e paginação
-  const { users, totalPages, loading, error } = useUsersList(filters);
-  console.log("UsersPage renderizou!", { name, office, manager, page });
+  const { users, totalPages, loading, error, refetch } = useUsersList(filters);
 
   function AvatarCell({ avatar, name }) {
     const [src, setSrc] = useState(
@@ -34,16 +43,36 @@ export default function UsersPage() {
         ? profileAPI.getPhoto(avatar)
         : profileIcon
     );
-  
     return (
       <img
         src={src}
         alt={name}
-        className="w-8 h-8 rounded-full object-cover ml-16"
+        className="w-8 h-8 rounded-full object-cover ml-12"
         onError={() => setSrc("/default_avatar.png")}
       />
     );
   }
+
+  // Modal handler
+  const openEditModal = (userRow) => {
+    setEditingUser(userRow);
+    setEditRole((userRow.role || "USER").toUpperCase());
+    setEditManagerId(userRow.managerId || "");
+  };
+
+  // Handler para submit do modal
+  const handleEditUserSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await authAPI.updateUserRoleAndManager(editingUser.id, editRole, editManagerId);
+    setEditingUser(null);      // Fecha o modal
+    // Se quiseres, dá feedback ao user (notificação, etc)
+    // Atualiza a lista de users
+    refetch();
+  } catch (err) {
+    alert("Erro ao atualizar utilizador: " + (err.message || ""));
+  }
+};
 
   // Definição das colunas para a tabela
   const columns = [
@@ -67,20 +96,30 @@ export default function UsersPage() {
       accessor: "email",
       className: "w-[220px] truncate",
     },
-{
-  header: "",
-  accessor: (u) => <AvatarCell avatar={u.avatar} name={u.name} />,
-  className: "w-[100px] flex items-center",
-},
+    {
+      header: "",
+      accessor: (u) => <AvatarCell avatar={u.avatar} name={u.name} />,
+      className: "w-[100px] flex items-center",
+    },
     {
       header: <FormattedMessage id="users.table.actions" defaultMessage="Ações" />,
       accessor: null,
-      render: (user) => (
-        <div className="flex flex-row items-center gap-2 justify-center">
-          <MessageUserButton userId={user.id} />
+      render: (userRow) => (
+        <div className="flex flex-row items-center gap-6 justify-center">
+          <MessageUserButton userId={userRow.id} />
+          {/* Apenas admins veem a roda dentada */}
+          {isAdmin && (
+            <button
+              title="Editar Utilizador"
+              className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full flex items-center hover:bg-gray-300"
+              onClick={() => openEditModal(userRow)}
+            >
+              <FiSettings />
+            </button>
+          )}
           <button
             onClick={() =>
-              navigate(`/profile/${user.id}`, { state: { profileOwnerEmail: user.email } })
+              navigate(`/profile/${userRow.id}`, { state: { profileOwnerEmail: userRow.email } })
             }
             className="bg-[#D41C1C] text-white px-3 py-1 rounded flex items-center gap-2"
           >
@@ -89,7 +128,7 @@ export default function UsersPage() {
         </div>
       ),
       className: "w-[200px] text-center pr-8",
-      colSpan: 2, // Podes remover se não estiveres a usar colSpan na tabela base
+      colSpan: 2,
     },
   ];
 
@@ -179,6 +218,61 @@ export default function UsersPage() {
         </AppButton>
       </div>
 
+      {/* Modal de edição */}
+      {editingUser && (
+        <Modal
+          isOpen={!!editingUser}
+          onClose={() => setEditingUser(null)}
+          title={<FormattedMessage id="users.editUser.title" defaultMessage="Editar Utilizador" />}
+        >
+          <form onSubmit={handleEditUserSubmit}>
+            {/* Papel */}
+            <div className="mb-3">
+              <label className="block text-sm font-medium mb-1">
+                <FormattedMessage id="users.field.role" defaultMessage="Papel" />
+              </label>
+              <select
+                className="border px-2 py-1 rounded w-full"
+                value={editRole}
+                onChange={e => setEditRole(e.target.value)}
+              >
+                <option value="USER">Utilizador</option>
+                <option value="MANAGER">Gestor</option>
+                <option value="ADMIN">Administrador</option>
+              </select>
+            </div>
+            {/* Manager */}
+            <div className="mb-3">
+              <label className="block text-sm font-medium mb-1">
+                <FormattedMessage id="users.field.manager" defaultMessage="Gestor" />
+              </label>
+              <select
+                className="border px-2 py-1 rounded w-full"
+                value={editManagerId}
+                onChange={e => setEditManagerId(e.target.value)}
+              >
+                <option value="">--</option>
+                {/* Só users com role manager/admin */}
+                {users.filter(u => u.role === "MANAGER" || u.role === "ADMIN").map(managerUser => (
+                  <option key={managerUser.id} value={managerUser.id}>
+                    {managerUser.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Botões */}
+            <div className="flex gap-2 mt-4 justify-end">
+              <AppButton type="button" onClick={() => setEditingUser(null)} variant="secondary">
+                <FormattedMessage id="modal.cancel" defaultMessage="Cancelar" />
+              </AppButton>
+              <AppButton type="submit" variant="primary">
+                <FormattedMessage id="modal.save" defaultMessage="Guardar" />
+              </AppButton>
+            </div>
+          </form>
+        </Modal>
+      )}
+
       {/* Loading/Error */}
       {loading && <div className="py-8 text-center text-gray-500">A carregar...</div>}
       {error && <div className="py-8 text-center text-red-600">{error}</div>}
@@ -222,5 +316,6 @@ export default function UsersPage() {
     </PageLayout>
   );
 }
+
 
 

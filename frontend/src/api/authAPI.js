@@ -137,6 +137,36 @@ const resetPassword = async (token, newPassword) => {
 };
 
 /**
+ * Updates the role and manager of a user by user ID.
+ *
+ * @param {number|string} userId - The ID of the user to update.
+ * @param {string} role - The new role ("USER", "MANAGER", "ADMIN").
+ * @param {number|null} managerId - The ID of the new manager (nullable).
+ * @returns {Promise<Object>} The API response.
+ * @throws {Error} If the update fails.
+ */
+const updateUserRoleAndManager = async (userId, role, managerId) => {
+  const sessionToken = sessionStorage.getItem('authToken');
+
+  if (!sessionToken) throw new Error("No session token found.");
+
+  const response = await apiCall(API_ENDPOINTS.auth.roleUpdate(userId), {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      sessionToken,
+    },
+    body: JSON.stringify({
+      role,
+      managerId: managerId || null,
+    }),
+  });
+
+  return response;
+};
+
+
+/**
  * Validates and refreshes a session token.
  * 
  * @param {string} sessionToken - The session token to validate.
@@ -160,6 +190,7 @@ export const authAPI = {
   registerUser,
   requestPasswordReset,
   resetPassword,
+  updateUserRoleAndManager,
   validateSession,
 };
 

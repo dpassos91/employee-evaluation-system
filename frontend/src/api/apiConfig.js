@@ -33,6 +33,8 @@ const API_ENDPOINTS = {
     requestResetPassword: `${API_BASE_URL}/users/request-reset`,
     /** @type {string} Reset password endpoint */
     resetPassword: `${API_BASE_URL}/users/reset-password`,
+    /** @function Update user role and manager by user id */
+    roleUpdate: (id) => `${API_BASE_URL}/users/${id}/role-manager`,
     /** @type {string} Validate session endpoint */
     validateSession: `${API_BASE_URL}/users/validate-session`
   },

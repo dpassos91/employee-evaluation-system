@@ -12,6 +12,9 @@ import aor.projetofinal.exception.EmailAlreadyExistsException;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
@@ -1310,6 +1313,45 @@ public class UserBean implements Serializable {
         }
         return checkPassword(rawPassword, user.getPassword());
     }
+
+    /**
+ * Updates the role and manager of a given user.
+ * Logs all actions and errors using log4j.
+ *
+ * @param userId        The ID of the user to update.
+ * @param newRoleName   The new role name ("USER", "MANAGER", "ADMIN").
+ * @param newManagerId  The ID of the new manager (nullable).
+ * @throws NotFoundException         If the user does not exist.
+ * @throws IllegalArgumentException  If the role does not exist.
+ */
+@Transactional
+public void updateRoleAndManager(int userId, String newRoleName, Integer newManagerId) {
+    UserEntity user = userDao.findById(userId);
+    if (user == null) {
+        logger.warn("User: {} | IP: {} - Tried to update role/manager for non-existing userId={}",
+                RequestContext.getAuthor(), RequestContext.getIp(), userId);
+        throw new NotFoundException();
+    }
+
+    // Update Role
+    RoleEntity newRole = roleDao.findByName(newRoleName);
+    if (newRole == null) {
+        logger.warn("User: {} | IP: {} - Tried to update userId={} to non-existing role '{}'",
+                RequestContext.getAuthor(), RequestContext.getIp(), userId, newRoleName);
+        throw new IllegalArgumentException("Invalid role: " + newRoleName);
+    }
+    user.setRole(newRole);
+
+    // Update Manager (can be null)
+    UserEntity newManager = (newManagerId != null) ? userDao.findById(newManagerId) : null;
+    user.setManager(newManager);
+
+    userDao.save(user);
+
+    logger.info("User: {} | IP: {} - Updated userId={} to role '{}' and managerId={}",
+            RequestContext.getAuthor(), RequestContext.getIp(), userId, newRoleName, newManagerId);
+}
+
 
 }
 
