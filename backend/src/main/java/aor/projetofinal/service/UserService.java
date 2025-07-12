@@ -2,6 +2,7 @@ package aor.projetofinal.service;
 
 import aor.projetofinal.dto.*;
 import aor.projetofinal.entity.SessionTokenEntity;
+import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 import aor.projetofinal.util.EmailUtil;
 import aor.projetofinal.util.ProfileValidator;
 import aor.projetofinal.bean.UserBean;
@@ -310,6 +311,77 @@ public Response updateUserPassword(
     }
 
 
+    /**
+     * Retrieves a paginated list of confirmed, active users who do not have a manager assigned.
+     * Supports optional filters by name and office.
+     * Accessible only to users with ADMIN role.
+     *
+     * @param name       Optional name filter (matches first or last name).
+     * @param officeStr  Optional office filter (as string, converted to UsualWorkPlaceEnum).
+     * @param page       Page number for pagination (default 1).
+     * @param pageSize   Number of results per page (default 10).
+     * @param token      Session token from request header for authentication.
+     * @return HTTP 200 with paginated users; 401 if session invalid; 403 if not admin; 400 if office is invalid.
+     */
+    @GET
+    @Path("/users-without-manager-paginated")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsersWithoutManagerPaginated(
+            @QueryParam("name") String name,
+            @QueryParam("office") String officeStr,
+            @QueryParam("page") @DefaultValue("1") int page,
+            @QueryParam("pageSize") @DefaultValue("10") int pageSize,
+            @HeaderParam("sessionToken") String token
+    ) {
+        logger.info("User: {} | IP: {} - Requested users without manager (paginated). Filters - Name: '{}', Office: '{}', Page: {}, PageSize: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), name, officeStr, page, pageSize);
+
+        // Validate session token
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("User: {} | IP: {} - Invalid or expired session token.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity requester = tokenEntity.getUser();
+
+        // Check admin privileges
+        if (!"ADMIN".equalsIgnoreCase(requester.getRole().getName())) {
+            logger.warn("User: {} | IP: {} - Forbidden: only ADMIN can access this resource.",
+                    requester.getEmail(), RequestContext.getIp());
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Only administrators can access this resource.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // Parse office enum
+        UsualWorkPlaceEnum officeEnum = null;
+        try {
+            if (officeStr != null && !officeStr.isBlank()) {
+                officeEnum = UsualWorkPlaceEnum.fromString(officeStr);
+            }
+        } catch (IllegalArgumentException e) {
+            logger.warn("User: {} | IP: {} - Invalid office filter value: '{}'",
+                    requester.getEmail(), RequestContext.getIp(), officeStr);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"message\": \"Invalid office value: " + officeStr + "\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // Delegate to bean
+        PaginatedUsersDto result = userBean.listUsersWithoutManagerFiltered(name, officeEnum, page, pageSize);
+
+        logger.info("User: {} | IP: {} - Retrieved {} users without manager (page {}).",
+                requester.getEmail(), RequestContext.getIp(), result.getUsers().size(), page);
+
+        return Response.ok(result, MediaType.APPLICATION_JSON).build();
+    }
 
 
 

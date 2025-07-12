@@ -4,6 +4,7 @@ import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.entity.SettingsEntity;
 import aor.projetofinal.entity.UserEntity;
+import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -29,6 +30,48 @@ public class UserDao {
                 .setParameter("roleName", "ADMIN")
                 .getSingleResult();
     }
+
+
+    /**
+     * Counts the total number of active, confirmed users without an assigned manager,
+     * optionally filtered by name and office.
+     * <p>
+     * This count excludes users with the ADMIN role.
+     *
+     * @param name   Full or partial name of the user to match (normalized and case-insensitive).
+     * @param office Office location (as enum) to filter results; may be null.
+     * @return The total number of users matching the given filters.
+     */
+    public long countConfirmedUsersWithoutManagerFiltered(String name, UsualWorkPlaceEnum office) {
+        logger.info("User: {} | IP: {} - Counting users without manager with filters. Name: '{}', Office: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), name, office);
+
+        StringBuilder jpql = new StringBuilder("SELECT COUNT(u) FROM UserEntity u WHERE 1=1");
+        jpql.append(" AND u.confirmed = true AND u.active = true AND u.manager IS NULL");
+        jpql.append(" AND LOWER(u.role.name) <> 'admin'");
+
+        if (name != null && !name.isBlank()) {
+            jpql.append(" AND CONCAT(' ', LOWER(u.profile.normalizedFirstName), ' ', LOWER(u.profile.normalizedLastName)) LIKE CONCAT('%', :name, '%')");
+        }
+
+        if (office != null) {
+            jpql.append(" AND u.profile.usualWorkplace = :office");
+        }
+
+        TypedQuery<Long> query = em.createQuery(jpql.toString(), Long.class);
+
+        if (name != null && !name.isBlank()) {
+            query.setParameter("name", name.toLowerCase());
+        }
+
+        if (office != null) {
+            query.setParameter("office", office);
+        }
+
+        return query.getSingleResult();
+    }
+
+
 
     public void create(UserEntity user) {
         em.persist(user);
@@ -75,7 +118,59 @@ public class UserDao {
         }
     }
 
-public UserEntity findBySessionToken(String token) {
+
+
+
+    /**
+     * Retrieves a paginated list of active, confirmed users without an assigned manager,
+     * filtered by name and office (if provided).
+     * <p>
+     * This query excludes users with the ADMIN role and applies filters on normalized name fields and workplace.
+     *
+     * @param name     Full or partial name of the user to search (normalized and case-insensitive).
+     * @param office   Office location (as enum) to filter results; may be null.
+     * @param page     Page number for pagination (1-based).
+     * @param pageSize Number of users per page.
+     * @return A list of UserEntity objects matching the provided filters and pagination.
+     */
+    public List<UserEntity> findConfirmedUsersWithoutManagerFiltered(String name, UsualWorkPlaceEnum office, int page, int pageSize) {
+        logger.info("User: {} | IP: {} - Fetching paginated users without manager with filters. Name: '{}', Office: {}, Page: {}, PageSize: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), name, office, page, pageSize);
+
+        StringBuilder jpql = new StringBuilder("SELECT u FROM UserEntity u WHERE 1=1");
+        jpql.append(" AND u.confirmed = true AND u.active = true AND u.manager IS NULL");
+        jpql.append(" AND LOWER(u.role.name) <> 'admin'");
+
+        if (name != null && !name.isBlank()) {
+            jpql.append(" AND CONCAT(' ', LOWER(u.profile.normalizedFirstName), ' ', LOWER(u.profile.normalizedLastName)) LIKE CONCAT('%', :name, '%')");
+        }
+
+        if (office != null) {
+            jpql.append(" AND u.profile.usualWorkplace = :office");
+        }
+
+        jpql.append(" ORDER BY u.profile.firstName ASC, u.profile.lastName ASC");
+
+        TypedQuery<UserEntity> query = em.createQuery(jpql.toString(), UserEntity.class);
+
+        if (name != null && !name.isBlank()) {
+            query.setParameter("name", name.toLowerCase());
+        }
+
+        if (office != null) {
+            query.setParameter("office", office);
+        }
+
+        query.setFirstResult((page - 1) * pageSize);
+        query.setMaxResults(pageSize);
+
+        return query.getResultList();
+    }
+
+
+
+
+    public UserEntity findBySessionToken(String token) {
     try {
         TypedQuery<UserEntity> query = em.createQuery(
             "SELECT st.user FROM SessionTokenEntity st WHERE st.tokenValue = :token", UserEntity.class);
