@@ -142,11 +142,100 @@ public class EvaluationCycleService {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
 
+    }
 
 
 
 
+    /**
+     * Retrieves a list of users who still have evaluations in progress in the current cycle.
+     *
+     * <p>This endpoint is restricted to administrators only. It checks if the requester
+     * has a valid session and the "ADMIN" role before returning data.</p>
+     *
+     * <p>The response contains a {@link UsersWithIncompleteEvaluationsDto} object with the
+     * list of users and the total number of incomplete evaluations.</p>
+     *
+     * @param token The session token of the authenticated user (provided via HTTP header).
+     * @return HTTP 200 OK with JSON body of users with incomplete evaluations if successful;
+     *         HTTP 401 Unauthorized if the token is invalid;
+     *         HTTP 403 Forbidden if the requester is not an admin.
+     */
+    @GET
+    @Path("/list-incomplete-evaluations")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getIncompleteEvaluations(@HeaderParam("sessionToken") String token) {
+        // Validate session token
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("User: {} | IP: {} - Unauthorized access to /list-incomplete-evaluations (invalid token).",
+                    RequestContext.getAuthor(), RequestContext.getIp());
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
 
+        UserEntity requester = tokenEntity.getUser();
+
+        // Check admin role
+        if (!requester.getRole().getName().equalsIgnoreCase("admin")) {
+            logger.warn("User: {} | IP: {} - Forbidden: non-admin attempted to access /list-incomplete-evaluations.",
+                    requester.getEmail(), RequestContext.getIp());
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Only admins can access this information.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UsersWithIncompleteEvaluationsDto dto = evaluationBean.listUsersWithIncompleteEvaluationsFromLastCycle();
+        return Response.ok(dto).build();
+    }
+
+
+    /**
+     * Retrieves a list of confirmed users who do not have a manager assigned.
+     *
+     * <p>This endpoint is restricted to administrators only. It validates the session token
+     * and verifies that the requester has the "ADMIN" role.</p>
+     *
+     * <p>The response contains a {@link UsersWithoutManagerDto} object with the list of users
+     * and the total count.</p>
+     *
+     * @param token The session token of the authenticated user (provided via HTTP header).
+     * @return HTTP 200 OK with JSON body of users without managers if successful;
+     *         HTTP 401 Unauthorized if the token is invalid;
+     *         HTTP 403 Forbidden if the requester is not an admin.
+     */
+    @GET
+    @Path("/list-users-withouth-manager")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsersWithoutManagers(@HeaderParam("sessionToken") String token) {
+        // Validate session token
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("User: {} | IP: {} - Unauthorized access to /list-users-withouth-manager (invalid token).",
+                    RequestContext.getAuthor(), RequestContext.getIp());
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity requester = tokenEntity.getUser();
+
+        // Check admin role
+        if (!requester.getRole().getName().equalsIgnoreCase("admin")) {
+            logger.warn("User: {} | IP: {} - Forbidden: non-admin attempted to access /list-users-withouth-manager.",
+                    requester.getEmail(), RequestContext.getIp());
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Only admins can access this information.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UsersWithoutManagerDto dto = userBean.listConfirmedUsersWithoutManager();
+        return Response.ok(dto).build();
     }
 
 
