@@ -176,7 +176,25 @@ public class ProfileDao {
 
     }
 
-
+/**
+ * Finds the ProfileEntity associated with the given user ID, loading the User entity eagerly.
+ * This ensures the profile always has access to userId, email, and role for DTO conversion.
+ *
+ * @param userId The unique ID of the user whose profile is being requested.
+ * @return The ProfileEntity with User loaded, or null if not found.
+ */
+public ProfileEntity findByUserId(int userId) {
+    try {
+        TypedQuery<ProfileEntity> query = em.createQuery(
+            "SELECT p FROM ProfileEntity p JOIN FETCH p.user WHERE p.user.id = :userId",
+            ProfileEntity.class
+        );
+        query.setParameter("userId", userId);
+        return query.getSingleResult();
+    } catch (NoResultException e) {
+        return null;
+    }
+}
     
         public void save(ProfileEntity profile) {
         em.merge(profile);

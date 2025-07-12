@@ -152,13 +152,13 @@ return Response.ok(csv)
         return Response.ok(profileDto).build();
     }
 
-    /**
+/**
  * Retrieves a user's profile by their unique user ID.
- * Only accessible by the user themselves or by an admin.
+ * Returns a detailed ProfileDto for use in profile pages (self or admin access).
  *
- * @param userId         The unique ID of the user (from the URL path).
- * @param sessionToken   The session token for authentication (from the request header).
- * @return HTTP 200 with the ProfileDto if authorized, or an appropriate error response otherwise.
+ * @param userId        The unique ID of the user whose profile is being requested.
+ * @param sessionToken  The session token for authentication (from the header).
+ * @return HTTP 200 with the ProfileDto if found, or an appropriate error response.
  */
 @GET
 @Path("/by-id/{userId}")
@@ -178,33 +178,9 @@ public Response getProfileById(
                 .build();
     }
 
-    // Get current user (by token) and profile owner (by id)
-    SessionTokenEntity sessionTokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
-    UserEntity currentUser = sessionTokenEntity.getUser();
-    UserEntity profileOwner = userDao.findById(userId);
+    // Fetch the profile entity by user ID, with User loaded eagerly
+    ProfileEntity profileEntity = profileBean.findProfileByUserId(userId);
 
-    if (profileOwner == null) {
-        logger.warn("User: {} | IP: {} - Tried to fetch non-existent user profile by id: '{}'.",
-                RequestContext.getAuthor(), RequestContext.getIp(), userId);
-        return Response.status(404)
-                .entity("{\"message\": \"User not found.\"}")
-                .type(MediaType.APPLICATION_JSON)
-                .build();
-    }
-
-    // Only admin or the profile owner can access the profile
-    /*if (!(currentUser.getRole().getName().equalsIgnoreCase("admin")
-            || currentUser.getId() == profileOwner.getId())) {
-        logger.warn("User: {} | IP: {} - Not authorized to fetch the profile of id '{}'.",
-                RequestContext.getAuthor(), RequestContext.getIp(), userId);
-        return Response.status(403)
-                .entity("{\"message\": \"Not authorized to access this profile.\"}")
-                .type(MediaType.APPLICATION_JSON)
-                .build();
-    }*/
-
-    // Get the associated ProfileEntity
-    ProfileEntity profileEntity = profileOwner.getProfile();
     if (profileEntity == null) {
         logger.warn("User: {} | IP: {} - No profile found for user id '{}'.",
                 RequestContext.getAuthor(), RequestContext.getIp(), userId);
@@ -214,13 +190,13 @@ public Response getProfileById(
                 .build();
     }
 
-    // Convert ProfileEntity to ProfileDto
+    // Convert the ProfileEntity to a ProfileDto (includes user data, manager, etc.)
     ProfileDto profileDto = profileBean.convertToDto(profileEntity);
 
     logger.info("User: {} | IP: {} - Successfully fetched profile of user id '{}'.",
             RequestContext.getAuthor(), RequestContext.getIp(), userId);
 
-    // Success
+    // Return the profile data
     return Response.ok(profileDto).build();
 }
 

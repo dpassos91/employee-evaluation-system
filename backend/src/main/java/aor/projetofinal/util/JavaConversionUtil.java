@@ -209,36 +209,69 @@ public static FlatProfileDto convertProfileEntityToFlatProfileDto(ProfileEntity 
 }
 
 
-    /**
-     * Converts a ProfileEntity to a ProfileDto (includes user reference).
-     * This is used for detailed profile editing or retrieval.
-     *
-     * @param p The ProfileEntity to convert.
-     * @return A ProfileDto mapped from the entity.
-     */
-    public static ProfileDto convertProfileEntityToProfileDto(ProfileEntity p) {
-        ProfileDto profileDto = new ProfileDto();
+ /**
+ * Converts a ProfileEntity to a ProfileDto for detailed profile view/edit.
+ * This method extracts all relevant data as "flat" fields (no JPA entities),
+ * including user identity, manager, role, and profile details.
+ *
+ * @param p The ProfileEntity to convert.
+ * @return A fully populated ProfileDto.
+ */
+public static ProfileDto convertProfileEntityToProfileDto(ProfileEntity p) {
+    ProfileDto profileDto = new ProfileDto();
 
-        profileDto.setFirstName(p.getFirstName());
-        profileDto.setLastName(p.getLastName());
-        profileDto.setBirthDate(p.getBirthDate());
-        profileDto.setAddress(p.getAddress());
-        profileDto.setBirthDate(p.getBirthDate());
-        profileDto.setPhone(p.getPhone());
-        profileDto.setPhotograph(p.getPhotograph());
-        profileDto.setBio(p.getBio());
+    // Basic profile fields
+    profileDto.setUserId(p.getUser() != null ? Long.valueOf(p.getUser().getId()) : null);
+    profileDto.setFirstName(p.getFirstName());
+    profileDto.setLastName(p.getLastName());
+    profileDto.setBirthDate(p.getBirthDate());
+    profileDto.setAddress(p.getAddress());
+    profileDto.setPhone(p.getPhone());
+    profileDto.setPhotograph(p.getPhotograph());
+    profileDto.setBio(p.getBio());
 
-        // Set workplace as string (e.g., "LISBOA")
-        if (p.getUsualWorkplace() != null) {
-            profileDto.setUsualWorkplace(UsualWorkPlaceEnum.transformToString(p.getUsualWorkplace()));
-        } else {
-            profileDto.setUsualWorkplace(null);
-        }
-
-        profileDto.setUser(p.getUser());
-
-        return profileDto;
+    // Usual workplace as string
+    if (p.getUsualWorkplace() != null) {
+        profileDto.setUsualWorkplace(p.getUsualWorkplace().name());
+    } else {
+        profileDto.setUsualWorkplace(null);
     }
+
+    // Email, role from User
+    if (p.getUser() != null) {
+        profileDto.setEmail(p.getUser().getEmail());
+        if (p.getUser().getRole() != null) {
+            profileDto.setRole(p.getUser().getRole().getName());
+        }
+    }
+
+    // Manager info
+    if (p.getUser() != null && p.getUser().getManager() != null) {
+        UserEntity manager = p.getUser().getManager();
+        profileDto.setManagerId(Long.valueOf(manager.getId()));
+
+        // Manager's display name (first + last name, or email if name missing)
+        String mName = "";
+        ProfileEntity mProfile = manager.getProfile();
+        if (mProfile != null) {
+            String mFirst = mProfile.getFirstName() != null ? mProfile.getFirstName() : "";
+            String mLast = mProfile.getLastName() != null ? mProfile.getLastName() : "";
+            mName = (mFirst + " " + mLast).trim();
+        }
+        if (mName.isEmpty() && manager.getEmail() != null) {
+            mName = manager.getEmail();
+        }
+        profileDto.setManagerName(mName);
+    }
+
+    // Profile completeness info (if you have a validator utility)
+    // These lines are optional, based on the logic for completeness/UI validation
+    profileDto.setProfileComplete(ProfileValidator.isProfileComplete(p));
+    profileDto.setMissingFields(ProfileValidator.getMissingFields(p));
+
+    return profileDto;
+}
+
 
     /**
      * Converts a SessionTokenEntity to a SessionStatusDto.

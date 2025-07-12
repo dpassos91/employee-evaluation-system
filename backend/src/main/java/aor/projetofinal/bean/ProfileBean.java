@@ -67,28 +67,54 @@ public class ProfileBean implements Serializable {
      * @param entity The ProfileEntity to convert.
      * @return A ProfileDto representing the given entity, or null if the entity is null.
      */
-    public ProfileDto convertToDto(ProfileEntity entity) {
-        if (entity == null) {
-            logger.warn("User: {} | IP: {} - Attempted to convert a null ProfileEntity to DTO. Operation aborted.",
-                    RequestContext.getAuthor(), RequestContext.getIp());
-            return null;
-        }
-        logger.info("User: {} | IP: {} - Converting ProfileEntity to ProfileDto.",
+public ProfileDto convertToDto(ProfileEntity entity) {
+    if (entity == null) {
+        logger.warn("User: {} | IP: {} - Attempted to convert a null ProfileEntity to DTO. Operation aborted.",
                 RequestContext.getAuthor(), RequestContext.getIp());
-
-        ProfileDto dto = new ProfileDto();
-        dto.setFirstName(entity.getFirstName());
-        dto.setLastName(entity.getLastName());
-        dto.setAddress(entity.getAddress());
-        dto.setPhone(entity.getPhone());
-        dto.setPhotograph(entity.getPhotograph());
-        dto.setBio(entity.getBio());
-        dto.setProfileComplete(ProfileValidator.isProfileComplete(entity));
-        dto.setMissingFields(ProfileValidator.getMissingFields(entity));
-        dto.setBirthDate(entity.getBirthDate() != null ? entity.getBirthDate() : null);
-        dto.setUsualWorkplace(entity.getUsualWorkplace() != null ? entity.getUsualWorkplace().name() : null);
-        return dto;
+        return null;
     }
+    logger.info("User: {} | IP: {} - Converting ProfileEntity to ProfileDto.",
+            RequestContext.getAuthor(), RequestContext.getIp());
+
+    ProfileDto dto = new ProfileDto();
+    dto.setFirstName(entity.getFirstName());
+    dto.setLastName(entity.getLastName());
+    dto.setAddress(entity.getAddress());
+    dto.setPhone(entity.getPhone());
+    dto.setPhotograph(entity.getPhotograph());
+    dto.setBio(entity.getBio());
+    dto.setProfileComplete(ProfileValidator.isProfileComplete(entity));
+    dto.setMissingFields(ProfileValidator.getMissingFields(entity));
+    dto.setBirthDate(entity.getBirthDate() != null ? entity.getBirthDate() : null);
+    dto.setUsualWorkplace(entity.getUsualWorkplace() != null ? entity.getUsualWorkplace().name() : null);
+
+    // Add these lines to populate user-related and manager fields
+    if (entity.getUser() != null) {
+        dto.setUserId(Long.valueOf(entity.getUser().getId()));
+        dto.setEmail(entity.getUser().getEmail());
+        if (entity.getUser().getRole() != null) {
+            dto.setRole(entity.getUser().getRole().getName());
+        }
+        if (entity.getUser().getManager() != null) {
+            UserEntity manager = entity.getUser().getManager();
+            dto.setManagerId(Long.valueOf(manager.getId()));
+            String mName = "";
+            ProfileEntity mProfile = manager.getProfile();
+            if (mProfile != null) {
+                String mFirst = mProfile.getFirstName() != null ? mProfile.getFirstName() : "";
+                String mLast = mProfile.getLastName() != null ? mProfile.getLastName() : "";
+                mName = (mFirst + " " + mLast).trim();
+            }
+            if (mName.isEmpty() && manager.getEmail() != null) {
+                mName = manager.getEmail();
+            }
+            dto.setManagerName(mName);
+        }
+    }
+
+    return dto;
+}
+
 
     /**
      * Finds user profiles based on optional filters: employee name, workplace, and manager email.
@@ -211,6 +237,18 @@ public boolean updateProfilePhoto(UserEntity user, String photoFileName) {
     profileDao.save(profile); // This is safe here; you're inside a @Stateless bean!
     logger.info("User: {} | IP: {} | Email: {} - Profile photo updated to '{}'.", RequestContext.getAuthor(), RequestContext.getIp(), email, photoFileName);
     return true;
+}
+
+/**
+ * Finds and returns the ProfileEntity associated with the given user ID.
+ * This method delegates to the ProfileDao to perform the actual database query,
+ * and ensures the ProfileEntity is returned with its associated User loaded.
+ *
+ * @param userId The unique ID of the user whose profile is being requested.
+ * @return The ProfileEntity corresponding to the user, or null if not found.
+ */
+public ProfileEntity findProfileByUserId(int userId) {
+    return profileDao.findByUserId(userId);
 }
 
 }
