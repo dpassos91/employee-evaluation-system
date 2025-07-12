@@ -34,14 +34,12 @@ export function useUsersList(filters) {
 
       // Map profiles to expected format for the table
 const mapped = (result.profiles || []).map(profile => ({
-  id: profile.userId, // Agora é profile.userId, não profile.user?.id
+  id: profile.userId,
   name: [profile.firstName, profile.lastName].filter(Boolean).join(" "),
   office: formatWorkplace(profile.usualWorkplace),
   manager: profile.managerName || "",
   email: profile.email,
   avatar: profile.photograph,
-  role: profile.role,
-  managerId: profile.managerId || ""
 }));
 
       setUsers(mapped);

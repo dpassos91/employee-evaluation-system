@@ -65,6 +65,11 @@ export default function ProfilePage() {
   // True if current user is viewing own profile or is admin (can edit)
   const canEdit = user?.role === "ADMIN" || String(user?.id) === String(userId);
 
+  // Only ADMIN can edit MANAGER on USER profiles
+const canEditManager = user?.role === "ADMIN" && String(user?.id) !== String(userId);
+
+const [managers, setManagers] = useState([]);
+
   /**
    * Fetch profile data from API.
    * Only update global state if viewing own profile AND values actually change, to avoid render cycles.
@@ -78,6 +83,8 @@ export default function ProfilePage() {
       const sessionToken = sessionStorage.getItem("authToken");
       const profileData = await profileAPI.getProfileById(targetUserId, sessionToken);
       setProfile(profileData);
+
+      console.log("PROFILE JSON:", profileData);
 
       // Only update Zustand if the logged user is viewing their own profile
       if (String(user?.id) === String(targetUserId)) {
@@ -108,11 +115,42 @@ export default function ProfilePage() {
   }, [userId, user?.id, formatMessage]);
 
   /**
+ * Fetches available managers when ADMIN is viewing another user's profile.
+ * Triggers only if canEditManager is true.
+ *
+ * Populates the `managers` state with the result, or sets it to an empty array on failure.
+ */
+useEffect(() => {
+  if (canEditManager) {
+    authAPI.fetchManagers()
+      .then(setManagers)
+      .catch(() => setManagers([]));
+  }
+}, [canEditManager]);
+
+  /**
    * Triggers fetching the profile whenever the userId in the route changes.
    */
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+useEffect(() => {
+  if (canEditManager) {
+    authAPI.fetchManagers()
+      .then(setManagers)
+      .catch(() => setManagers([]));
+  }
+}, [canEditManager]);
+
+const [originalManagerId, setOriginalManagerId] = useState(null);
+
+// Sempre que o perfil é carregado/alterado, atualiza o originalManagerId
+useEffect(() => {
+  if (profile && profile.managerId !== undefined) {
+    setOriginalManagerId(profile.managerId ?? "");
+  }
+}, [profile?.managerId]);
 
   /**
    * Display a toast with missing profile fields if own profile is incomplete.
@@ -148,51 +186,71 @@ export default function ProfilePage() {
   /**
    * Local profile edit handlers (used for editing inputs)
    */
-  const handleChange = (field, value) => {
-    setProfile((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
+ const handleChange = (field, value) => {
+  setProfile((prev) => ({
+    ...prev,
+    [field]: field === "managerId" ? Number(value) || null : value, // converte apenas para o managerId
+  }));
+};
 
   /**
    * Handler for form submission to save profile changes.
    */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const sessionToken = sessionStorage.getItem("authToken");
-      // Use the profile owner's email if editing another user's profile, otherwise use the logged-in user's email
-      const emailToUpdate = profileOwnerEmail || user.email;
-      await profileAPI.updateProfile(emailToUpdate, profile, sessionToken);
-      console.log("Profile updated:", profile);
-      toast.success(
-        formatMessage({
-          id: "profile.update.success",
-          defaultMessage: "Profile updated successfully!",
-        })
-      );
-      await fetchProfile(); // Refresh profile data after save
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const sessionToken = sessionStorage.getItem("authToken");
+    let didUpdateManager = false;
 
-      // If the currently logged-in user just updated their own profile,
-      // update the global user state so components like Sidebar reflect the new name immediately
-      if (String(user?.id) === String(userId) && profile) {
-        setUser({
-          ...user,
-          firstName: profile.firstName, 
-          lastName: profile.lastName,   
-          photograph: profile.photograph
-        });
-      }
-    } catch (err) {
-      toast.error(
-        formatMessage({
-          id: "profile.update.error",
-          defaultMessage: "Error updating profile!",
-        })
+    // Só ADMIN pode alterar manager, e só se mudou
+    if (
+      canEditManager &&
+      String(profile.managerId ?? "") !== String(originalManagerId ?? "")
+    ) {
+      await authAPI.updateUserRoleAndManager(
+        profile.userId,
+        profile.role,
+        profile.managerId
       );
+      didUpdateManager = true;
+      setOriginalManagerId(profile.managerId); // Atualiza o original
     }
-  };
+
+    // Só envia campos do ProfileDto
+    const profileToUpdate = {
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      photograph: profile.photograph,
+      address: profile.address,
+      birthDate: profile.birthDate,
+      phone: profile.phone,
+      bio: profile.bio,
+      usualWorkplace: profile.usualWorkplace
+      // Não envies: userId, managerId, managerName, role, etc.
+    };
+
+    await profileAPI.updateProfile(
+      profileOwnerEmail || user.email,
+      profileToUpdate,
+      sessionToken
+    );
+
+    toast.success(
+      didUpdateManager
+        ? formatMessage({ id: "profile.manager.update.success", defaultMessage: "Manager updated successfully!" })
+        : formatMessage({ id: "profile.update.success", defaultMessage: "Profile updated successfully!" })
+    );
+    await fetchProfile();
+  } catch (err) {
+    toast.error(
+      formatMessage({
+        id: "profile.update.error",
+        defaultMessage: "Error updating profile!",
+      })
+    );
+  }
+};
+
 
   /**
    * Handler for changing the user's password via modal.
@@ -293,8 +351,6 @@ const handlePhotoUpload = async () => {
             <FormattedMessage id="profile.title" defaultMessage="Profile" />
           </h2>
 <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-[#D41C1C] bg-white flex items-center justify-center mt-10">
-            {console.log('profile.photograph:', profile.photograph)}
-
 <img
   src={
     profile.photograph && profile.photograph.trim() !== ""
@@ -374,16 +430,31 @@ const handlePhotoUpload = async () => {
                 />
               </div>
               <div className="flex flex-col">
-                <label className="font-medium mb-2 text-gray-700 mb-1">
-                  <FormattedMessage id="profile.manager" defaultMessage="Manager" />
-                </label>
-                <input
-                  type="text"
-                  value={profile.managerName || ""}
-                  disabled
-                  className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-gray-100 text-gray-700 cursor-not-allowed"
-                />
-              </div>
+  <label className="font-medium mb-2 text-gray-700 mb-1">
+    <FormattedMessage id="profile.manager" defaultMessage="Manager" />
+  </label>
+  {canEditManager ? (
+    <select
+      value={profile.managerId || ""}
+      onChange={e => handleChange("managerId", e.target.value)}
+      className="border border-gray-300 rounded px-2 py-1.5 text-sm"
+    >
+      <option value="">---</option>
+      {managers.map(manager => (
+        <option key={manager.id} value={manager.id}>
+          {manager.firstName} {manager.lastName} ({manager.email})
+        </option>
+      ))}
+    </select>
+  ) : (
+    <input
+      type="text"
+      value={profile.managerName || ""}
+      disabled
+      className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-gray-100 text-gray-700 cursor-not-allowed"
+    />
+  )}
+</div>
             </div>
 
             {/* Main info */}
