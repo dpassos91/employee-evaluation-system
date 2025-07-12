@@ -3,6 +3,7 @@ package aor.projetofinal.bean;
 import aor.projetofinal.dao.*;
 import aor.projetofinal.dto.*;
 import aor.projetofinal.entity.*;
+import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 import aor.projetofinal.util.JavaConversionUtil;
 import aor.projetofinal.util.PasswordUtil;
 
@@ -799,6 +800,52 @@ public class UserBean implements Serializable {
 
         return dto;
     }
+
+
+    /**
+     * Retrieves a paginated and filtered list of confirmed, active users who do not have an assigned manager.
+     * The results can be filtered by name and office, and are ordered alphabetically.
+     *
+     * @param name      Optional name filter (partial match on normalized first and last names).
+     * @param office    Optional office filter (must be a UsualWorkPlaceEnum value).
+     * @param page      The page number to retrieve (1-based index).
+     * @param pageSize  Number of users per page.
+     * @return PaginatedUsersDto containing the filtered user list and pagination metadata.
+     */
+    public PaginatedUsersDto listUsersWithoutManagerFiltered(String name, UsualWorkPlaceEnum office, int page, int pageSize) {
+        logger.info("User: {} | IP: {} - Fetching paginated users without manager. Filters - name: '{}', office: '{}', page: {}, pageSize: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), name, office, page, pageSize);
+
+        List<UserEntity> users = userDao.findConfirmedUsersWithoutManagerFiltered(name, office, page, pageSize);
+        long total = userDao.countConfirmedUsersWithoutManagerFiltered(name, office);
+
+        List<NoManagerDto> dtos = new ArrayList<>();
+        for (UserEntity user : users) {
+            NoManagerDto dto = new NoManagerDto();
+            dto.setId(user.getId());
+            dto.setEmail(user.getEmail());
+
+            if (user.getProfile() != null) {
+                dto.setFirstName(user.getProfile().getFirstName());
+                dto.setLastName(user.getProfile().getLastName());
+                dto.setUsualWorkPlace(user.getProfile().getUsualWorkplace());
+            }
+
+            dtos.add(dto);
+        }
+
+        logger.info("User: {} | IP: {} - Retrieved {} users without manager (total matching: {}).",
+                RequestContext.getAuthor(), RequestContext.getIp(), dtos.size(), total);
+
+        PaginatedUsersDto result = new PaginatedUsersDto();
+        result.setUsers(dtos);
+        result.setTotal(total);
+        result.setPage(page);
+        result.setPageSize(pageSize);
+
+        return result;
+    }
+
 
 
     /**

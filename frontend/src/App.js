@@ -33,6 +33,7 @@ import EvaluationListPage from "./pages/EvaluationListPage";
 import EvaluationFormPage from "./pages/EvaluationFormPage";
 import EvaluationHistoryPage from "./pages/EvaluationHistoryPage";
 import NewEvaluationCyclePage from "./pages/NewEvaluationCyclePage";
+import UsersWithoutManagerPage from "./pages/UsersWithoutManagerPage";
 import CoursesPage from "./pages/CoursesPage";
 
 /**
@@ -190,6 +191,15 @@ const handleWebSocketMessage = useCallback((data) => {
   }
 />
 
+
+<Route
+  path="/newevaluationcycle/userswithoutmanager"
+  element={
+    <RoleRoute allowedRoles={["ADMIN"]}>
+      <UsersWithoutManagerPage />
+    </RoleRoute>
+  }
+/>
 
 <Route
             path="/courses"

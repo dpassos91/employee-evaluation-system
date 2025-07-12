@@ -69,9 +69,47 @@ const getIncompleteEvaluations = async (sessionToken) => {
   });
 };
 
+/**
+ * Retrieves a paginated list of confirmed users who do not have a manager assigned.
+ * Supports optional filters by name and office.
+ * Only accessible to admins.
+ *
+ * @param {object} params - The query parameters:
+ *   {
+ *     name?: string,
+ *     office?: string,
+ *     page?: number,
+ *     pageSize?: number
+ *   }
+ * @param {string} sessionToken - JWT or session token from sessionStorage
+ * @returns {Promise<object>} - API response containing:
+ *   {
+ *     usersWithoutManager: UserDto[],
+ *     totalCount: number
+ *   }
+ */
+const getUsersWithoutManagerPaginated = async (params = {}, sessionToken) => {
+  const query = new URLSearchParams();
+
+  if (params.name) query.append("name", params.name);
+  if (params.office) query.append("office", params.office);
+  if (params.page) query.append("page", params.page);
+  if (params.pageSize) query.append("pageSize", params.pageSize);
+
+  const url = `${API_ENDPOINTS.evaluationCycles.usersWithoutManagerPaginated}?${query.toString()}`;
+
+  return apiCall(url, {
+    method: 'GET',
+    headers: {
+      sessionToken,
+    },
+  });
+};
+
 
 export const evaluationCycleAPI = {
   createCycle,
   getUsersWithoutManager,
   getIncompleteEvaluations,
+  getUsersWithoutManagerPaginated,
 };

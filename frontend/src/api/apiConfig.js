@@ -115,6 +115,12 @@ evaluationCycles: {
 
   /** @type {string} Get list of users with incomplete evaluations (admin only) */
   incompleteEvaluations: `${API_BASE_URL}/evaluations-cycles/list-incomplete-evaluations`,
+
+
+// Associations evaluation cycles-user
+
+   /** @type {string} Get paginated list of confirmed users without manager (admin only) */
+  usersWithoutManagerPaginated: `${API_BASE_URL}/users/users-without-manager-paginated`,
 },
 
 
