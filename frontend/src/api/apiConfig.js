@@ -97,6 +97,8 @@ evaluations: {
   close: (evaluationId) => `${API_BASE_URL}/evaluations/close/${evaluationId}`,
   /** @type {string} Close all evaluations in the current cycle (admin only) */
   bulkClose: `${API_BASE_URL}/evaluations/close-all`,
+  /** @function Get evaluation history with filters (paginated) */
+  historyWithFilters: `${API_BASE_URL}/evaluations/history-with-filters`,
 
 // Associations evaluations-user
 managerDropdown: `${API_BASE_URL}/users/manager-dropdown`,

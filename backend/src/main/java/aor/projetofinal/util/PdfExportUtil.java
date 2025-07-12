@@ -2,6 +2,7 @@ package aor.projetofinal.util;
 
 import aor.projetofinal.entity.EvaluationEntity;
 import aor.projetofinal.entity.UserEntity;
+import aor.projetofinal.entity.enums.GradeEvaluationEnum;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;
 
@@ -57,7 +58,8 @@ public class PdfExportUtil {
             document.add(cycleInfo);
 
             // Grade
-            String gradeLabel = evaluation.getGrade().getDescription(); // e.g., "Contribuição conforme o esperado"
+            GradeEvaluationEnum gradeEnum = evaluation.getGrade();
+            String gradeLabel = gradeEnum.getGrade() + " - " + gradeEnum.getDescription();
             Paragraph gradeInfo = new Paragraph("Grade: " + gradeLabel,
                     FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12));
             gradeInfo.setSpacingAfter(10f);

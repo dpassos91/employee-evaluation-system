@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from "react";
 import { apiConfig } from "../api/apiConfig";
 
 /**
- * Hook para obter histórico de avaliações com filtros.
- * 
- * @param {string} email - Email do utilizador avaliado
- * @param {object} filters - { cycle, cycleEndDate, grade, page }
+ * Hook to fetch evaluation history with filters.
+ *
+ * @param {string} email - Evaluated user's email
+ * @param {object} filters - { cycleId, cycleEndDate, grade, page }
  * @returns {object} { evaluations, totalPages, totalCount, currentPage, loading, error, refetch }
  */
 export function useEvaluationHistoryWithFilters(email, filters) {
@@ -22,7 +22,7 @@ export function useEvaluationHistoryWithFilters(email, filters) {
 
     const params = new URLSearchParams();
     params.append("email", email);
-    if (filters.cycle) params.append("cycle", filters.cycle);
+    if (filters.cycleId) params.append("cycle", filters.cycleId);
     if (filters.cycleEndDate) params.append("cycleEndDate", filters.cycleEndDate);
     if (filters.grade) params.append("grade", filters.grade);
     if (filters.page) params.append("page", filters.page);
@@ -33,12 +33,11 @@ export function useEvaluationHistoryWithFilters(email, filters) {
       );
 
       const mapped = (result.evaluations || []).map((e) => ({
-        id: e.id,
+        id: e.evaluationId,
         cycleNumber: e.cycleNumber,
-        cycleEndDate: e.cycleEndDate,
+        cycleEndDate: e.evaluationDate,
         grade: e.grade,
         feedback: e.feedback,
-        exportUrl: e.exportUrl, // optional: for PDF
       }));
 
       setEvaluations(mapped);
@@ -46,7 +45,7 @@ export function useEvaluationHistoryWithFilters(email, filters) {
       setTotalCount(result.totalCount || 0);
       setCurrentPage(result.currentPage || filters.page || 1);
     } catch (err) {
-      setError(err.message || "Erro ao carregar histórico de avaliações.");
+      setError(err.message || "Failed to load evaluations.");
       setEvaluations([]);
     } finally {
       setLoading(false);

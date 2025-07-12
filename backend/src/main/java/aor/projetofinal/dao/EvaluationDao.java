@@ -16,6 +16,7 @@ import aor.projetofinal.util.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,12 +60,13 @@ public class EvaluationDao {
         TypedQuery<Long> query = em.createQuery(
                 "SELECT COUNT(e) FROM EvaluationEntity e " +
                         "WHERE e.evaluated = :evaluated " +
-                        "AND e.state = aor.projetofinal.entity.enums.EvaluationStateEnum.CLOSED " +
+                        "AND e.state = :state " +
                         "AND e.cycle.active = false",
                 Long.class
         );
 
         query.setParameter("evaluated", evaluated);
+        query.setParameter("state", EvaluationStateEnum.CLOSED);
         return query.getSingleResult();
     }
 
@@ -155,6 +157,55 @@ public class EvaluationDao {
 
 
 
+    /**
+     * Counts the total number of closed evaluations for a user,
+     * optionally filtered by grade, cycle number, or cycle end date.
+     *
+     * @param evaluated     The evaluated user.
+     * @param grade         Optional grade filter.
+     * @param cycle         Optional cycle number filter.
+     * @param cycleEndDate  Optional cycle end date filter (in "yyyy-MM-dd" format).
+     * @return Total number of matching evaluations.
+     */
+    public long countFilteredClosedEvaluations(
+            UserEntity evaluated, Integer grade, Integer cycle, String cycleEndDate
+    ) {
+        logger.info("User: {} | IP: {} - Counting filtered closed evaluations for user {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluated.getEmail());
+
+        StringBuilder sb = new StringBuilder(
+                "SELECT COUNT(e) FROM EvaluationEntity e " +
+                        "WHERE e.evaluated = :evaluated " +
+                        "AND e.state = :state " +
+                        "AND e.cycle.active = false "
+        );
+
+        if (grade != null) sb.append("AND e.grade = :grade ");
+        if (cycle != null) sb.append("AND e.cycle.id = :cycle ");
+        if (cycleEndDate != null) sb.append("AND e.cycle.endDate BETWEEN :startOfDay AND :endOfDay ");
+
+        TypedQuery<Long> query = em.createQuery(sb.toString(), Long.class);
+        query.setParameter("evaluated", evaluated);
+        query.setParameter("state", EvaluationStateEnum.CLOSED);
+
+        if (grade != null) {
+            GradeEvaluationEnum gradeEnum = GradeEvaluationEnum.getEnumfromGrade(grade);
+            query.setParameter("grade", gradeEnum);
+        }
+        if (cycle != null) query.setParameter("cycle", Long.valueOf(cycle));
+        if (cycleEndDate != null) {
+            LocalDate parsedDate = LocalDate.parse(cycleEndDate);
+            query.setParameter("startOfDay", parsedDate.atStartOfDay());
+            query.setParameter("endOfDay", parsedDate.atTime(LocalTime.MAX));
+        }
+
+        long count = query.getSingleResult();
+
+        logger.info("User: {} | IP: {} - Counted {} evaluations.",
+                RequestContext.getAuthor(), RequestContext.getIp(), count);
+
+        return count;
+    }
 
 
 
@@ -235,13 +286,14 @@ public class EvaluationDao {
         TypedQuery<EvaluationEntity> query = em.createQuery(
                 "SELECT e FROM EvaluationEntity e " +
                         "WHERE e.evaluated = :evaluated " +
-                        "AND e.state = aor.projetofinal.entity.enums.EvaluationStateEnum.CLOSED " +
+                        "AND e.state = :state " +
                         "AND e.cycle.active = false " +
-                        "ORDER BY e.date DESC", // most recent evaluations first
+                        "ORDER BY e.date DESC",
                 EvaluationEntity.class
         );
 
         query.setParameter("evaluated", evaluated);
+        query.setParameter("state", EvaluationStateEnum.CLOSED);
 
         int offset = (page > 0 ? page - 1 : 0) * pageSize;
         query.setFirstResult(offset);
@@ -249,6 +301,7 @@ public class EvaluationDao {
 
         return query.getResultList();
     }
+
 
 
 
@@ -396,6 +449,67 @@ public class EvaluationDao {
 
         return query.getResultList();
     }
+
+
+    /**
+     * Retrieves a paginated list of closed evaluations for a given user,
+     * optionally filtered by grade, cycle number, or cycle end date.
+     *
+     * @param evaluated     The evaluated user.
+     * @param page          The current page number (1-based).
+     * @param pageSize      Number of evaluations per page.
+     * @param grade         Optional grade filter.
+     * @param cycle         Optional cycle number filter.
+     * @param cycleEndDate  Optional cycle end date filter (in "yyyy-MM-dd" format).
+     * @return List of filtered EvaluationEntity results.
+     */
+    public List<EvaluationEntity> findFilteredClosedEvaluations(
+            UserEntity evaluated, int page, int pageSize,
+            Integer grade, Integer cycle, String cycleEndDate
+    ) {
+        logger.info("User: {} | IP: {} - Fetching filtered closed evaluations for user {} (page {}).",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluated.getEmail(), page);
+
+        StringBuilder sb = new StringBuilder(
+                "SELECT e FROM EvaluationEntity e " +
+                        "WHERE e.evaluated = :evaluated " +
+                        "AND e.state = :state " +
+                        "AND e.cycle.active = false "
+        );
+
+        if (grade != null) sb.append("AND e.grade = :grade ");
+        if (cycle != null) sb.append("AND e.cycle.id = :cycle ");
+        if (cycleEndDate != null) sb.append("AND e.cycle.endDate BETWEEN :startOfDay AND :endOfDay ");
+
+        sb.append("ORDER BY e.date DESC");
+
+        TypedQuery<EvaluationEntity> query = em.createQuery(sb.toString(), EvaluationEntity.class);
+        query.setParameter("evaluated", evaluated);
+        query.setParameter("state", EvaluationStateEnum.CLOSED);
+
+        if (grade != null) {
+            GradeEvaluationEnum gradeEnum = GradeEvaluationEnum.getEnumfromGrade(grade);
+            query.setParameter("grade", gradeEnum);
+        }
+        if (cycle != null) query.setParameter("cycle", Long.valueOf(cycle));
+        if (cycleEndDate != null) {
+            LocalDate parsedDate = LocalDate.parse(cycleEndDate);
+            query.setParameter("startOfDay", parsedDate.atStartOfDay());
+            query.setParameter("endOfDay", parsedDate.atTime(LocalTime.MAX));
+        }
+
+        int offset = (page > 0 ? page - 1 : 0) * pageSize;
+        query.setFirstResult(offset);
+        query.setMaxResults(pageSize);
+
+        List<EvaluationEntity> results = query.getResultList();
+
+        logger.info("User: {} | IP: {} - Found {} evaluations.",
+                RequestContext.getAuthor(), RequestContext.getIp(), results.size());
+
+        return results;
+    }
+
 
 
 
