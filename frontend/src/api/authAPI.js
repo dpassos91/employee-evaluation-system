@@ -50,6 +50,17 @@ const confirmAccount = async (confirmToken) => {
 };
 
 /**
+ * Fetches all users with role "MANAGER" (active and confirmed).
+ * Returns a list of UsersDropdownMenuDto.
+ */
+const fetchManagers = async () => {
+  const token = sessionStorage.getItem('authToken'); // se precisares de autenticação
+  return apiCall(API_ENDPOINTS.auth.managers, {
+    headers: { sessionToken: token }
+  });
+};
+
+/**
  * Logs in a user, stores the session token in sessionStorage,
  * and returns the login response with user info and profile status.
  * 
@@ -185,6 +196,7 @@ const validateSession = async (sessionToken) => {
 export const authAPI = {
   changePassword,
   confirmAccount,
+  fetchManagers,
   loginUser,
   logoutUser,
   registerUser,

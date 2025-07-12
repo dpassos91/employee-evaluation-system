@@ -14,6 +14,7 @@ import { userStore } from "../stores/userStore";
 import { FiSettings } from "react-icons/fi";
 import Modal from "../components/Modal"; // Certifica-te que o teu Modal está importado
 import { authAPI } from "../api/authAPI";
+import { useEffect } from "react";
 
 export default function UsersPage() {
   // Filtros e página
@@ -25,6 +26,8 @@ export default function UsersPage() {
   const [editingUser, setEditingUser] = useState(null);
   const [editRole, setEditRole] = useState("");
   const [editManagerId, setEditManagerId] = useState("");
+
+  const [managers, setManagers] = useState([]);
 
   const user = userStore((state) => state.user);
   const isAdmin = user?.role === "ADMIN";
@@ -175,6 +178,16 @@ export default function UsersPage() {
     }
   };
 
+useEffect(() => {
+  console.log("useEffect (fetch managers) executado!");
+  authAPI.fetchManagers()
+    .then(managers => {
+      console.log("Managers recebidos:", managers);
+      setManagers(managers);
+    })
+    .catch(() => setManagers([]));
+}, []);
+
   return (
     <PageLayout title={<FormattedMessage id="users.list.title" defaultMessage="Listagem de Utilizadores" />}>
       {/* Filtros */}
@@ -246,19 +259,22 @@ export default function UsersPage() {
               <label className="block text-sm font-medium mb-1">
                 <FormattedMessage id="users.field.manager" defaultMessage="Gestor" />
               </label>
-              <select
-                className="border px-2 py-1 rounded w-full"
-                value={editManagerId}
-                onChange={e => setEditManagerId(e.target.value)}
-              >
-                <option value="">--</option>
-                {/* Só users com role manager/admin */}
-                {users.filter(u => u.role === "MANAGER" || u.role === "ADMIN").map(managerUser => (
-                  <option key={managerUser.id} value={managerUser.id}>
-                    {managerUser.name}
-                  </option>
-                ))}
-              </select>
+<select
+  className="border px-2 py-1 rounded w-full"
+  value={editManagerId}
+  onChange={e => setEditManagerId(e.target.value)}
+>
+  <option value=""> </option>
+  {Array.isArray(managers) && managers.length > 0 ? (
+    managers.map(manager => (
+      <option key={manager.id} value={manager.id}>
+        {manager.firstName} {manager.lastName} ({manager.email})
+      </option>
+    ))
+  ) : (
+    <option disabled>Nenhum gestor disponível</option>
+  )}
+</select>
             </div>
             {/* Botões */}
             <div className="flex gap-2 mt-4 justify-end">
