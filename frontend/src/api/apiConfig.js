@@ -97,6 +97,8 @@ evaluations: {
   close: (evaluationId) => `${API_BASE_URL}/evaluations/close/${evaluationId}`,
   /** @type {string} Close all evaluations in the current cycle (admin only) */
   bulkClose: `${API_BASE_URL}/evaluations/close-all`,
+  /** @function Get evaluation history with filters (paginated) */
+  historyWithFilters: `${API_BASE_URL}/evaluations/history-with-filters`,
 
 // Associations evaluations-user
 managerDropdown: `${API_BASE_URL}/users/manager-dropdown`,
@@ -107,6 +109,12 @@ assignManager: `${API_BASE_URL}/users/assign-manager`,
 evaluationCycles: {
   /** @type {string} Create a new evaluation cycle */
   create: `${API_BASE_URL}/evaluations-cycles/create-cycle`,
+
+  /** @type {string} Get list of confirmed users without a manager (admin only) */
+  usersWithoutManager: `${API_BASE_URL}/evaluations-cycles/list-users-withouth-manager`,
+
+  /** @type {string} Get list of users with incomplete evaluations (admin only) */
+  incompleteEvaluations: `${API_BASE_URL}/evaluations-cycles/list-incomplete-evaluations`,
 },
 
 

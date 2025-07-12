@@ -195,30 +195,43 @@ public class EvaluationBean implements Serializable {
 
 
     /**
-     * Returns a paginated history of closed evaluations for the given user.
-     * Evaluations are filtered by state CLOSED and cycle inactive, and ordered by date (most recent first).
+     * Retrieves paginated evaluation history for the given user, applying optional filters.
      *
-     * @param evaluated The user whose evaluation history is being requested.
-     * @param page      The page number requested (1-based).
-     * @return A PaginatedEvaluationHistoryDto containing evaluations and pagination metadata.
+     * @param evaluated The evaluated user.
+     * @param page Page number.
+     * @param grade Optional grade filter.
+     * @param cycle Optional cycle number filter.
+     * @param cycleEndDate Optional cycle end date filter in "yyyy-MM-dd" format.
+     * @return Paginated DTO with evaluations matching the filters.
      */
-    public PaginatedEvaluationHistoryDto getEvaluationHistory(UserEntity evaluated, int page) {
+    public PaginatedEvaluationHistoryDto getFilteredEvaluationHistory(
+            UserEntity evaluated, int page, Integer grade, Integer cycle, String cycleEndDate
+    ) {
         int pageSize = 10;
         int offsetPage = (page < 1) ? 1 : page;
 
-        List<EvaluationEntity> results = evaluationDao.findClosedByEvaluatedPaginated(evaluated, offsetPage, pageSize);
-        long totalCount = evaluationDao.countClosedByEvaluated(evaluated);
+        logger.info("User: {} | IP: {} - Filtering evaluations for user {} | Page: {} | Grade: {} | Cycle: {} | EndDate: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluated.getEmail(), offsetPage, grade, cycle, cycleEndDate);
 
-        List<FlatEvaluationHistoryDto> dtos = new ArrayList<>();
-        for (EvaluationEntity entity : results) {
-            FlatEvaluationHistoryDto dto = JavaConversionUtil.convertToFlatHistoryDto(entity);
-            if (dto != null) dtos.add(dto);
-        }
+        List<EvaluationEntity> results = evaluationDao.findFilteredClosedEvaluations(
+                evaluated, offsetPage, pageSize, grade, cycle, cycleEndDate
+        );
+
+        long totalCount = evaluationDao.countFilteredClosedEvaluations(evaluated, grade, cycle, cycleEndDate);
+
+        List<FlatEvaluationHistoryDto> dtos = results.stream()
+                .map(JavaConversionUtil::convertToFlatHistoryDto)
+                .filter(Objects::nonNull)
+                .toList();
 
         int totalPages = (int) Math.ceil((double) totalCount / pageSize);
 
+        logger.info("User: {} | IP: {} - Found {} evaluations ({} total, {} pages).",
+                RequestContext.getAuthor(), RequestContext.getIp(), dtos.size(), totalCount, totalPages);
+
         return new PaginatedEvaluationHistoryDto(dtos, totalCount, totalPages, offsetPage);
     }
+
 
 
 

@@ -27,6 +27,9 @@ export default function EvaluationFormPage() {
   const [loading, setLoading] = useState(true);
   const [updatingManager, setUpdatingManager] = useState(false);
 
+  const isChangeDisabled =
+  updatingManager || selectedManager === managerEmail || selectedManager === email;
+
   useEffect(() => {
     const fetchEvaluation = async () => {
       try {
@@ -156,13 +159,13 @@ export default function EvaluationFormPage() {
                   ))}
                 </select>
                 <button
-                  type="button"
-                  onClick={handleAssignManager}
-                  disabled={updatingManager}
-                  className="bg-red-600 text-white px-3 py-1 rounded"
-                >
-                  <FormattedMessage id="evaluations.form.changeManager" defaultMessage="Alterar" />
-                </button>
+  type="button"
+  onClick={handleAssignManager}
+  disabled={isChangeDisabled}
+  className="bg-red-600 text-white px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  <FormattedMessage id="evaluations.form.changeManager" defaultMessage="Alterar" />
+</button>
               </div>
             ) : (
               <input

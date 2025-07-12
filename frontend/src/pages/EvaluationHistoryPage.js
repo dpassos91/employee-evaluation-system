@@ -9,16 +9,16 @@ import { toast } from "react-toastify";
 export default function EvaluationHistoryPage() {
   const { email } = useParams();
 
-  const [cycle, setCycle] = useState("");
+  const [cycleId, setCycleId] = useState("");
   const [cycleEndDate, setCycleEndDate] = useState("");
   const [grade, setGrade] = useState("");
   const [hover, setHover] = useState(null);
   const [page, setPage] = useState(1);
 
-  const filters = useMemo(
-    () => ({ cycle, cycleEndDate, grade, page }),
-    [cycle, cycleEndDate, grade, page]
-  );
+ const filters = useMemo(
+  () => ({ cycleId, cycleEndDate, grade, page }),
+  [cycleId, cycleEndDate, grade, page]
+);
 
   const {
     evaluations,
@@ -31,17 +31,16 @@ export default function EvaluationHistoryPage() {
   const handleExportPDF = async (evaluationId) => {
     try {
       const token = sessionStorage.getItem("authToken");
-      const url = `${apiConfig.API_ENDPOINTS.evaluations.exportPdf}?id=${evaluationId}`;
-      const response = await fetch(url, {
-        headers: { sessionToken: token, token },
-      });
+      const url = apiConfig.API_ENDPOINTS.evaluations.exportPdf(evaluationId);
+      const response = await fetch(url, apiConfig.authInterceptor());
       const blob = await response.blob();
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `avaliacao_${evaluationId}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+const file = new Blob([blob], { type: "application/pdf" });
+const link = document.createElement("a");
+link.href = URL.createObjectURL(file);
+link.download = `avaliacao_${evaluationId}.pdf`;
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
     } catch {
       toast.error("Erro ao exportar avaliação para PDF.");
     }
@@ -53,8 +52,12 @@ export default function EvaluationHistoryPage() {
         <input
           placeholder="Ciclo"
           className="border px-2 py-1 rounded"
-          value={cycle}
-          onChange={(e) => { setCycle(e.target.value); setPage(1); }}
+          value={cycleId}
+          onChange={(e) => {
+  const value = parseInt(e.target.value, 10);
+  setCycleId(Number.isNaN(value) ? "" : value);
+  setPage(1);
+}}
         />
         <input
           type="date"

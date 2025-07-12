@@ -327,28 +327,36 @@ public class EvaluationService {
     }
 
 
-
     /**
-     * Returns the paginated history of closed evaluations for a given user.
-     * Only accessible to the evaluated user themselves, their current manager, or an admin.
+     * Retrieves a paginated list of closed evaluations for a given user,
+     * applying optional filters (grade, cycle number, cycle end date).
      *
-     * @param sessionToken  The session token of the requester
-     * @param email         The email of the evaluated user (whose history is being requested)
-     * @param page          The page number (default = 1)
-     * @return JSON response with paginated evaluation history or error
+     * @param sessionToken The session token of the requesting user.
+     * @param email Email of the evaluated user.
+     * @param page Page number for pagination (default is 1).
+     * @param grade Optional filter by grade (1 to 4).
+     * @param cycle Optional filter by cycle number.
+     * @param cycleEndDate Optional filter by cycle end date (yyyy-MM-dd).
+     * @return Paginated list of evaluations, or error if access is denied or data is invalid.
      */
     @GET
-    @Path("/history")
+    @Path("/history-with-filters")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEvaluationHistory(
+    public Response getEvaluationHistoryWithFilters(
             @HeaderParam("sessionToken") String sessionToken,
             @QueryParam("email") String email,
-            @QueryParam("page") @DefaultValue("1") int page
+            @QueryParam("page") @DefaultValue("1") int page,
+            @QueryParam("grade") Integer grade,
+            @QueryParam("cycle") Integer cycle,
+            @QueryParam("cycleEndDate") String cycleEndDate
     ) {
-        // 1. Validate session
+        logger.info("User: {} | IP: {} - Requesting filtered evaluation history for user {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), email);
+
+        // Validate session
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
         if (tokenEntity == null || tokenEntity.getUser() == null) {
-            logger.warn("Unauthorized request to evaluation history.");
+            logger.warn("IP: {} - Unauthorized access attempt (invalid or expired session).", RequestContext.getIp());
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("{\"message\": \"Invalid or expired session.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -357,8 +365,9 @@ public class EvaluationService {
 
         UserEntity requester = tokenEntity.getUser();
 
-        // 2. Load evaluated user
+        // Load evaluated user
         UserEntity evaluated = userDao.findByEmail(email);
+
         if (evaluated == null) {
             logger.warn("User: {} | IP: {} - Attempted to access history of non-existent user {}.",
                     requester.getEmail(), RequestContext.getIp(), email);
@@ -368,8 +377,9 @@ public class EvaluationService {
                     .build();
         }
 
-        // 3. Check access rights
-        boolean isSelf = evaluated.getEmail().equalsIgnoreCase(requester.getEmail());
+        // Check access rights
+
+        boolean isSelf = requester.getEmail().equalsIgnoreCase(email);
         boolean isAdmin = requester.getRole().getName().equalsIgnoreCase("ADMIN");
         boolean isManager = evaluated.getManager() != null &&
                 evaluated.getManager().getEmail().equalsIgnoreCase(requester.getEmail());
@@ -383,16 +393,25 @@ public class EvaluationService {
                     .build();
         }
 
-        // 4. Load paginated history
-        PaginatedEvaluationHistoryDto dto = evaluationBean.getEvaluationHistory(evaluated, page);
+        // Load paginated history
 
-        logger.info("User: {} | IP: {} - Accessed evaluation history of {} (Page {}).",
+        PaginatedEvaluationHistoryDto dto = evaluationBean.getFilteredEvaluationHistory(
+                evaluated, page, grade, cycle, cycleEndDate
+        );
+
+        logger.info("User: {} | IP: {} - Successfully fetched filtered evaluation history of {} (page {}).",
                 requester.getEmail(), RequestContext.getIp(), evaluated.getEmail(), page);
 
-        return Response.ok(dto)
-                .type(MediaType.APPLICATION_JSON)
-                .build();
+        return Response.ok(dto, MediaType.APPLICATION_JSON).build();
     }
+
+
+
+
+
+
+
+
 
 
 

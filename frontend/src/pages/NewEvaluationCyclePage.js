@@ -24,25 +24,22 @@ export default function NewEvaluationCyclePage() {
       return;
     }
 
-    const fetchStats = async () => {
-      try {
-       const [noManagerRes, openCyclesRes] = await Promise.all([
-          // Podes criar helpers em evaluationCycleAPI depois
-          // Por agora mantemos como estava
-          fetch("/grupo7/rest/evaluation-cycles/users-without-manager", {
-            headers: { sessionToken: sessionStorage.getItem("authToken") },
-          }).then(r => r.json()),
-          fetch("/grupo7/rest/evaluation-cycles/incomplete-evaluations", {
-            headers: { sessionToken: sessionStorage.getItem("authToken") },
-          }).then(r => r.json()),
-        ]);
+   const fetchStats = async () => {
+  try {
+    const token = sessionStorage.getItem("authToken");
 
-        setUsersWithoutManager(noManagerRes.count || 0);
-        setOpenEvaluations(openCyclesRes.count || 0);
-      } catch (error) {
-        toast.error("Erro ao carregar dados do ciclo.");
-      }
-    };
+    const [noManagerRes, openCyclesRes] = await Promise.all([
+      evaluationCycleAPI.getUsersWithoutManager(token),
+      evaluationCycleAPI.getIncompleteEvaluations(token),
+    ]);
+
+    setUsersWithoutManager(noManagerRes.numberOfUsersWithoutManager || 0);
+    setOpenEvaluations(openCyclesRes.totalUsersWithIncompleteEvaluations || 0);
+  } catch (error) {
+    toast.error("Erro ao carregar dados do ciclo.");
+  }
+};
+
 
     fetchStats();
   }, [isAdmin, navigate]);
@@ -98,25 +95,43 @@ export default function NewEvaluationCyclePage() {
           />
         </div>
 
-        {/* Utilizadores sem gestor */}
-        <div className="mt-4">
-          <span className="block text-md">
-            <FormattedMessage
-              id="cycle.noManager"
-              defaultMessage="Utilizadores sem Gestor"
-            />: <strong>{usersWithoutManager}</strong>
-          </span>
-        </div>
+     {/* Utilizadores sem gestor */}
+<div className="mt-4 text-md">
+  <span className="inline-flex items-center">
+    <FormattedMessage
+      id="cycle.noManager"
+      defaultMessage="Utilizadores sem Gestor"
+    />: <strong className="ml-1">{usersWithoutManager}</strong>
+    {usersWithoutManager > 0 && (
+      <button
+        onClick={() => navigate("/users-without-manager")}
+        className="ml-3 mr-4 bg-gray-200 hover:bg-gray-300 text-sm text-gray-700 font-medium py-1 px-3 rounded shadow-sm transition"
+      >
+        Ver Detalhes
+      </button>
+    )}
+  </span>
+</div>
 
-        {/* Processos abertos */}
-        <div className="mt-2">
-          <span className="block text-md">
-            <FormattedMessage
-              id="cycle.openEvaluations"
-              defaultMessage="Processos em aberto do ciclo anterior"
-            />: <strong>{openEvaluations}</strong>
-          </span>
-        </div>
+{/* Processos abertos */}
+<div className="mt-2 text-md">
+  <span className="inline-flex items-center">
+    <FormattedMessage
+      id="cycle.openEvaluations"
+      defaultMessage="Processos em aberto do ciclo anterior"
+    />: <strong className="ml-1">{openEvaluations}</strong>
+    {openEvaluations > 0 && (
+      <button
+        onClick={() => navigate("/incomplete-evaluations")}
+        className="ml-3 mr-4 bg-gray-200 hover:bg-gray-300 text-sm text-gray-700 font-medium py-1 px-3 rounded shadow-sm transition"
+      >
+        Ver Detalhes
+      </button>
+    )}
+  </span>
+</div>
+
+
       </AppForm>
     </PageLayout>
   );
