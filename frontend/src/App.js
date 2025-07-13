@@ -34,6 +34,7 @@ import EvaluationFormPage from "./pages/EvaluationFormPage";
 import EvaluationHistoryPage from "./pages/EvaluationHistoryPage";
 import NewEvaluationCyclePage from "./pages/NewEvaluationCyclePage";
 import UsersWithoutManagerPage from "./pages/UsersWithoutManagerPage";
+import EvaluationIntermediaryPage from "./pages/EvaluationIntermediaryPage";
 import CoursesPage from "./pages/CoursesPage";
 
 /**
@@ -144,22 +145,15 @@ const handleWebSocketMessage = useCallback((data) => {
               </PrivateRoute>
             }
           />
-            <Route
-            path="/evaluations/fill/:email"
-            element={
-              <PrivateRoute>
-                <EvaluationListPage />
-              </PrivateRoute>
-            }
-          />
+           
 
 
 <Route
             path="/evaluationlist"
             element={
-              <PrivateRoute>
+              <RoleRoute allowedRoles={["ADMIN", "MANAGER"]}>
                 <EvaluationListPage />
-              </PrivateRoute>
+              </RoleRoute>
             }
           />
 
@@ -168,9 +162,9 @@ const handleWebSocketMessage = useCallback((data) => {
   path="/evaluationform/:userId"
   element={
     
-    <PrivateRoute>
+    <RoleRoute allowedRoles={["ADMIN", "MANAGER"]}>
       <EvaluationFormPage />
-    </PrivateRoute>
+    </RoleRoute>
   }
 />
 
@@ -202,6 +196,16 @@ const handleWebSocketMessage = useCallback((data) => {
     </RoleRoute>
   }
 />
+
+<Route
+  path="/evaluations"
+  element={
+   <RoleRoute allowedRoles={["ADMIN", "MANAGER"]}>
+      <EvaluationIntermediaryPage />
+    </RoleRoute>
+  }
+/>
+
 
 <Route
             path="/courses"

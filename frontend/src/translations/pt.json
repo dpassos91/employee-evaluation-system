@@ -163,6 +163,9 @@
    "toast.assignManagerSuccess": "Gestor atribuído com sucesso.",
   "toast.assignManagerError": "Erro ao atribuir gestor.",
   "toast.exportPdfError": "Erro ao exportar avaliação para PDF.",
+  "evaluation.intermediary.title": "Gestão de Avaliações",
+  "button.newCycle": "Novo Ciclo de Avaliação",
+  "button.evaluationList": "Lista de Avaliações",
 
 
 

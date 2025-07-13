@@ -161,6 +161,9 @@
 "toast.assignManagerSuccess": "Manager successfully assigned.",
   "toast.assignManagerError": "Failed to assign manager.",
   "toast.exportPdfError": "Failed to export evaluation to PDF.",
+  "evaluation.intermediary.title": "Evalation Management",
+  "button.newCycle": "New Evaluation Cycle",
+  "button.evaluationList": "Evaluation List",
 
 
 
