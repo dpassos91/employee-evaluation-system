@@ -26,6 +26,7 @@ const fetchEvaluations = useCallback(async () => {
 
       const mapped = (result.evaluations || []).map(evaluation => ({
         id: evaluation.evaluationId,
+        userId: evaluation.evaluatedId,
         evaluated: evaluation.evaluatedName,
         email: evaluation.evaluatedEmail,
         state: evaluation.state,

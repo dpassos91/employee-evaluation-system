@@ -1,3 +1,8 @@
+/**
+ * UsersWithoutManagerPage lists all users who currently don't have a manager assigned.
+ * Admins can filter by name or office and assign a manager via dropdown.
+ */
+
 import { useState, useMemo, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
@@ -10,21 +15,34 @@ import { useIntl } from "react-intl";
 
 
 export default function UsersWithoutManagerPage() {
+    /** @type {[string, Function]} */
   const [nameFilter, setNameFilter] = useState("");
+   /** @type {[string, Function]} */
   const [officeFilter, setOfficeFilter] = useState("");
+   /** @type {[number, Function]} */
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
   const intl = useIntl();
 
+
+   /**
+   * Displays a toast notification.
+   * @param {string} id - i18n ID.
+   * @param {string} defaultMessage - Default message fallback.
+   * @param {"success"|"error"} [type="error"] - Toast type.
+   */
 const showToast = (id, defaultMessage, type = "error") => {
   const msg = intl.formatMessage({ id, defaultMessage });
   toast[type](msg);
 };
 
+
+/** Current authenticated user from Zustand store */
   const user = userStore((state) => state.user);
   const isAdmin = user?.role === "ADMIN";
 
+  // Admin-only state for manager assignment
   const [selectedManagers, setSelectedManagers] = useState({});
 
   const [managerName, setManagerName] = useState("");
@@ -39,6 +57,10 @@ const showToast = (id, defaultMessage, type = "error") => {
 
   const offices = ["", "Boston", "Coimbra", "Lisboa", "Munich", "Porto", "Southampton", "Viseu"];
 
+
+   /**
+   * Loads the list of available managers if the user is an admin.
+   */
   // Fetch managers from managerDropdown endpoint
   useEffect(() => {
       const fetchDropdownUsers = async () => {
@@ -56,7 +78,9 @@ const showToast = (id, defaultMessage, type = "error") => {
     }, [isAdmin]);
 
   
-
+ /**
+   * Memoized filters used by the custom hook.
+   */
   const filters = useMemo(() => ({
     name: nameFilter,
     office: officeFilter,
@@ -64,6 +88,10 @@ const showToast = (id, defaultMessage, type = "error") => {
     pageSize,
   }), [nameFilter, officeFilter, page]);
 
+
+  /**
+   * Hook to fetch the list of users without manager.
+   */
   const {
     users,
     totalPages,
@@ -72,6 +100,11 @@ const showToast = (id, defaultMessage, type = "error") => {
     refetch
   } = useUsersWithoutManagerList(filters);
 
+
+   /**
+   * Assigns a manager to the specified user.
+   * @param {string} userEmail - Email of the user to assign a manager to.
+   */
  const handleAssignManager = async (userEmail) => {
   const selectedManager = selectedManagers[userEmail];
   if (!selectedManager) return;
@@ -92,6 +125,11 @@ const showToast = (id, defaultMessage, type = "error") => {
   }
 };
 
+
+ /**
+   * Handles pagination changes.
+   * @param {number} p - New page number.
+   */
   const handleGoToPage = (p) => setPage(p);
 
 

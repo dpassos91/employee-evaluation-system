@@ -103,8 +103,8 @@ const getGradeOptions = async (sessionToken) => {
 /**
  * Loads evaluation data for a specific evaluated user in the active cycle.
  */
-const loadEvaluation = async (email, sessionToken) => {
-  const url = API_ENDPOINTS.evaluations.load(email);
+const loadEvaluation = async (userId, sessionToken) => {
+  const url = API_ENDPOINTS.evaluations.load(userId);
   return apiCall(url, {
     method: 'GET',
     headers: { sessionToken },

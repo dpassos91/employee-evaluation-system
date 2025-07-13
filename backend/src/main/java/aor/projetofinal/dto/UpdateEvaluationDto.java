@@ -1,6 +1,8 @@
 package aor.projetofinal.dto;
 
 public class UpdateEvaluationDto {
+    private int evaluatedId;
+
     private int grade;                // the frontend should send a number between 1 and 4
     private String feedback;         // manager's feedback on the evaluation
     private String evaluatedEmail;   // evaluated user's email
@@ -9,6 +11,17 @@ public class UpdateEvaluationDto {
     private String photograph;
     private String evaluatorName;
     private String evaluatorEmail;
+
+
+
+    public int getEvaluatedId() {
+        return evaluatedId;
+    }
+
+    public void setEvaluatedId(int evaluatedId) {
+        this.evaluatedId = evaluatedId;
+    }
+
 
     public int getGrade() { return grade; }
     public void setGrade(int grade) { this.grade = grade; }

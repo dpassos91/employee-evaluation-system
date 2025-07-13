@@ -1,3 +1,8 @@
+/**
+ * NewEvaluationCyclePage component allows administrators to create a new evaluation cycle.
+ * It shows system warnings (like users without manager or unfinished evaluations)
+ * and handles cycle creation via API.
+ */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
@@ -11,13 +16,25 @@ import { useIntl } from "react-intl";
 
 export default function NewEvaluationCyclePage() {
   const navigate = useNavigate();
+  /** @type {[string, Function]} */
   const [endDate, setEndDate] = useState("");
+   /** @type {[number, Function]} */
   const [usersWithoutManager, setUsersWithoutManager] = useState(0);
+   /** @type {[number, Function]} */
   const [openEvaluations, setOpenEvaluations] = useState(0);
+  /** @type {[boolean, Function]} */
   const [loading, setLoading] = useState(false);
 
 const intl = useIntl();
 
+
+ /**
+   * Displays a toast message (can update existing one).
+   * @param {string} id - i18n message ID.
+   * @param {string} defaultMessage - Fallback message.
+   * @param {"success"|"error"} [type="error"] - Type of toast.
+   * @param {string|null} toastId - Optional toast ID to update existing.
+   */
 const showToast = (id, defaultMessage, type = "error", toastId = null) => {
     const msg = intl.formatMessage({ id, defaultMessage });
     if (toastId) {
@@ -32,9 +49,14 @@ const showToast = (id, defaultMessage, type = "error", toastId = null) => {
     }
   };
 
+  /** Authenticated user information from global state (Zustand) */
   const user = userStore((state) => state.user);
   const isAdmin = user?.role === "ADMIN";
 
+
+    /**
+   * Fetches system statistics: users without manager and open evaluations.
+   */
   useEffect(() => {
     if (!isAdmin) {
       showToast("toast.onlyAdmins", "Apenas administradores podem aceder a esta página.");
@@ -62,6 +84,11 @@ const showToast = (id, defaultMessage, type = "error", toastId = null) => {
     fetchStats();
   }, [isAdmin, navigate]);
 
+
+   /**
+   * Handles submission of the new cycle form.
+   * Validates date input and calls API to create a new cycle.
+   */
   const handleSubmit = async () => {
     if (!endDate) {
       showToast("toast.missingEndDate", "Por favor, seleciona uma data de fim.");

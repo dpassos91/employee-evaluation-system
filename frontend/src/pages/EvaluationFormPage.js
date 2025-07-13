@@ -1,3 +1,12 @@
+/**
+ * EvaluationFormPage component renders an evaluation form that allows admins
+ * to assign managers and users to submit performance feedback.
+ * 
+ * It fetches evaluation data, handles form input, displays user information,
+ * and provides feedback via toast notifications.
+ */
+
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
@@ -12,12 +21,21 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 
 export default function EvaluationFormPage() {
-  const { email } = useParams();
+  /** @type {{ userId: string }} */
+  const { userId: rawUserId } = useParams();
+const userId = parseInt(rawUserId, 10);
   const navigate = useNavigate();
   const user = userStore((state) => state.user);
 
 const intl = useIntl();
 
+ /**
+   * Displays a toast notification with internationalized message.
+   * @param {string} id - Message ID for i18n.
+   * @param {string} defaultMessage - Fallback message text.
+   * @param {"error"|"success"} [type="error"] - Toast type.
+   * @param {object} [options={}] - Toast options (e.g., onClose, autoClose).
+   */
 const showToast = (id, defaultMessage, type = "error", options = {}) => {
   const msg = intl.formatMessage({ id, defaultMessage });
   toast[type](msg, options); 
@@ -34,19 +52,29 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
   const [managerEmail, setManagerEmail] = useState("");
   const [dropdownUsers, setDropdownUsers] = useState([]);
   const [selectedManager, setSelectedManager] = useState("");
+  const [evaluatedEmail, setEvaluatedEmail] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [updatingManager, setUpdatingManager] = useState(false);
 
   const isChangeDisabled =
-  updatingManager || selectedManager === managerEmail || selectedManager === email;
+  updatingManager ||
+  selectedManager === managerEmail ||
+  selectedManager === evaluatedEmail;
 
+
+
+   /**
+   * Fetches evaluation data from the API and populates form fields.
+   */
   useEffect(() => {
     const fetchEvaluation = async () => {
       try {
-        const result = await evaluationAPI.loadEvaluation(email, sessionStorage.getItem("authToken"));
+        const result = await evaluationAPI.loadEvaluation(userId, sessionStorage.getItem("authToken"));
+
         const evaluation = result.evaluation;
 
+        setEvaluatedEmail(evaluation.evaluatedEmail || "");
         setName(evaluation.evaluatedName || "");
         setGrade(evaluation.grade ? String(evaluation.grade) : "");
         setFeedback(evaluation.feedback || "");
@@ -62,8 +90,12 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
     };
 
     fetchEvaluation();
-  }, [email]);
+  }, [userId]);
 
+
+   /**
+   * Loads available managers for the dropdown if user is admin.
+   */
   useEffect(() => {
     const fetchDropdownUsers = async () => {
       if (!isAdmin) return;
@@ -78,6 +110,10 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
     fetchDropdownUsers();
   }, [isAdmin]);
 
+
+   /**
+   * Submits the evaluation data to the API.
+   */
   const handleSubmit = async () => {
 
     try {
@@ -86,7 +122,7 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
 
         {
 
-          evaluatedEmail: email,
+          evaluatedEmail,
 
           grade: parseInt(grade),
 
@@ -117,12 +153,14 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
   };
 
 
-
+/**
+   * Assigns a new manager to the evaluated user.
+   */
   const handleAssignManager = async () => {
     if (!selectedManager || selectedManager === managerEmail) return;
     setUpdatingManager(true);
     try {
-      await evaluationAPI.assignManager({ userEmail: email, managerEmail: selectedManager });
+      await evaluationAPI.assignManager({ userEmail: evaluatedEmail, managerEmail: selectedManager });
       showToast("toast.managerUpdateSuccess", "Gestor atualizado com sucesso.", "success");
       setManagerEmail(selectedManager);
       const newManager = dropdownUsers.find((u) => u.email === selectedManager);

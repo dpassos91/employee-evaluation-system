@@ -1,3 +1,8 @@
+/**
+ * EvaluationListPage component displays a paginated and filterable list of user evaluations.
+ * Allows admins to manage evaluation states (e.g., close/reopen), export to CSV, and navigate to evaluation forms.
+ */
+
 import { useState, useMemo } from "react";
 import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
@@ -13,17 +18,31 @@ import { evaluationAPI } from "../api/evaluationAPI";
 
 
 export default function EvaluationListPage() {
-// Filters and page
+// Filter and pagination state
+  /** @type {[string, Function]} */
   const [name, setName] = useState("");
+  /** @type {[string, Function]} */
   const [evaluationState, setEvaluationState] = useState("");
+  /** @type {[string, Function]} */
   const [grade, setGrade] = useState("");
+   /** @type {[string, Function]} */
   const [cycleEnd, setCycleEnd] = useState("");
+  /** @type {[number|null, Function]} */
   const [hover, setHover] = useState(null);
+  /** @type {[number, Function]} */
   const [page, setPage] = useState(1);
   const navigate = useNavigate(); 
 
 const intl = useIntl();
 
+
+  /**
+   * Displays a toast message.
+   * @param {string} id - Message ID for i18n.
+   * @param {string} defaultMessage - Default text if translation not found.
+   * @param {"success"|"error"} type - Toast type.
+   * @param {string|null} toastId - Optional toast ID to update an existing one.
+   */
 const showToast = (id, defaultMessage, type = "success", toastId = null) => {
   const msg = intl.formatMessage({ id, defaultMessage });
 
@@ -48,12 +67,17 @@ const showToast = (id, defaultMessage, type = "success", toastId = null) => {
 
   // Checks if the current user is an admin
   const isAdmin = user?.role === "ADMIN";
-
+/**
+   * Memoized filters to prevent unnecessary renders.
+   */
     const filters = useMemo(
     () => ({ name, evaluationState, grade,  cycleEndDate: cycleEnd, page }),
     [name, evaluationState, grade, cycleEnd, page]
   );
 
+  /**
+   * Fetch evaluations using provided filters.
+   */
   // Get users with filters and pagination
     const { evaluations, totalPages, loading, error, refetch  } = useUsersEvaluationList(filters);
 
@@ -124,10 +148,17 @@ const handleCloseAllEvaluations = async () => {
   }
 };
 
-const handleFillEvaluation = (email) => {
-  navigate(`/evaluationform/${email}`);
+/**
+   * Navigates to the evaluation form page for the selected user.
+   * @param {number} userId - ID of the evaluated user.
+   */
+const handleFillEvaluation = (userId) => {
+  navigate(`/evaluationform/${userId}`);
 };
 
+/**
+   * Exports the current filtered list as a CSV file.
+   */
 const handleExportCSV = async () => {
   try {
     const token = sessionStorage.getItem("authToken");
@@ -284,7 +315,7 @@ const handleExportCSV = async () => {
   {/* Show "Fill" only if at IN_EVALUATION */}
   {evaluation.state === "IN_EVALUATION" ? (
     <button
-      onClick={() => handleFillEvaluation(evaluation.email)}
+      onClick={() => handleFillEvaluation(evaluation.userId)}
       className="bg-[#D41C1C] text-white px-3 py-1 rounded"
     >
       <FormattedMessage id="evaluation.button.fill" defaultMessage="Preencher" />
@@ -293,7 +324,7 @@ const handleExportCSV = async () => {
     <>
       {/* Show only if it's not at IN_EVALUATION */}
       <button
-        onClick={() => navigate(`/evaluationform/${evaluation.email}`)}
+        onClick={() => navigate(`/evaluationform/${evaluation.userId}`)}
         className="bg-[#D41C1C] text-white px-3 py-1 rounded"
       >
         <FormattedMessage id="evaluation.button.view" defaultMessage="Ver" /> <span>&gt;</span>

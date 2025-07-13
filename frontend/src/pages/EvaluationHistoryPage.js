@@ -1,3 +1,8 @@
+/**
+ * EvaluationHistoryPage component displays the evaluation history for a given user.
+ * It allows filtering by cycle, end date, and grade, and provides a PDF export option.
+ */
+
 import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
@@ -8,21 +13,40 @@ import { toast } from "react-toastify";
 import { useIntl } from "react-intl";
 
 export default function EvaluationHistoryPage() {
-  const { userId } = useParams();
+  
+   /** 
+   * Extracts and parses the user ID from the route parameters.
+   * Ensures it is treated as a number.
+   */
+  const { userId: rawUserId } = useParams();
+const userId = parseInt(rawUserId, 10);
 
 const intl = useIntl();
 
+
+ // Filter states
+  /** @type {[string, Function]} */
   const [cycleId, setCycleId] = useState("");
+  /** @type {[string, Function]} */
   const [cycleEndDate, setCycleEndDate] = useState("");
+  /** @type {[string, Function]} */
   const [grade, setGrade] = useState("");
+  /** @type {[number|null, Function]} */
   const [hover, setHover] = useState(null);
+  /** @type {[number, Function]} */
   const [page, setPage] = useState(1);
 
+
+  /**
+   * Memoized filter object to avoid unnecessary re-fetches.
+   */
  const filters = useMemo(
   () => ({ cycleId, cycleEndDate, grade, page }),
   [cycleId, cycleEndDate, grade, page]
 );
-
+ /**
+   * Fetches filtered evaluation history using a custom hook.
+   */
   const {
     evaluations,
     totalPages,
@@ -31,6 +55,10 @@ const intl = useIntl();
     refetch,
   } = useEvaluationHistoryWithFilters(userId, filters);
 
+  /**
+   * Downloads a PDF for the specified evaluation.
+   * @param {number} evaluationId - ID of the evaluation to export.
+   */
   const handleExportPDF = async (evaluationId) => {
   try {
     const token = sessionStorage.getItem("authToken");

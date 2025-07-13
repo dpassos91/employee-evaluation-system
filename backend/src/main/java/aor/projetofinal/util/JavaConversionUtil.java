@@ -100,6 +100,7 @@ public class JavaConversionUtil {
         UserEntity evaluated = evaluation.getEvaluated();
         if (evaluated != null) {
             dto.setEvaluatedEmail(evaluated.getEmail());
+            dto.setEvaluatedId((long) evaluated.getId());
 
             if (evaluated.getProfile() != null) {
                 String fullName = evaluated.getProfile().getFirstName() + " " + evaluated.getProfile().getLastName();
