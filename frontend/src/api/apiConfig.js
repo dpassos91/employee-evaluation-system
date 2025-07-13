@@ -172,12 +172,21 @@ profiles: {
 },
 
   /** Settings endpoints */
-  settings: {
-    /** @type {string} Get current settings */
-    getSettings: `${API_BASE_URL}/settings`,
-    /** @type {string} Update settings */
-    updateSettings: `${API_BASE_URL}/settings`,
-  },
+settings: {
+  getTimeouts: `${API_BASE_URL}/settings/timeouts`,
+  updateConfirmationTimeout: `${API_BASE_URL}/settings/confirmation-timeout`,
+  updateRecoveryTimeout: `${API_BASE_URL}/settings/recovery-timeout`,
+  updateSessionTimeout: `${API_BASE_URL}/settings/session-timeout`,
+
+  //Settings - cycle relationship
+
+  promoteToAdmin: (email) =>
+    `${API_BASE_URL}/users/promote-to-admin?email=${encodeURIComponent(email)}`,
+
+},
+
+
+
 };
 
 /**
@@ -316,5 +325,7 @@ export const apiConfig = {
   authInterceptor,
   apiCall,
   handleApiError,
+  
+
 };
 

@@ -35,6 +35,7 @@ import EvaluationHistoryPage from "./pages/EvaluationHistoryPage";
 import NewEvaluationCyclePage from "./pages/NewEvaluationCyclePage";
 import UsersWithoutManagerPage from "./pages/UsersWithoutManagerPage";
 import EvaluationIntermediaryPage from "./pages/EvaluationIntermediaryPage";
+import SettingsPage from "./pages/SettingsPage";
 import CoursesPage from "./pages/CoursesPage";
 
 /**
@@ -215,6 +216,20 @@ const handleWebSocketMessage = useCallback((data) => {
               </RoleRoute>
             }
           />
+
+
+<Route
+  path="/settings"
+  element={
+    <RoleRoute allowedRoles={["ADMIN"]}>
+      <SettingsPage />
+    </RoleRoute>
+  }
+/>
+
+
+
+
           {/* Redirect all unknown routes to login */}
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
