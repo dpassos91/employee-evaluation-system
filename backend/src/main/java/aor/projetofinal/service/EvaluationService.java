@@ -344,14 +344,14 @@ public class EvaluationService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEvaluationHistoryWithFilters(
             @HeaderParam("sessionToken") String sessionToken,
-            @QueryParam("email") String email,
+            @QueryParam("userId") int userId,
             @QueryParam("page") @DefaultValue("1") int page,
             @QueryParam("grade") Integer grade,
             @QueryParam("cycle") Integer cycle,
             @QueryParam("cycleEndDate") String cycleEndDate
     ) {
         logger.info("User: {} | IP: {} - Requesting filtered evaluation history for user {}.",
-                RequestContext.getAuthor(), RequestContext.getIp(), email);
+                RequestContext.getAuthor(), RequestContext.getIp(),  RequestContext.getIp());
 
         // Validate session
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
@@ -366,11 +366,11 @@ public class EvaluationService {
         UserEntity requester = tokenEntity.getUser();
 
         // Load evaluated user
-        UserEntity evaluated = userDao.findByEmail(email);
+        UserEntity evaluated = userDao.findById(userId);
 
         if (evaluated == null) {
             logger.warn("User: {} | IP: {} - Attempted to access history of non-existent user {}.",
-                    requester.getEmail(), RequestContext.getIp(), email);
+                    requester.getEmail(), RequestContext.getIp(), userId);
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("{\"message\": \"Evaluated user not found.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -379,10 +379,10 @@ public class EvaluationService {
 
         // Check access rights
 
-        boolean isSelf = requester.getEmail().equalsIgnoreCase(email);
+        boolean isSelf = requester.getId() == userId;
         boolean isAdmin = requester.getRole().getName().equalsIgnoreCase("ADMIN");
         boolean isManager = evaluated.getManager() != null &&
-                evaluated.getManager().getEmail().equalsIgnoreCase(requester.getEmail());
+                evaluated.getManager().getId() == requester.getId();;
 
         if (!isSelf && !isManager && !isAdmin) {
             logger.warn("User: {} | IP: {} - Access denied to evaluation history of {}.",

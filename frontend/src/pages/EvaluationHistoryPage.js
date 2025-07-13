@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { useIntl } from "react-intl";
 
 export default function EvaluationHistoryPage() {
-  const { email } = useParams();
+  const { userId } = useParams();
 
 const intl = useIntl();
 
@@ -29,7 +29,7 @@ const intl = useIntl();
     loading,
     error,
     refetch,
-  } = useEvaluationHistoryWithFilters(email, filters);
+  } = useEvaluationHistoryWithFilters(userId, filters);
 
   const handleExportPDF = async (evaluationId) => {
   try {

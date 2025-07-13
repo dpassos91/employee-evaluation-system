@@ -8,7 +8,7 @@ import { evaluationAPI } from "../api/evaluationAPI";
  * @param {object} filters - { cycleId, cycleEndDate, grade, page }
  * @returns {object} { evaluations, totalPages, totalCount, currentPage, loading, error, refetch }
  */
-export function useEvaluationHistoryWithFilters(email, filters) {
+export function useEvaluationHistoryWithFilters(userId, filters) {
   const [evaluations, setEvaluations] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -22,7 +22,7 @@ export function useEvaluationHistoryWithFilters(email, filters) {
 
     try {
       const token = sessionStorage.getItem("authToken");
-      const result = await evaluationAPI.getEvaluationHistoryWithFilters(email, filters, token);
+      const result = await evaluationAPI.getEvaluationHistoryWithFilters(userId, filters, token);
 
       const mapped = (result.evaluations || []).map((e) => ({
         id: e.evaluationId,
@@ -42,7 +42,7 @@ export function useEvaluationHistoryWithFilters(email, filters) {
     } finally {
       setLoading(false);
     }
-  }, [email, filters]);
+  }, [userId, filters]);
 
   useEffect(() => {
     fetchEvaluations();

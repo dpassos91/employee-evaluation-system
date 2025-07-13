@@ -204,9 +204,9 @@ const downloadEvaluationPdf = async (evaluationId, sessionToken) => {
 /**
  * Gets evaluation history with filters (paginated).
  */
-const getEvaluationHistoryWithFilters = async (email, filters, sessionToken) => {
+const getEvaluationHistoryWithFilters = async (userId, filters, sessionToken) => {
   const params = new URLSearchParams();
-  params.append("email", email);
+   params.append("userId", userId);
   if (filters.cycleId) params.append("cycle", filters.cycleId);
   if (filters.cycleEndDate) params.append("cycleEndDate", filters.cycleEndDate);
   if (filters.grade) params.append("grade", filters.grade);
