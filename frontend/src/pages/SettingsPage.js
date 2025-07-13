@@ -4,6 +4,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { settingsAPI } from "../api/settingsAPI";
 import AppButton from "../components/AppButton";
 import { toast } from "react-toastify";
+import { evaluationAPI } from "../api/evaluationAPI";
 
 /**
  * SettingsPage
@@ -15,6 +16,8 @@ export default function SettingsPage() {
   const [recoveryTimeout, setRecoveryTimeout] = useState("");
   const [sessionTimeout, setSessionTimeout] = useState("");
   const { formatMessage } = useIntl();
+  const [potentialAdmins, setPotentialAdmins] = useState([]);
+const [selectedAdminEmail, setSelectedAdminEmail] = useState("");
 
   // Fetch timeouts from the backend
   useEffect(() => {
@@ -31,6 +34,21 @@ export default function SettingsPage() {
 
     fetchTimeouts();
   }, [formatMessage]);
+
+useEffect(() => {
+  const fetchPotentialAdmins = async () => {
+    try {
+      const data = await evaluationAPI.getManagerDropdown(); 
+      setPotentialAdmins(data);
+    } catch (err) {
+      toast.error(formatMessage({ id: "settings.load.managers.error", defaultMessage: "Failed to load potential admins." }));
+    }
+  };
+
+  fetchPotentialAdmins();
+}, [formatMessage]);
+
+
 
   // Individual update functions
   const handleUpdateConfirmation = async () => {
@@ -127,6 +145,38 @@ export default function SettingsPage() {
             <FormattedMessage id="settings.update" defaultMessage="Update" />
           </AppButton>
         </div>
+
+
+        {/* Promote to Admin Section */}
+<div className="mt-10 border-t pt-6">
+  <h2 className="text-lg font-semibold mb-4">
+    <FormattedMessage id="settings.promote.title" defaultMessage="Promote User to Admin" />
+  </h2>
+
+  <div className="flex items-center gap-4">
+    <select
+      className="border px-2 py-1 rounded w-72"
+      value={selectedAdminEmail}
+      onChange={(e) => setSelectedAdminEmail(e.target.value)}
+    >
+      <option value="">
+        {formatMessage({ id: "settings.promote.select", defaultMessage: "Select a user" })}
+      </option>
+      {potentialAdmins.map((user) => (
+        <option key={user.email} value={user.email}>
+          {user.firstName} {user.lastName} ({user.email})
+        </option>
+      ))}
+    </select>
+
+    <AppButton
+      onClick={() => handlePromoteToAdmin(selectedAdminEmail)}
+      disabled={!selectedAdminEmail}
+    >
+      <FormattedMessage id="settings.promote.button" defaultMessage="Promote" />
+    </AppButton>
+  </div>
+</div>
 
       </div>
     </PageLayout>

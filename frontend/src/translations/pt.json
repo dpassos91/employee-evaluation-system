@@ -172,6 +172,23 @@
 
 
 "settings.title": "Definições",
+"settings.update": "Atualizar",
+  "settings.confirmation.label": "Tempo de validade do token de confirmação (min)",
+  "settings.recovery.label": "Tempo de validade do token de recuperação (min)",
+  "settings.session.label": "Tempo de validade da sessão (min)",
+  "settings.confirmation.success": "Token de confirmação atualizado.",
+  "settings.confirmation.error": "Erro ao atualizar o token de confirmação.",
+  "settings.recovery.success": "Token de recuperação atualizado.",
+  "settings.recovery.error": "Erro ao atualizar o token de recuperação.",
+  "settings.session.success": "Sessão atualizada com sucesso.",
+  "settings.session.error": "Erro ao atualizar a sessão.",
+  "settings.promote.title": "Promover Utilizador a Administrador",
+  "settings.promote.select": "Selecionar um utilizador",
+  "settings.promote.button": "Promover",
+  "settings.promote.success": "Utilizador promovido a administrador com sucesso.",
+  "settings.promote.error": "Erro ao promover utilizador.",
+  "settings.load.error": "Erro ao carregar configurações.",
+  "settings.load.managers.error": "Erro ao carregar potenciais administradores.",
 
 
 

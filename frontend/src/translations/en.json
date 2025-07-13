@@ -169,6 +169,24 @@
 
 
 "settings.title": "Settings",
+
+  "settings.update": "Update",
+  "settings.confirmation.label": "Confirmation Token Timeout (min)",
+  "settings.recovery.label": "Recovery Token Timeout (min)",
+  "settings.session.label": "Session Timeout (min)",
+  "settings.confirmation.success": "Confirmation timeout updated.",
+  "settings.confirmation.error": "Failed to update confirmation timeout.",
+  "settings.recovery.success": "Recovery timeout updated.",
+  "settings.recovery.error": "Failed to update recovery timeout.",
+  "settings.session.success": "Session timeout updated.",
+  "settings.session.error": "Failed to update session timeout.",
+  "settings.promote.title": "Promote User to Admin",
+  "settings.promote.select": "Select a user",
+  "settings.promote.button": "Promote",
+  "settings.promote.success": "User successfully promoted to admin.",
+  "settings.promote.error": "Failed to promote user.",
+  "settings.load.error": "Failed to load settings.",
+  "settings.load.managers.error": "Failed to load potential admins.",
     
  
 "accessDenied.title": "Access restricted",
