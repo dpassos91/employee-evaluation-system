@@ -1,17 +1,46 @@
+/**
+ * EvaluationFormPage component renders an evaluation form that allows admins
+ * to assign managers and users to submit performance feedback.
+ * 
+ * It fetches evaluation data, handles form input, displays user information,
+ * and provides feedback via toast notifications.
+ */
+
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import AppForm from "../components/AppForm";
 import { FormattedMessage } from "react-intl";
-import { apiConfig } from "../api/apiConfig";
+import { evaluationAPI } from "../api/evaluationAPI";
 import { toast } from "react-toastify";
 import { userStore } from "../stores/userStore";
 import profileIcon from "../images/profile_icon.png";
+import { useIntl } from "react-intl";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 export default function EvaluationFormPage() {
-  const { email } = useParams();
+  /** @type {{ userId: string }} */
+  const { userId: rawUserId } = useParams();
+const userId = parseInt(rawUserId, 10);
   const navigate = useNavigate();
   const user = userStore((state) => state.user);
+
+const intl = useIntl();
+
+ /**
+   * Displays a toast notification with internationalized message.
+   * @param {string} id - Message ID for i18n.
+   * @param {string} defaultMessage - Fallback message text.
+   * @param {"error"|"success"} [type="error"] - Toast type.
+   * @param {object} [options={}] - Toast options (e.g., onClose, autoClose).
+   */
+const showToast = (id, defaultMessage, type = "error", options = {}) => {
+  const msg = intl.formatMessage({ id, defaultMessage });
+  toast[type](msg, options); 
+};
+
 
   const isAdmin = user?.role === "ADMIN";
 
@@ -23,21 +52,29 @@ export default function EvaluationFormPage() {
   const [managerEmail, setManagerEmail] = useState("");
   const [dropdownUsers, setDropdownUsers] = useState([]);
   const [selectedManager, setSelectedManager] = useState("");
+  const [evaluatedEmail, setEvaluatedEmail] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [updatingManager, setUpdatingManager] = useState(false);
 
   const isChangeDisabled =
-  updatingManager || selectedManager === managerEmail || selectedManager === email;
+  updatingManager ||
+  selectedManager === managerEmail ||
+  selectedManager === evaluatedEmail;
 
+
+
+   /**
+   * Fetches evaluation data from the API and populates form fields.
+   */
   useEffect(() => {
     const fetchEvaluation = async () => {
       try {
-        const result = await apiConfig.apiCall(
-          apiConfig.API_ENDPOINTS.evaluations.load(email)
-        );
+        const result = await evaluationAPI.loadEvaluation(userId, sessionStorage.getItem("authToken"));
+
         const evaluation = result.evaluation;
 
+        setEvaluatedEmail(evaluation.evaluatedEmail || "");
         setName(evaluation.evaluatedName || "");
         setGrade(evaluation.grade ? String(evaluation.grade) : "");
         setFeedback(evaluation.feedback || "");
@@ -46,58 +83,85 @@ export default function EvaluationFormPage() {
         setManagerEmail(evaluation.evaluatorEmail || "");
         setSelectedManager(evaluation.evaluatorEmail || "");
       } catch (err) {
-        toast.error("Erro ao carregar dados da avaliação.");
+        showToast("toast.loadEvaluationError", "Erro ao carregar dados da avaliação.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchEvaluation();
-  }, [email]);
+  }, [userId]);
 
+
+   /**
+   * Loads available managers for the dropdown if user is admin.
+   */
   useEffect(() => {
     const fetchDropdownUsers = async () => {
       if (!isAdmin) return;
       try {
-        const result = await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.managerDropdown);
+        const result = await evaluationAPI.getManagerDropdown();
         setDropdownUsers(result);
       } catch (err) {
-        toast.error("Erro ao carregar lista de gestores disponíveis.");
+        showToast("toast.loadManagersError", "Erro ao carregar lista de gestores disponíveis.");
       }
     };
 
     fetchDropdownUsers();
   }, [isAdmin]);
 
+
+   /**
+   * Submits the evaluation data to the API.
+   */
   const handleSubmit = async () => {
+
     try {
-      await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.update, {
-        method: "PUT",
-        body: JSON.stringify({
-          evaluatedEmail: email,
+
+      await evaluationAPI.updateEvaluation(
+
+        {
+
+          evaluatedEmail,
+
           grade: parseInt(grade),
+
           feedback,
-        }),
+
+        },
+
+        sessionStorage.getItem("authToken")
+
+      );
+
+
+
+      showToast("toast.updateSuccess", "Avaliação atualizada com sucesso.", "success", {
+
+        onClose: () => navigate("/evaluationlist"),
+
+        autoClose: 2000,
+
       });
-      toast.success("Avaliação atualizada com sucesso.");
-      navigate("/evaluationlist");
+
     } catch (err) {
-      toast.error("Erro ao salvar avaliação.");
+
+      showToast("toast.updateError", "Erro ao salvar avaliação.");
+
     }
+
   };
 
+
+/**
+   * Assigns a new manager to the evaluated user.
+   */
   const handleAssignManager = async () => {
     if (!selectedManager || selectedManager === managerEmail) return;
     setUpdatingManager(true);
     try {
-      await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.assignManager, {
-        method: "POST",
-        body: JSON.stringify({
-          userEmail: email,
-          managerEmail: selectedManager,
-        }),
-      });
-      toast.success("Gestor atualizado com sucesso.");
+      await evaluationAPI.assignManager({ userEmail: evaluatedEmail, managerEmail: selectedManager });
+      showToast("toast.managerUpdateSuccess", "Gestor atualizado com sucesso.", "success");
       setManagerEmail(selectedManager);
       const newManager = dropdownUsers.find((u) => u.email === selectedManager);
       setManagerName(`${newManager.firstName} ${newManager.lastName}`);
@@ -108,6 +172,9 @@ export default function EvaluationFormPage() {
     }
   };
 
+
+  
+
   return (
   <PageLayout title={<FormattedMessage id="evaluations.form.title" defaultMessage="Formulário de Avaliação" />}>
     {loading ? (
@@ -116,7 +183,7 @@ export default function EvaluationFormPage() {
       </div>
     ) : (
       <div className="flex items-start gap-10 px-10 pt-6">
-        {/* Avatar à esquerda */}
+        {/* Avatar at the left */}
         <div className="flex-shrink-0">
           <img
             src={photo || profileIcon}
@@ -125,9 +192,9 @@ export default function EvaluationFormPage() {
           />
         </div>
 
-        {/* Formulário à direita */}
+        {/* Form at the right */}
         <div className="flex flex-col gap-4 max-w-md w-full">
-          {/* Nome */}
+          {/* Name */}
           <div>
             <label className="block text-sm font-bold mb-1">
               <FormattedMessage id="evaluations.form.name" defaultMessage="Nome" />
@@ -140,7 +207,7 @@ export default function EvaluationFormPage() {
             />
           </div>
 
-          {/* Gestor */}
+          {/* Manager */}
           <div>
             <label className="block text-sm font-bold mb-1">
               <FormattedMessage id="evaluations.form.manager" defaultMessage="Gestor" />
@@ -177,7 +244,7 @@ export default function EvaluationFormPage() {
             )}
           </div>
 
-          {/* Avaliação */}
+          {/* Evaluation */}
           <div>
             <label className="block text-sm font-bold mb-1">
               <FormattedMessage id="evaluations.form.grade" defaultMessage="Avaliação" />
@@ -188,11 +255,21 @@ export default function EvaluationFormPage() {
               className="w-full border rounded px-2 py-1"
               required
             >
-              <option value="">--</option>
-              <option value="1">1 - Contribuição baixa</option>
-              <option value="2">2 - Contribuição parcial</option>
-              <option value="3">3 - Como esperado</option>
-              <option value="4">4 - Excedeu</option>
+              <option value="">
+    <FormattedMessage id="evaluations.selectGrade" defaultMessage="-- Selecionar --" />
+  </option>
+  <option value="1">
+    <FormattedMessage id="evaluations.grade.1" defaultMessage="1 - Contribuição baixa" />
+  </option>
+  <option value="2">
+    <FormattedMessage id="evaluations.grade.2" defaultMessage="2 - Contribuição parcial" />
+  </option>
+  <option value="3">
+    <FormattedMessage id="evaluations.grade.3" defaultMessage="3 - Conforme esperado" />
+  </option>
+  <option value="4">
+    <FormattedMessage id="evaluations.grade.4" defaultMessage="4 - Contribuição excedida" />
+  </option>
             </select>
           </div>
 
@@ -209,7 +286,7 @@ export default function EvaluationFormPage() {
             />
           </div>
 
-          {/* Botões alinhados abaixo dos campos */}
+          {/* Buttons alligned */}
           <div className="flex justify-center gap-4 pt-4">
             <button
               type="button"
@@ -228,7 +305,13 @@ export default function EvaluationFormPage() {
           </div>
         </div>
       </div>
+
+
+
     )}
+
+<ToastContainer position="top-center" autoClose={3000} />
+
   </PageLayout>
 );
 

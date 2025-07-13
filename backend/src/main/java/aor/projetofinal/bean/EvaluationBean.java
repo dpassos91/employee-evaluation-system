@@ -74,7 +74,7 @@ public class EvaluationBean implements Serializable {
         UserEntity evaluated = evaluation.getEvaluated();
         if (evaluated != null) {
             dto.setEvaluatedEmail(evaluated.getEmail());
-
+            dto.setEvaluatedId(evaluated.getId());
             if (evaluated.getProfile() != null) {
                 dto.setEvaluatedName(evaluated.getProfile().getFirstName() + " " +
                         evaluated.getProfile().getLastName());

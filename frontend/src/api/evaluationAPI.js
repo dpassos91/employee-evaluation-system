@@ -54,16 +54,18 @@ const getEvaluationStates = async () => {
  */
 const exportEvaluationsCsv = async (filters, sessionToken) => {
   const params = new URLSearchParams();
-  if (filters.name) params.append('name', filters.name);
-  if (filters.state) params.append('state', filters.state);
-  if (filters.grade) params.append('grade', filters.grade);
-  if (filters.cycleEnd) params.append('cycleEnd', filters.cycleEnd);
+  if (filters.name) params.append("name", filters.name);
+  if (filters.state) params.append("state", filters.state);
+  if (filters.grade) params.append("grade", filters.grade);
+  if (filters.cycleEnd) params.append("cycleEnd", filters.cycleEnd);
 
   const url = `${API_ENDPOINTS.evaluations.exportCsv}?${params.toString()}`;
-  return apiCall(url, {
-    method: 'GET',
-    headers: { sessionToken },
+  const response = await fetch(url, {
+    headers: { sessionToken, token: sessionToken },
   });
+
+  if (!response.ok) throw new Error("Erro ao exportar CSV");
+  return await response.blob();
 };
 
 /**
@@ -101,8 +103,8 @@ const getGradeOptions = async (sessionToken) => {
 /**
  * Loads evaluation data for a specific evaluated user in the active cycle.
  */
-const loadEvaluation = async (email, sessionToken) => {
-  const url = API_ENDPOINTS.evaluations.load(email);
+const loadEvaluation = async (userId, sessionToken) => {
+  const url = API_ENDPOINTS.evaluations.load(userId);
   return apiCall(url, {
     method: 'GET',
     headers: { sessionToken },
@@ -153,6 +155,75 @@ const bulkCloseEvaluations = async (sessionToken) => {
   });
 };
 
+/**
+ * Get users to assign as managers in the dropdown.
+ */
+const getManagerDropdown = async () => {
+  return apiCall(API_ENDPOINTS.evaluations.managerDropdown, {
+    method: 'GET',
+    headers: { sessionToken: sessionStorage.getItem("authToken") }
+  });
+};
+
+/**
+ * Assigns a manager from the dropdown to a user.
+ */
+const assignManager = async ({ userEmail, managerEmail }) => {
+  return apiCall(API_ENDPOINTS.evaluations.assignManager, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      sessionToken: sessionStorage.getItem("authToken"),
+    },
+    body: JSON.stringify({ userEmail, managerEmail }),
+  });
+};
+
+
+/**
+ * Downloads a single closed evaluation as a PDF file.
+ */
+const downloadEvaluationPdf = async (evaluationId, sessionToken) => {
+  const url = API_ENDPOINTS.evaluations.exportPdf(evaluationId);
+  const response = await fetch(url, {
+    headers: { sessionToken, token: sessionToken },
+  });
+
+  if (!response.ok) throw new Error("Erro ao exportar PDF");
+
+  const blob = await response.blob();
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `avaliacao_${evaluationId}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+
+/**
+ * Gets evaluation history with filters (paginated).
+ */
+const getEvaluationHistoryWithFilters = async (userId, filters, sessionToken) => {
+  const params = new URLSearchParams();
+   params.append("userId", userId);
+  if (filters.cycleId) params.append("cycle", filters.cycleId);
+  if (filters.cycleEndDate) params.append("cycleEndDate", filters.cycleEndDate);
+  if (filters.grade) params.append("grade", filters.grade);
+  if (filters.page) params.append("page", filters.page);
+
+  const url = `${API_ENDPOINTS.evaluations.historyWithFilters}?${params.toString()}`;
+
+  return apiCall(url, {
+    method: "GET",
+    headers: { sessionToken },
+  });
+};
+
+
+
+
+
 export const evaluationAPI = {
   listEvaluationsByFilters,
   getEvaluationStates,
@@ -165,4 +236,8 @@ export const evaluationAPI = {
   reopenEvaluation,
   closeEvaluation,
   bulkCloseEvaluations,
+  getManagerDropdown,
+  assignManager,
+  downloadEvaluationPdf,
+  getEvaluationHistoryWithFilters,
 };

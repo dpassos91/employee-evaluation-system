@@ -1,21 +1,48 @@
+/**
+ * UsersWithoutManagerPage lists all users who currently don't have a manager assigned.
+ * Admins can filter by name or office and assign a manager via dropdown.
+ */
+
 import { useState, useMemo, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
 import { formatWorkplace } from "../utils/formatWorkplace";
 import { useUsersWithoutManagerList } from "../hooks/useUsersWithoutManagerList";
-import { apiConfig } from "../api/apiConfig";
+import { evaluationAPI } from "../api/evaluationAPI";
 import { userStore } from "../stores/userStore";
 import { toast } from "react-toastify";
+import { useIntl } from "react-intl";
+
 
 export default function UsersWithoutManagerPage() {
+    /** @type {[string, Function]} */
   const [nameFilter, setNameFilter] = useState("");
+   /** @type {[string, Function]} */
   const [officeFilter, setOfficeFilter] = useState("");
+   /** @type {[number, Function]} */
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
+  const intl = useIntl();
+
+
+   /**
+   * Displays a toast notification.
+   * @param {string} id - i18n ID.
+   * @param {string} defaultMessage - Default message fallback.
+   * @param {"success"|"error"} [type="error"] - Toast type.
+   */
+const showToast = (id, defaultMessage, type = "error") => {
+  const msg = intl.formatMessage({ id, defaultMessage });
+  toast[type](msg);
+};
+
+
+/** Current authenticated user from Zustand store */
   const user = userStore((state) => state.user);
   const isAdmin = user?.role === "ADMIN";
 
+  // Admin-only state for manager assignment
   const [selectedManagers, setSelectedManagers] = useState({});
 
   const [managerName, setManagerName] = useState("");
@@ -30,15 +57,20 @@ export default function UsersWithoutManagerPage() {
 
   const offices = ["", "Boston", "Coimbra", "Lisboa", "Munich", "Porto", "Southampton", "Viseu"];
 
+
+   /**
+   * Loads the list of available managers if the user is an admin.
+   */
   // Fetch managers from managerDropdown endpoint
   useEffect(() => {
       const fetchDropdownUsers = async () => {
         if (!isAdmin) return;
         try {
-          const result = await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.managerDropdown);
+          const result = await evaluationAPI.getManagerDropdown();
           setDropdownUsers(result);
         } catch (err) {
-          toast.error("Erro ao carregar lista de gestores disponíveis.");
+          showToast("toast.loadManagersError", "Erro ao carregar lista de gestores disponíveis.");
+
         }
       };
   
@@ -46,7 +78,9 @@ export default function UsersWithoutManagerPage() {
     }, [isAdmin]);
 
   
-
+ /**
+   * Memoized filters used by the custom hook.
+   */
   const filters = useMemo(() => ({
     name: nameFilter,
     office: officeFilter,
@@ -54,6 +88,10 @@ export default function UsersWithoutManagerPage() {
     pageSize,
   }), [nameFilter, officeFilter, page]);
 
+
+  /**
+   * Hook to fetch the list of users without manager.
+   */
   const {
     users,
     totalPages,
@@ -62,26 +100,36 @@ export default function UsersWithoutManagerPage() {
     refetch
   } = useUsersWithoutManagerList(filters);
 
+
+   /**
+   * Assigns a manager to the specified user.
+   * @param {string} userEmail - Email of the user to assign a manager to.
+   */
  const handleAssignManager = async (userEmail) => {
   const selectedManager = selectedManagers[userEmail];
   if (!selectedManager) return;
 
   setUpdatingManager(true);
   try {
-    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.assignManager, {
-      method: "POST",
-      body: JSON.stringify({ userEmail, managerEmail: selectedManager }),
-    });
+    await evaluationAPI.assignManager({ userEmail, managerEmail: selectedManager });
 
-    toast.success("Gestor atribuído com sucesso.");
+
+    showToast("toast.assignManagerSuccess", "Gestor atribuído com sucesso.", "success");
+
     refetch();
   } catch (err) {
-    toast.error("Erro ao atribuir gestor.");
+    showToast("toast.assignManagerError", "Erro ao atribuir gestor.");
+
   } finally {
     setUpdatingManager(false);
   }
 };
 
+
+ /**
+   * Handles pagination changes.
+   * @param {number} p - New page number.
+   */
   const handleGoToPage = (p) => setPage(p);
 
 
@@ -100,45 +148,67 @@ export default function UsersWithoutManagerPage() {
       />
     }
   >
-    {/* Filtros */}
+    {/* Filters */}
     <div className="mb-4 flex gap-4">
+  
+  <FormattedMessage id="filter.byName" defaultMessage="Filtrar por nome">
+    {(placeholderText) => (
       <input
         type="text"
         className="border px-2 py-1 rounded"
-        placeholder="Filtrar por nome"
+        placeholder={placeholderText}
         value={nameFilter}
         onChange={(e) => {
           setNameFilter(e.target.value);
           setPage(1);
         }}
       />
-      <select
-        className="border px-2 py-1 rounded"
-        value={officeFilter}
-        onChange={(e) => {
-          setOfficeFilter(e.target.value);
-          setPage(1);
-        }}
-      >
-        {offices.map((office) => (
-          <option key={office} value={office}>
-            {office || "Todos os escritórios"}
-          </option>
-        ))}
-      </select>
-    </div>
+    )}
+  </FormattedMessage>
 
-    {/* Tabela */}
+  {/* Select from filtered office FormattedMessage with option "Any office" */}
+  <select
+    className="border px-2 py-1 rounded"
+    value={officeFilter}
+    onChange={(e) => {
+      setOfficeFilter(e.target.value);
+      setPage(1);
+    }}
+  >
+    {offices.map((office) => (
+      <option key={office || 'all'} value={office || ''}>
+        {office ? office : (
+          <FormattedMessage
+            id="filter.allOffices"
+            defaultMessage="Todos os escritórios"
+          />
+        )}
+      </option>
+    ))}
+  </select>
+</div>
+
+
+    {/* Table */}
     <div className="border rounded">
       <table className="w-full text-sm">
         <thead>
-          <tr className="bg-gray-100 text-left">
-            <th className="p-2">Nome</th>
-            <th className="p-2">Email</th>
-            <th className="p-2">Escritório</th>
-            <th className="p-2">Atribuir Gestor</th>
-          </tr>
-        </thead>
+  <tr>
+    <th className="p-2">
+      <FormattedMessage id="table.name" defaultMessage="Nome" />
+    </th>
+    <th className="p-2">
+      <FormattedMessage id="table.email" defaultMessage="Email" />
+    </th>
+    <th className="p-2">
+      <FormattedMessage id="table.office" defaultMessage="Escritório" />
+    </th>
+    <th className="p-2">
+      <FormattedMessage id="table.assignManager" defaultMessage="Atribuir Gestor" />
+    </th>
+  </tr>
+</thead>
+
         <tbody>
           {users.map((user) => (
             <tr key={user.id} className="border-t">
@@ -158,7 +228,9 @@ export default function UsersWithoutManagerPage() {
                       }
                       className="border px-2 py-1 rounded w-40"
                     >
-                      <option value="">-- Selecionar --</option>
+                     <option value="">
+  <FormattedMessage id="form.select.placeholder" defaultMessage="-- Selecionar --" />
+</option>
                       {dropdownUsers.map((u) => (
                         <option key={u.email} value={u.email}>
                           {u.firstName} {u.lastName}
@@ -198,7 +270,7 @@ export default function UsersWithoutManagerPage() {
       )}
     </div>
 
-    {/* Paginação manual */}
+    {/* Pagination */}
     {!loading && totalPages > 1 && (
       <div className="mt-4 flex justify-end gap-2 text-blue-700 text-sm">
         {Array.from({ length: totalPages }).map((_, idx) => (

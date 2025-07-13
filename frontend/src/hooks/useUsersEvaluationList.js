@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { apiConfig } from "../api/apiConfig";
-
+import { evaluationAPI } from "../api/evaluationAPI";
 
 /**
  * Custom hook to fetch evaluation data with filters and pagination.
@@ -18,34 +17,24 @@ export function useUsersEvaluationList(filters) {
 
   // fetch evaluations, useCallback warrantes this funcion only changes when filter change  
 const fetchEvaluations = useCallback(async () => {
-    setLoading(true);
+   setLoading(true);
     setError(null);
 
-// Build query string parameters based on filters
-    const params = new URLSearchParams();
-    if (filters.name) params.append("evaluated-name", filters.name);
-    if (filters.evaluationState) params.append("evaluation-state", filters.evaluationState);
-    if (filters.cycleEndDate) params.append("cycle-end-date", filters.cycleEndDate);
-    if (filters.grade) params.append("grade", filters.grade);
-    if (filters.page) params.append("page", filters.page);
+    try {
+      const token = sessionStorage.getItem("authToken");
+      const result = await evaluationAPI.listEvaluationsByFilters(filters, token);
 
-
-
-try {
-      const result = await apiConfig.apiCall(
-        `${apiConfig.API_ENDPOINTS.evaluations.listByFilters}?${params.toString()}`
-      );
-      // Map evaluation list to expected format for the table
-const mapped = (result.evaluations|| []).map(evaluation => ({
-  id: evaluation.evaluationId, 
-  evaluated: evaluation.evaluatedName, //the Dto that arrives at the frontend already concatenates first and last name
-  email: evaluation.evaluatedEmail,
-  state: evaluation.state,
-  grade: evaluation.grade,
-  avatar: evaluation.photograph,
-  evaluator: evaluation.evaluatorName,
-  cycleEnd: evaluation.cycleEndDate,
-}));
+      const mapped = (result.evaluations || []).map(evaluation => ({
+        id: evaluation.evaluationId,
+        userId: evaluation.evaluatedId,
+        evaluated: evaluation.evaluatedName,
+        email: evaluation.evaluatedEmail,
+        state: evaluation.state,
+        grade: evaluation.grade,
+        avatar: evaluation.photograph,
+        evaluator: evaluation.evaluatorName,
+        cycleEnd: evaluation.cycleEndDate,
+      }));
 
       setEvaluations(mapped);
       setTotalPages(result.totalPages || 1);
@@ -59,14 +48,11 @@ const mapped = (result.evaluations|| []).map(evaluation => ({
     }
   }, [filters]);
 
-  // Refetch whenever filters change
   useEffect(() => {
     fetchEvaluations();
   }, [fetchEvaluations]);
 
-
-
-    return {
+  return {
     evaluations,
     totalPages,
     totalCount,
@@ -74,6 +60,5 @@ const mapped = (result.evaluations|| []).map(evaluation => ({
     loading,
     error,
     refetch: fetchEvaluations,
-
-    }
+  };
 }

@@ -344,14 +344,14 @@ public class EvaluationService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEvaluationHistoryWithFilters(
             @HeaderParam("sessionToken") String sessionToken,
-            @QueryParam("email") String email,
+            @QueryParam("userId") int userId,
             @QueryParam("page") @DefaultValue("1") int page,
             @QueryParam("grade") Integer grade,
             @QueryParam("cycle") Integer cycle,
             @QueryParam("cycleEndDate") String cycleEndDate
     ) {
         logger.info("User: {} | IP: {} - Requesting filtered evaluation history for user {}.",
-                RequestContext.getAuthor(), RequestContext.getIp(), email);
+                RequestContext.getAuthor(), RequestContext.getIp(),  RequestContext.getIp());
 
         // Validate session
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(sessionToken);
@@ -366,11 +366,11 @@ public class EvaluationService {
         UserEntity requester = tokenEntity.getUser();
 
         // Load evaluated user
-        UserEntity evaluated = userDao.findByEmail(email);
+        UserEntity evaluated = userDao.findById(userId);
 
         if (evaluated == null) {
             logger.warn("User: {} | IP: {} - Attempted to access history of non-existent user {}.",
-                    requester.getEmail(), RequestContext.getIp(), email);
+                    requester.getEmail(), RequestContext.getIp(), userId);
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("{\"message\": \"Evaluated user not found.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -379,10 +379,10 @@ public class EvaluationService {
 
         // Check access rights
 
-        boolean isSelf = requester.getEmail().equalsIgnoreCase(email);
+        boolean isSelf = requester.getId() == userId;
         boolean isAdmin = requester.getRole().getName().equalsIgnoreCase("ADMIN");
         boolean isManager = evaluated.getManager() != null &&
-                evaluated.getManager().getEmail().equalsIgnoreCase(requester.getEmail());
+                evaluated.getManager().getId() == requester.getId();
 
         if (!isSelf && !isManager && !isAdmin) {
             logger.warn("User: {} | IP: {} - Access denied to evaluation history of {}.",
@@ -553,7 +553,7 @@ public class EvaluationService {
     @GET
     @Path("/load-evaluation")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response loadEvaluation(@QueryParam("email") String evaluatedEmail,
+    public Response loadEvaluation(@QueryParam("userId") int evaluatedUserId,
                                    @HeaderParam("sessionToken") String token) {
 
         // valdiate session
@@ -568,7 +568,7 @@ public class EvaluationService {
         UserEntity evaluator = tokenEntity.getUser();
 
         // validates the existence of the evaluated user
-        UserEntity evaluated = userDao.findByEmail(evaluatedEmail);
+        UserEntity evaluated = userDao.findById(evaluatedUserId);
         if (evaluated == null) {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("{\"message\": \"Evaluated user not found.\"}")
@@ -581,9 +581,11 @@ public class EvaluationService {
         // verifies permissions
         boolean isAdmin = evaluator.getRole().getName().equalsIgnoreCase("admin");
         boolean isManager = evaluated.getManager() != null &&
-                evaluated.getManager().getEmail().equalsIgnoreCase(evaluator.getEmail());
+                evaluated.getManager().getId() == evaluator.getId();
 
-        if (!isAdmin && !isManager) {
+        boolean isEvaluatedUser = evaluator.getId() == evaluated.getId();
+
+        if (!isAdmin && !isManager && !isEvaluatedUser) {
             return Response.status(Response.Status.FORBIDDEN)
                     .entity("{\"message\": \"You are not authorized to view this evaluation.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -600,7 +602,7 @@ public class EvaluationService {
         }
 
         logger.info("User: {} | IP: {} - Loading evaluation for user {}.",
-                RequestContext.getAuthor(), RequestContext.getIp(), evaluatedEmail);
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluatedUserId);
 
 
         // gets the correct evaluation to load
@@ -614,7 +616,7 @@ public class EvaluationService {
 
         // check if the cycle is close so that the evaluated user can see his evaluation
 
-        boolean isEvaluatedUser = evaluated.getEmail().equalsIgnoreCase(evaluator.getEmail());
+
         boolean isEvaluationClosed = evaluation.getState() == EvaluationStateEnum.CLOSED;
         boolean isCycleClosed = !evaluation.getCycle().isActive();
 
@@ -631,7 +633,7 @@ public class EvaluationService {
         UpdateEvaluationDto dto = evaluationBean.buildEvaluationDtoCorrespondingToTheEvaluation(evaluation);
 
         logger.info("User: {} | IP: {} - Evaluation loaded successfully for user {}.",
-                RequestContext.getAuthor(), RequestContext.getIp(), evaluatedEmail);
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluatedUserId);
 
 
         return Response.ok()

@@ -1,25 +1,63 @@
+/**
+ * EvaluationListPage component displays a paginated and filterable list of user evaluations.
+ * Allows admins to manage evaluation states (e.g., close/reopen), export to CSV, and navigate to evaluation forms.
+ */
+
 import { useState, useMemo } from "react";
 import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
 import { useUsersEvaluationList } from "../hooks/useUsersEvaluationList"; 
 import { userStore } from "../stores/userStore";
-import { apiConfig } from "../api/apiConfig";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useIntl } from "react-intl";
+import { evaluationAPI } from "../api/evaluationAPI";
 
 
 
 
 export default function EvaluationListPage() {
-// Filtros e página
+// Filter and pagination state
+  /** @type {[string, Function]} */
   const [name, setName] = useState("");
+  /** @type {[string, Function]} */
   const [evaluationState, setEvaluationState] = useState("");
+  /** @type {[string, Function]} */
   const [grade, setGrade] = useState("");
+   /** @type {[string, Function]} */
   const [cycleEnd, setCycleEnd] = useState("");
+  /** @type {[number|null, Function]} */
   const [hover, setHover] = useState(null);
+  /** @type {[number, Function]} */
   const [page, setPage] = useState(1);
   const navigate = useNavigate(); 
+
+const intl = useIntl();
+
+
+  /**
+   * Displays a toast message.
+   * @param {string} id - Message ID for i18n.
+   * @param {string} defaultMessage - Default text if translation not found.
+   * @param {"success"|"error"} type - Toast type.
+   * @param {string|null} toastId - Optional toast ID to update an existing one.
+   */
+const showToast = (id, defaultMessage, type = "success", toastId = null) => {
+  const msg = intl.formatMessage({ id, defaultMessage });
+
+  if (toastId) {
+    toast.update(toastId, {
+      render: msg,
+      type,
+      isLoading: false,
+      autoClose: 3000,
+    });
+  } else {
+    toast[type](msg);
+  }
+};
+
 
 
 /**
@@ -29,135 +67,111 @@ export default function EvaluationListPage() {
 
   // Checks if the current user is an admin
   const isAdmin = user?.role === "ADMIN";
-
+/**
+   * Memoized filters to prevent unnecessary renders.
+   */
     const filters = useMemo(
     () => ({ name, evaluationState, grade,  cycleEndDate: cycleEnd, page }),
     [name, evaluationState, grade, cycleEnd, page]
   );
 
-  // Buscar utilizadores com filtros e paginação
+  /**
+   * Fetch evaluations using provided filters.
+   */
+  // Get users with filters and pagination
     const { evaluations, totalPages, loading, error, refetch  } = useUsersEvaluationList(filters);
 
- // Funções para lidar com filtros
+ // Functions to handle filters
   const handleFilterName = (e) => { setName(e.target.value); setPage(1); };
   const handleFilterEvaluationState = (e) => { setEvaluationState(e.target.value); setPage(1); };
   const handleFilterGrade = (e) => { setGrade(e.target.value); setPage(1); };
   const handleFilterCycleEnd = (e) => { setCycleEnd(e.target.value); setPage(1); };
   const handleGoToPage = (p) => setPage(p);
 
-// Lista de estados de avaliação (pode ser dinâmica!)
+// Evaluation States 
    const evaluationStates = ["", "IN_EVALUATION", "EVALUATED", "CLOSED"];
 
 
 // Functions to change evaluation states and lead to the evaluation page
 
 const handleCloseEvaluation = async (id) => {
-  const toastId = toast.loading("A fechar avaliação...");
+  const toastId = toast.loading(intl.formatMessage({
+    id: "toast.closingEvaluation",
+    defaultMessage: "A fechar avaliação..."
+  }));
   try {
-    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.close(id), {
-      method: "PUT",
-    });
+    await evaluationAPI.closeEvaluation(id, sessionStorage.getItem("authToken"));
 
-    toast.update(toastId, {
-      render: "Avaliação fechada com sucesso.",
-      type: "success",
-      isLoading: false,
-      autoClose: 3000,
-    });
+    showToast("toast.closeSuccess", "Avaliação fechada com sucesso.", "success", toastId);
 
     refetch();
   } catch (err) {
-    toast.update(toastId, {
-      render: "Erro ao fechar avaliação.",
-      type: "error",
-      isLoading: false,
-      autoClose: 3000,
-    });
+   showToast("toast.closeError", "Erro ao fechar avaliação.", "error", toastId);
   }
 };
 
 const handleReopenEvaluation = async (id) => {
-  const toastId = toast.loading("A reabrir avaliação...");
+  const toastId = toast.loading(intl.formatMessage({
+    id: "toast.reopeningEvaluation",
+    defaultMessage: "A reabrir avaliação..."
+  }));
   try {
-    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.reopen(id), {
-      method: "PUT",
-    });
+    await evaluationAPI.reopenEvaluation(id, sessionStorage.getItem("authToken"));
 
-    toast.update(toastId, {
-      render: "Avaliação reaberta com sucesso.",
-      type: "success",
-      isLoading: false,
-      autoClose: 3000,
-    });
+   showToast("toast.reopenSuccess", "Avaliação reaberta com sucesso.", "success", toastId);
 
     refetch();
   } catch (err) {
-    toast.update(toastId, {
-      render: "Erro ao reabrir avaliação.",
-      type: "error",
-      isLoading: false,
-      autoClose: 3000,
-    });
+     showToast("toast.reopenError", "Erro ao reabrir avaliação.", "error", toastId);
   }
 };
 
 const handleCloseAllEvaluations = async () => {
-  if (!window.confirm("Tens a certeza que queres fechar todos os processos?")) return;
+  if (!window.confirm(intl.formatMessage({
+    id: "toast.confirmBulkClose",
+    defaultMessage: "Tens a certeza que queres fechar todos os processos?"
+  }))) return;
 
-  const toastId = toast.loading("A fechar todos os processos...");
+  const toastId = toast.loading(intl.formatMessage({
+    id: "toast.closingAll",
+    defaultMessage: "A fechar todos os processos..."
+  }));
 
   try {
-    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.bulkClose, {
-      method: "PUT",
-    });
+    await evaluationAPI.bulkCloseEvaluations(sessionStorage.getItem("authToken"));
 
-    toast.update(toastId, {
-      render: "Todos os processos foram fechados com sucesso.",
-      type: "success",
-      isLoading: false,
-      autoClose: 3000,
-    });
+   showToast("toast.closeAllSuccess", "Todos os processos foram fechados com sucesso.", "success", toastId);
 
     refetch();
   } catch (err) {
-    toast.update(toastId, {
-      render: "Erro ao fechar os processos.",
-      type: "error",
-      isLoading: false,
-      autoClose: 3000,
-    });
+    showToast("toast.closeAllError", "Erro ao fechar os processos.", "error", toastId);
   }
 };
 
-const handleFillEvaluation = (email) => {
-  navigate(`/evaluationform/${email}`);
+/**
+   * Navigates to the evaluation form page for the selected user.
+   * @param {number} userId - ID of the evaluated user.
+   */
+const handleFillEvaluation = (userId) => {
+  navigate(`/evaluationform/${userId}`);
 };
 
-
-
-
+/**
+   * Exports the current filtered list as a CSV file.
+   */
 const handleExportCSV = async () => {
   try {
-    // Lê filtros do state (name, office, manager)
-    const params = new URLSearchParams();
-    if (name) params.append("name", name); 
-    if (evaluationState) params.append("state", evaluationState);
-    if (grade) params.append("grade", grade);
-    if (cycleEnd) params.append("cycleEnd", cycleEnd);
-
-    const url = `${apiConfig.API_ENDPOINTS.evaluations.exportCsv}?${params.toString()}`;
-
     const token = sessionStorage.getItem("authToken");
 
-    // Usa fetch diretamente para blobs
-    const response = await fetch(url, {
-      headers: {
-        sessionToken: token,
-        token,
-      },
-    });
-    if (!response.ok) throw new Error("Erro ao exportar CSV");
-    const blob = await response.blob();
+    const exportFilters = {
+      name,
+      state: evaluationState,
+      grade,
+      cycleEnd: cycleEnd,
+    };
+
+    const blob = await evaluationAPI.exportEvaluationsCsv(exportFilters, token);
+
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "users_export.csv";
@@ -171,11 +185,9 @@ const handleExportCSV = async () => {
 
 
 
-
-
   return (
     <PageLayout title={<FormattedMessage id="evaluations.list.title" defaultMessage="Listagem de Avaliações" />}>
-      {/* Filtros */}
+      {/* Filters */}
 <div className="flex gap-4 mb-4">
         <FormattedMessage id="evaluations.filter.name" defaultMessage="Nome">
           {(msg) => (
@@ -261,7 +273,7 @@ const handleExportCSV = async () => {
       {error && <div className="py-8 text-center text-red-600">{error}</div>}
 
 
-      {/* Tabela de avaliações */}
+      {/* Evaluation Table */}
 {!loading && evaluations.length > 0 && (
         <div className="overflow-x-auto w-full">
         <table className="min-w-full text-left border-collapse table-auto">
@@ -297,28 +309,28 @@ const handleExportCSV = async () => {
         />
       </td>
 
-      {/* AÇÕES */}
+      {/* Actions */}
       <td className="p-2 text-center">
         <div className="flex flex-row gap-2 justify-center">
-  {/* Mostrar "Preencher" apenas se IN_EVALUATION */}
+  {/* Show "Fill" only if at IN_EVALUATION */}
   {evaluation.state === "IN_EVALUATION" ? (
     <button
-      onClick={() => handleFillEvaluation(evaluation.email)}
+      onClick={() => handleFillEvaluation(evaluation.userId)}
       className="bg-[#D41C1C] text-white px-3 py-1 rounded"
     >
       <FormattedMessage id="evaluation.button.fill" defaultMessage="Preencher" />
     </button>
   ) : (
     <>
-      {/* Ver só se não está em IN_EVALUATION */}
+      {/* Show only if it's not at IN_EVALUATION */}
       <button
-        onClick={() => navigate(`/evaluationform/${evaluation.email}`)}
+        onClick={() => navigate(`/evaluationform/${evaluation.userId}`)}
         className="bg-[#D41C1C] text-white px-3 py-1 rounded"
       >
         <FormattedMessage id="evaluation.button.view" defaultMessage="Ver" /> <span>&gt;</span>
       </button>
 
-      {/* Fechar se em EVALUATED */}
+      {/* Close if at EVALUATED */}
       {evaluation.state === "EVALUATED" && (
         <button
           onClick={() => handleCloseEvaluation(evaluation.id)}
@@ -328,7 +340,7 @@ const handleExportCSV = async () => {
         </button>
       )}
 
-      {/* Reverter se em EVALUATED */}
+      {/* Revert if in EVALUATED */}
       {evaluation.state === "EVALUATED" && (
         <button
           onClick={() => handleReopenEvaluation(evaluation.id)}
@@ -350,7 +362,7 @@ const handleExportCSV = async () => {
         </div>
       )}
 
-      {/* Paginação real */}
+      {/* Pagination */}
       {!loading && totalPages > 1 && (
         <div className="mt-4 flex justify-end gap-2 text-blue-700 text-sm">
           {Array.from({ length: totalPages }).map((_, idx) => (
@@ -377,7 +389,11 @@ const handleExportCSV = async () => {
 
 
 {/*  show the bulk close button only if the user is admin and all evaluations are at evaluated-state*/}
-{isAdmin && evaluations.length > 0 && evaluations.every((e) => e.state === "EVALUATED") && (
+{isAdmin &&
+ evaluations.length > 0 &&
+ evaluations.some((e) => e.state === "EVALUATED") && 
+ evaluations.every((e) => e.state === "EVALUATED" || e.state === "CLOSED") && 
+ ( 
   <div className="flex justify-center mt-10">
     <button
       onClick={handleCloseAllEvaluations}

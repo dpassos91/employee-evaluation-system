@@ -1,64 +1,94 @@
+/**
+ * EvaluationHistoryPage component displays the evaluation history for a given user.
+ * It allows filtering by cycle, end date, and grade, and provides a PDF export option.
+ */
+
 import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
-import { apiConfig } from "../api/apiConfig";
+import { evaluationAPI } from "../api/evaluationAPI";
 import { useEvaluationHistoryWithFilters } from "../hooks/useEvaluationHistoryWithFilters";
 import { toast } from "react-toastify";
+import { useIntl } from "react-intl";
 
 export default function EvaluationHistoryPage() {
-  const { email } = useParams();
+  
+   /** 
+   * Extracts and parses the user ID from the route parameters.
+   * Ensures it is treated as a number.
+   */
+  const { userId: rawUserId } = useParams();
+const userId = parseInt(rawUserId, 10);
 
+const intl = useIntl();
+
+
+ // Filter states
+  /** @type {[string, Function]} */
   const [cycleId, setCycleId] = useState("");
+  /** @type {[string, Function]} */
   const [cycleEndDate, setCycleEndDate] = useState("");
+  /** @type {[string, Function]} */
   const [grade, setGrade] = useState("");
+  /** @type {[number|null, Function]} */
   const [hover, setHover] = useState(null);
+  /** @type {[number, Function]} */
   const [page, setPage] = useState(1);
 
+
+  /**
+   * Memoized filter object to avoid unnecessary re-fetches.
+   */
  const filters = useMemo(
   () => ({ cycleId, cycleEndDate, grade, page }),
   [cycleId, cycleEndDate, grade, page]
 );
-
+ /**
+   * Fetches filtered evaluation history using a custom hook.
+   */
   const {
     evaluations,
     totalPages,
     loading,
     error,
     refetch,
-  } = useEvaluationHistoryWithFilters(email, filters);
+  } = useEvaluationHistoryWithFilters(userId, filters);
 
+  /**
+   * Downloads a PDF for the specified evaluation.
+   * @param {number} evaluationId - ID of the evaluation to export.
+   */
   const handleExportPDF = async (evaluationId) => {
-    try {
-      const token = sessionStorage.getItem("authToken");
-      const url = apiConfig.API_ENDPOINTS.evaluations.exportPdf(evaluationId);
-      const response = await fetch(url, apiConfig.authInterceptor());
-      const blob = await response.blob();
-const file = new Blob([blob], { type: "application/pdf" });
-const link = document.createElement("a");
-link.href = URL.createObjectURL(file);
-link.download = `avaliacao_${evaluationId}.pdf`;
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
-    } catch {
-      toast.error("Erro ao exportar avaliação para PDF.");
-    }
-  };
+  try {
+    const token = sessionStorage.getItem("authToken");
+    await evaluationAPI.downloadEvaluationPdf(evaluationId, token);
+  } catch {
+    toast.error(intl.formatMessage({
+      id: "toast.exportPdfError",
+      defaultMessage: "Erro ao exportar avaliação para PDF."
+    }));
+  }
+};
 
   return (
     <PageLayout title={<FormattedMessage id="evaluations.history.title" defaultMessage="Histórico de Avaliações" />}>
       <div className="flex gap-4 mb-4">
-        <input
-          placeholder="Ciclo"
-          className="border px-2 py-1 rounded"
-          value={cycleId}
-          onChange={(e) => {
-  const value = parseInt(e.target.value, 10);
-  setCycleId(Number.isNaN(value) ? "" : value);
-  setPage(1);
-}}
-        />
+  
+  <FormattedMessage id="filter.cycle" defaultMessage="Ciclo">
+    {(placeholderText) => (
+      <input
+        placeholder={placeholderText}
+        className="border px-2 py-1 rounded"
+        value={cycleId}
+        onChange={(e) => {
+          const value = parseInt(e.target.value, 10);
+          setCycleId(Number.isNaN(value) ? "" : value);
+          setPage(1);
+        }}
+      />
+    )}
+  </FormattedMessage>
         <input
           type="date"
           value={cycleEndDate}
@@ -91,11 +121,19 @@ document.body.removeChild(link);
         <table className="min-w-full border-collapse table-auto text-sm">
           <thead className="bg-gray-200">
             <tr>
-              <th className="p-2">Ciclo</th>
-              <th className="p-2">Data de Fecho</th>
-              <th className="p-2">Avaliação</th>
-              <th className="p-2">Exportar</th>
-            </tr>
+  <th className="p-2">
+    <FormattedMessage id="table.cycle" defaultMessage="Ciclo" />
+  </th>
+  <th className="p-2">
+    <FormattedMessage id="table.endDate" defaultMessage="Data de Fecho" />
+  </th>
+  <th className="p-2">
+    <FormattedMessage id="table.grade" defaultMessage="Avaliação" />
+  </th>
+  <th className="p-2">
+    <FormattedMessage id="table.export" defaultMessage="Exportar" />
+  </th>
+</tr>
           </thead>
           <tbody>
             {evaluations.map((e) => (

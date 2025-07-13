@@ -24,7 +24,7 @@ export function useUsersWithoutManagerList(filters) {
       const token = sessionStorage.getItem("authToken");
       const result = await evaluationCycleAPI.getUsersWithoutManagerPaginated(filters, token);
 
-      setUsers(result.users || []);
+      setUsers(result.users || result.usersWithoutManager || []);
       setTotalCount(result.total || 0);
       setTotalPages(Math.ceil((result.total || 0) / (filters.pageSize || 10)));
       setCurrentPage(filters.page || 1);

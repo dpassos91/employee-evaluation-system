@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { apiConfig } from "../api/apiConfig";
+import { evaluationAPI } from "../api/evaluationAPI";
 
 /**
  * Hook to fetch evaluation history with filters.
@@ -8,7 +8,7 @@ import { apiConfig } from "../api/apiConfig";
  * @param {object} filters - { cycleId, cycleEndDate, grade, page }
  * @returns {object} { evaluations, totalPages, totalCount, currentPage, loading, error, refetch }
  */
-export function useEvaluationHistoryWithFilters(email, filters) {
+export function useEvaluationHistoryWithFilters(userId, filters) {
   const [evaluations, setEvaluations] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -20,17 +20,9 @@ export function useEvaluationHistoryWithFilters(email, filters) {
     setLoading(true);
     setError(null);
 
-    const params = new URLSearchParams();
-    params.append("email", email);
-    if (filters.cycleId) params.append("cycle", filters.cycleId);
-    if (filters.cycleEndDate) params.append("cycleEndDate", filters.cycleEndDate);
-    if (filters.grade) params.append("grade", filters.grade);
-    if (filters.page) params.append("page", filters.page);
-
     try {
-      const result = await apiConfig.apiCall(
-        `${apiConfig.API_ENDPOINTS.evaluations.historyWithFilters}?${params.toString()}`
-      );
+      const token = sessionStorage.getItem("authToken");
+      const result = await evaluationAPI.getEvaluationHistoryWithFilters(userId, filters, token);
 
       const mapped = (result.evaluations || []).map((e) => ({
         id: e.evaluationId,
@@ -45,12 +37,12 @@ export function useEvaluationHistoryWithFilters(email, filters) {
       setTotalCount(result.totalCount || 0);
       setCurrentPage(result.currentPage || filters.page || 1);
     } catch (err) {
-      setError(err.message || "Failed to load evaluations.");
+      setError(err.message || "Erro ao carregar histórico de avaliações.");
       setEvaluations([]);
     } finally {
       setLoading(false);
     }
-  }, [email, filters]);
+  }, [userId, filters]);
 
   useEffect(() => {
     fetchEvaluations();

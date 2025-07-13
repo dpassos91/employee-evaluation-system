@@ -88,7 +88,7 @@ evaluations: {
   /** @type {string} List evaluation grade options (1 to 4) */
   listGradeOptions: `${API_BASE_URL}/evaluations/list-evaluation-options`,
   /** @function Load an evaluation for a user in the current cycle */
-  load: (email) => `${API_BASE_URL}/evaluations/load-evaluation?email=${encodeURIComponent(email)}`,
+  load: (userId) => `${API_BASE_URL}/evaluations/load-evaluation?userId=${userId}`,
   /** @type {string} Update an evaluation with grade and feedback */
   update: `${API_BASE_URL}/evaluations/update-evaluation`,
   /** @function Reopen an evaluation by ID */

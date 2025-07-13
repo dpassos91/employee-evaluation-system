@@ -8,6 +8,7 @@ import java.io.Serializable;
  */
 public class FlatEvaluationDto implements Serializable {
     private Long evaluationId;
+    private Long evaluatedId;
     private String evaluatedName;
     private String evaluatedEmail;
     private String photograph;
@@ -28,6 +29,13 @@ public class FlatEvaluationDto implements Serializable {
         this.evaluationId = evaluationId;
     }
 
+    public Long getEvaluatedId() {
+        return evaluatedId;
+    }
+
+    public void setEvaluatedId(Long evaluatedId) {
+        this.evaluatedId = evaluatedId;
+    }
 
     public String getEvaluatedName() {
         return evaluatedName;
