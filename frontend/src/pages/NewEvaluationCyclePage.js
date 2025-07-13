@@ -78,7 +78,7 @@ export default function NewEvaluationCyclePage() {
           loading,
         },
       ]}>
-        {/* Data de fim do ciclo */}
+        {/* Cycle end date */}
         <div>
           <label className="block text-sm font-bold mb-1">
             <FormattedMessage
@@ -95,7 +95,7 @@ export default function NewEvaluationCyclePage() {
           />
         </div>
 
-     {/* Utilizadores sem gestor */}
+     {/* Users without a manager */}
 <div className="mt-4 text-md">
   <span className="inline-flex items-center">
     <FormattedMessage
@@ -107,13 +107,13 @@ export default function NewEvaluationCyclePage() {
         onClick={() => navigate("/users-without-manager")}
         className="ml-3 mr-4 bg-gray-200 hover:bg-gray-300 text-sm text-gray-700 font-medium py-1 px-3 rounded shadow-sm transition"
       >
-        Ver Detalhes
+        <FormattedMessage id="button.viewDetails" defaultMessage="Ver Detalhes" />
       </button>
     )}
   </span>
 </div>
 
-{/* Processos abertos */}
+{/* Open evaluation proceses */}
 <div className="mt-2 text-md">
   <span className="inline-flex items-center">
     <FormattedMessage
@@ -125,7 +125,7 @@ export default function NewEvaluationCyclePage() {
         onClick={() => navigate("/incomplete-evaluations")}
         className="ml-3 mr-4 bg-gray-200 hover:bg-gray-300 text-sm text-gray-700 font-medium py-1 px-3 rounded shadow-sm transition"
       >
-        Ver Detalhes
+        <FormattedMessage id="button.viewDetails" defaultMessage="Ver Detalhes" />
       </button>
     )}
   </span>

@@ -116,7 +116,7 @@ export default function EvaluationFormPage() {
       </div>
     ) : (
       <div className="flex items-start gap-10 px-10 pt-6">
-        {/* Avatar à esquerda */}
+        {/* Avatar at the left */}
         <div className="flex-shrink-0">
           <img
             src={photo || profileIcon}
@@ -125,9 +125,9 @@ export default function EvaluationFormPage() {
           />
         </div>
 
-        {/* Formulário à direita */}
+        {/* Form at the right */}
         <div className="flex flex-col gap-4 max-w-md w-full">
-          {/* Nome */}
+          {/* Name */}
           <div>
             <label className="block text-sm font-bold mb-1">
               <FormattedMessage id="evaluations.form.name" defaultMessage="Nome" />
@@ -140,7 +140,7 @@ export default function EvaluationFormPage() {
             />
           </div>
 
-          {/* Gestor */}
+          {/* Manager */}
           <div>
             <label className="block text-sm font-bold mb-1">
               <FormattedMessage id="evaluations.form.manager" defaultMessage="Gestor" />
@@ -177,7 +177,7 @@ export default function EvaluationFormPage() {
             )}
           </div>
 
-          {/* Avaliação */}
+          {/* Evaluation */}
           <div>
             <label className="block text-sm font-bold mb-1">
               <FormattedMessage id="evaluations.form.grade" defaultMessage="Avaliação" />
@@ -188,11 +188,21 @@ export default function EvaluationFormPage() {
               className="w-full border rounded px-2 py-1"
               required
             >
-              <option value="">--</option>
-              <option value="1">1 - Contribuição baixa</option>
-              <option value="2">2 - Contribuição parcial</option>
-              <option value="3">3 - Como esperado</option>
-              <option value="4">4 - Excedeu</option>
+              <option value="">
+    <FormattedMessage id="evaluations.selectGrade" defaultMessage="-- Selecionar --" />
+  </option>
+  <option value="1">
+    <FormattedMessage id="evaluations.grade.1" defaultMessage="1 - Contribuição baixa" />
+  </option>
+  <option value="2">
+    <FormattedMessage id="evaluations.grade.2" defaultMessage="2 - Contribuição parcial" />
+  </option>
+  <option value="3">
+    <FormattedMessage id="evaluations.grade.3" defaultMessage="3 - Conforme esperado" />
+  </option>
+  <option value="4">
+    <FormattedMessage id="evaluations.grade.4" defaultMessage="4 - Contribuição excedida" />
+  </option>
             </select>
           </div>
 
@@ -209,7 +219,7 @@ export default function EvaluationFormPage() {
             />
           </div>
 
-          {/* Botões alinhados abaixo dos campos */}
+          {/* Buttons alligned */}
           <div className="flex justify-center gap-4 pt-4">
             <button
               type="button"

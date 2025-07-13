@@ -12,7 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 
 export default function EvaluationListPage() {
-// Filtros e página
+// Filters and page
   const [name, setName] = useState("");
   const [evaluationState, setEvaluationState] = useState("");
   const [grade, setGrade] = useState("");
@@ -35,17 +35,17 @@ export default function EvaluationListPage() {
     [name, evaluationState, grade, cycleEnd, page]
   );
 
-  // Buscar utilizadores com filtros e paginação
+  // Get users with filters and pagination
     const { evaluations, totalPages, loading, error, refetch  } = useUsersEvaluationList(filters);
 
- // Funções para lidar com filtros
+ // Functions to handle filters
   const handleFilterName = (e) => { setName(e.target.value); setPage(1); };
   const handleFilterEvaluationState = (e) => { setEvaluationState(e.target.value); setPage(1); };
   const handleFilterGrade = (e) => { setGrade(e.target.value); setPage(1); };
   const handleFilterCycleEnd = (e) => { setCycleEnd(e.target.value); setPage(1); };
   const handleGoToPage = (p) => setPage(p);
 
-// Lista de estados de avaliação (pode ser dinâmica!)
+// Evaluation States 
    const evaluationStates = ["", "IN_EVALUATION", "EVALUATED", "CLOSED"];
 
 
@@ -138,7 +138,7 @@ const handleFillEvaluation = (email) => {
 
 const handleExportCSV = async () => {
   try {
-    // Lê filtros do state (name, office, manager)
+    // Loads fields from state (name, office, manager)
     const params = new URLSearchParams();
     if (name) params.append("name", name); 
     if (evaluationState) params.append("state", evaluationState);
@@ -149,7 +149,7 @@ const handleExportCSV = async () => {
 
     const token = sessionStorage.getItem("authToken");
 
-    // Usa fetch diretamente para blobs
+    // Apply fetch directly for blobs
     const response = await fetch(url, {
       headers: {
         sessionToken: token,
@@ -175,7 +175,7 @@ const handleExportCSV = async () => {
 
   return (
     <PageLayout title={<FormattedMessage id="evaluations.list.title" defaultMessage="Listagem de Avaliações" />}>
-      {/* Filtros */}
+      {/* Filters */}
 <div className="flex gap-4 mb-4">
         <FormattedMessage id="evaluations.filter.name" defaultMessage="Nome">
           {(msg) => (
@@ -261,7 +261,7 @@ const handleExportCSV = async () => {
       {error && <div className="py-8 text-center text-red-600">{error}</div>}
 
 
-      {/* Tabela de avaliações */}
+      {/* Evaluation Table */}
 {!loading && evaluations.length > 0 && (
         <div className="overflow-x-auto w-full">
         <table className="min-w-full text-left border-collapse table-auto">
@@ -297,10 +297,10 @@ const handleExportCSV = async () => {
         />
       </td>
 
-      {/* AÇÕES */}
+      {/* Actions */}
       <td className="p-2 text-center">
         <div className="flex flex-row gap-2 justify-center">
-  {/* Mostrar "Preencher" apenas se IN_EVALUATION */}
+  {/* Show "Fill" only if at IN_EVALUATION */}
   {evaluation.state === "IN_EVALUATION" ? (
     <button
       onClick={() => handleFillEvaluation(evaluation.email)}
@@ -310,7 +310,7 @@ const handleExportCSV = async () => {
     </button>
   ) : (
     <>
-      {/* Ver só se não está em IN_EVALUATION */}
+      {/* Show only if it's not at IN_EVALUATION */}
       <button
         onClick={() => navigate(`/evaluationform/${evaluation.email}`)}
         className="bg-[#D41C1C] text-white px-3 py-1 rounded"
@@ -318,7 +318,7 @@ const handleExportCSV = async () => {
         <FormattedMessage id="evaluation.button.view" defaultMessage="Ver" /> <span>&gt;</span>
       </button>
 
-      {/* Fechar se em EVALUATED */}
+      {/* Close if at EVALUATED */}
       {evaluation.state === "EVALUATED" && (
         <button
           onClick={() => handleCloseEvaluation(evaluation.id)}
@@ -328,7 +328,7 @@ const handleExportCSV = async () => {
         </button>
       )}
 
-      {/* Reverter se em EVALUATED */}
+      {/* Revert if in EVALUATED */}
       {evaluation.state === "EVALUATED" && (
         <button
           onClick={() => handleReopenEvaluation(evaluation.id)}
@@ -350,7 +350,7 @@ const handleExportCSV = async () => {
         </div>
       )}
 
-      {/* Paginação real */}
+      {/* Pagination */}
       {!loading && totalPages > 1 && (
         <div className="mt-4 flex justify-end gap-2 text-blue-700 text-sm">
           {Array.from({ length: totalPages }).map((_, idx) => (

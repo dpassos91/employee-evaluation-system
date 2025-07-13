@@ -49,16 +49,21 @@ document.body.removeChild(link);
   return (
     <PageLayout title={<FormattedMessage id="evaluations.history.title" defaultMessage="Histórico de Avaliações" />}>
       <div className="flex gap-4 mb-4">
-        <input
-          placeholder="Ciclo"
-          className="border px-2 py-1 rounded"
-          value={cycleId}
-          onChange={(e) => {
-  const value = parseInt(e.target.value, 10);
-  setCycleId(Number.isNaN(value) ? "" : value);
-  setPage(1);
-}}
-        />
+  
+  <FormattedMessage id="filter.cycle" defaultMessage="Ciclo">
+    {(placeholderText) => (
+      <input
+        placeholder={placeholderText}
+        className="border px-2 py-1 rounded"
+        value={cycleId}
+        onChange={(e) => {
+          const value = parseInt(e.target.value, 10);
+          setCycleId(Number.isNaN(value) ? "" : value);
+          setPage(1);
+        }}
+      />
+    )}
+  </FormattedMessage>
         <input
           type="date"
           value={cycleEndDate}
@@ -91,11 +96,19 @@ document.body.removeChild(link);
         <table className="min-w-full border-collapse table-auto text-sm">
           <thead className="bg-gray-200">
             <tr>
-              <th className="p-2">Ciclo</th>
-              <th className="p-2">Data de Fecho</th>
-              <th className="p-2">Avaliação</th>
-              <th className="p-2">Exportar</th>
-            </tr>
+  <th className="p-2">
+    <FormattedMessage id="table.cycle" defaultMessage="Ciclo" />
+  </th>
+  <th className="p-2">
+    <FormattedMessage id="table.endDate" defaultMessage="Data de Fecho" />
+  </th>
+  <th className="p-2">
+    <FormattedMessage id="table.grade" defaultMessage="Avaliação" />
+  </th>
+  <th className="p-2">
+    <FormattedMessage id="table.export" defaultMessage="Exportar" />
+  </th>
+</tr>
           </thead>
           <tbody>
             {evaluations.map((e) => (

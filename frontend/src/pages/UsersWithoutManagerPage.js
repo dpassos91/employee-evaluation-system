@@ -7,6 +7,7 @@ import { apiConfig } from "../api/apiConfig";
 import { userStore } from "../stores/userStore";
 import { toast } from "react-toastify";
 
+
 export default function UsersWithoutManagerPage() {
   const [nameFilter, setNameFilter] = useState("");
   const [officeFilter, setOfficeFilter] = useState("");
@@ -100,45 +101,67 @@ export default function UsersWithoutManagerPage() {
       />
     }
   >
-    {/* Filtros */}
+    {/* Filters */}
     <div className="mb-4 flex gap-4">
+  
+  <FormattedMessage id="filter.byName" defaultMessage="Filtrar por nome">
+    {(placeholderText) => (
       <input
         type="text"
         className="border px-2 py-1 rounded"
-        placeholder="Filtrar por nome"
+        placeholder={placeholderText}
         value={nameFilter}
         onChange={(e) => {
           setNameFilter(e.target.value);
           setPage(1);
         }}
       />
-      <select
-        className="border px-2 py-1 rounded"
-        value={officeFilter}
-        onChange={(e) => {
-          setOfficeFilter(e.target.value);
-          setPage(1);
-        }}
-      >
-        {offices.map((office) => (
-          <option key={office} value={office}>
-            {office || "Todos os escritórios"}
-          </option>
-        ))}
-      </select>
-    </div>
+    )}
+  </FormattedMessage>
 
-    {/* Tabela */}
+  {/* Select from filtered office FormattedMessage with option "Any office" */}
+  <select
+    className="border px-2 py-1 rounded"
+    value={officeFilter}
+    onChange={(e) => {
+      setOfficeFilter(e.target.value);
+      setPage(1);
+    }}
+  >
+    {offices.map((office) => (
+      <option key={office || 'all'} value={office || ''}>
+        {office ? office : (
+          <FormattedMessage
+            id="filter.allOffices"
+            defaultMessage="Todos os escritórios"
+          />
+        )}
+      </option>
+    ))}
+  </select>
+</div>
+
+
+    {/* Table */}
     <div className="border rounded">
       <table className="w-full text-sm">
         <thead>
-          <tr className="bg-gray-100 text-left">
-            <th className="p-2">Nome</th>
-            <th className="p-2">Email</th>
-            <th className="p-2">Escritório</th>
-            <th className="p-2">Atribuir Gestor</th>
-          </tr>
-        </thead>
+  <tr>
+    <th className="p-2">
+      <FormattedMessage id="table.name" defaultMessage="Nome" />
+    </th>
+    <th className="p-2">
+      <FormattedMessage id="table.email" defaultMessage="Email" />
+    </th>
+    <th className="p-2">
+      <FormattedMessage id="table.office" defaultMessage="Escritório" />
+    </th>
+    <th className="p-2">
+      <FormattedMessage id="table.assignManager" defaultMessage="Atribuir Gestor" />
+    </th>
+  </tr>
+</thead>
+
         <tbody>
           {users.map((user) => (
             <tr key={user.id} className="border-t">
@@ -158,7 +181,9 @@ export default function UsersWithoutManagerPage() {
                       }
                       className="border px-2 py-1 rounded w-40"
                     >
-                      <option value="">-- Selecionar --</option>
+                     <option value="">
+  <FormattedMessage id="form.select.placeholder" defaultMessage="-- Selecionar --" />
+</option>
                       {dropdownUsers.map((u) => (
                         <option key={u.email} value={u.email}>
                           {u.firstName} {u.lastName}
@@ -198,7 +223,7 @@ export default function UsersWithoutManagerPage() {
       )}
     </div>
 
-    {/* Paginação manual */}
+    {/* Pagination */}
     {!loading && totalPages > 1 && (
       <div className="mt-4 flex justify-end gap-2 text-blue-700 text-sm">
         {Array.from({ length: totalPages }).map((_, idx) => (
