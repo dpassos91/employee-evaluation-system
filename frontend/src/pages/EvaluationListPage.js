@@ -140,7 +140,7 @@ const handleCloseAllEvaluations = async () => {
   try {
     await evaluationAPI.bulkCloseEvaluations(sessionStorage.getItem("authToken"));
 
-   showToast("toast.closeAllSuccess", "Todos os processos foram fechados com sucesso.", "success", toastId);
+   showToast("toast.closeAllSuccess", "Todos os processos foram fechados com sucesso. O ciclo terminou!", "success", toastId);
 
     refetch();
   } catch (err) {

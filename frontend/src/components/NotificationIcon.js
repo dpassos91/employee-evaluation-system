@@ -31,9 +31,10 @@ export default function NotificationIcon() {
    */
   const handleClick = async () => {
     if (!dropdownOpen) {
+      await fetchNonMessageNotifications();
       await notificationAPI.markAllAsRead();
       await fetchCounts();
-      await fetchNonMessageNotifications();
+      
     }
     setDropdownOpen((open) => !open);
   };

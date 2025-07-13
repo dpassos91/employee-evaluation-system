@@ -36,6 +36,9 @@ public class EvaluationCycleBean implements Serializable {
     @Inject
     private EvaluationDao evaluationDao;
 
+    @Inject
+    private NotificationBean notificationBean;
+
     private static final Logger logger = LogManager.getLogger(EvaluationCycleBean.class);
 
     public EvaluationCycleEntity findActiveCycle() {
@@ -87,6 +90,7 @@ public class EvaluationCycleBean implements Serializable {
             cycle.setEndDate(LocalDateTime.now());
             evaluationCycleDao.save(cycle);
             emailManagersAndEvaluatedOfCycleClosure(cycle);
+            notifyCycleClosure(cycle);
             logger.info("User: {} | IP: {} - Cycle ID {} has been closed and deactivated.",
                     RequestContext.getAuthor(), RequestContext.getIp(), cycle.getId());
         } else {
@@ -130,6 +134,8 @@ public class EvaluationCycleBean implements Serializable {
 
             emailManagersAndEvaluatedOfCycleClosure(cycle);
 
+            notifyCycleClosure(cycle);
+
             logger.info("Cycle ID {} closed. All evaluations marked with date {}.", cycle.getId(), LocalDateTime.now());
         }
 
@@ -167,6 +173,19 @@ public class EvaluationCycleBean implements Serializable {
 
                 evaluationDao.create(evaluation);
                 createdCount++;
+
+                // create a notification for the manager
+
+                String evaluatedName = user.getProfile().getFirstName() + " " + user.getProfile().getLastName();
+                String message = String.format("A new evaluation cycle was created. You are responsible for the evaluation of %s.", evaluatedName);
+
+                notificationBean.createNotification(
+                        user.getManager().getId(),
+                        "SYSTEM",
+                        message
+                );
+
+
             }
         }
 
@@ -261,7 +280,48 @@ public class EvaluationCycleBean implements Serializable {
     }
 
 
+    /**
+     * Sends system notifications to all users involved in a given evaluation cycle (evaluated users and their evaluators).
+     * This should be used when a cycle is officially closed and users are allowed to view their results.
+     *
+     * The notification is sent:
+     * - Once per user (even if they are involved in multiple evaluations)
+     * - With the same generic system message
+     *
+     * The method assumes that the cycle entity provided already contains all evaluation references.
+     *
+     * @param cycle the evaluation cycle that has been closed
+     */
+    private void notifyCycleClosure(EvaluationCycleEntity cycle) {
+        String message = "Evaluation cycle is over, you can now check results";
 
+        // Avoid duplicate notifications for users who appear in multiple evaluations
+        Set<Integer> notifiedUserIds = new HashSet<>();
+
+        for (EvaluationEntity evaluation : cycle.getEvaluations()) {
+            UserEntity evaluated = evaluation.getEvaluated();
+            UserEntity evaluator = evaluation.getEvaluator();
+
+            if (evaluated != null && notifiedUserIds.add(evaluated.getId())) {
+                notificationBean.createNotification(
+                        evaluated.getId(),
+                        "SYSTEM",
+                        message
+                );
+            }
+
+            if (evaluator != null && notifiedUserIds.add(evaluator.getId())) {
+                notificationBean.createNotification(
+                        evaluator.getId(),
+                        "SYSTEM",
+                        message
+                );
+            }
+        }
+
+        logger.info("User: {} | IP: {} - Notifications created for all users in cycle ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), cycle.getId());
+    }
 
 
 
