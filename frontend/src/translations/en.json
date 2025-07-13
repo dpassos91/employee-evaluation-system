@@ -216,6 +216,22 @@
   "courses.field.link": "Link",
   "courses.field.language": "Language",
   "courses.field.category": "Area",
-  "courses.field.active": "Active"
+  "courses.field.active": "Active",
+
+
+  "profile.manager.update.success": "Manager updated successfully!",
+  
+  "profile.currentPassword": "Current password",
+  "profile.newPassword": "New password",
+  "profile.confirmPassword": "Confirm password",
+  "profile.password.short": "Password must have at least 6 characters.",
+  "profile.password.mismatch": "Passwords do not match.",
+  "profile.password.success": "Password updated successfully!",
+  "profile.password.error": "Error updating password!",
+  "profile.previewPhoto": "Preview Photo",
+  "profile.chooseOtherPhoto": "Choose Another Photo",
+  "profile.savePhoto": "Save Photo",
+  "profile.uploading": "Uploading..."
+
   
 }
