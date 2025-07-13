@@ -3,11 +3,11 @@ import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
 import { useUsersEvaluationList } from "../hooks/useUsersEvaluationList"; 
 import { userStore } from "../stores/userStore";
-import { apiConfig } from "../api/apiConfig";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useIntl } from "react-intl";
+import { evaluationAPI } from "../api/evaluationAPI";
 
 
 
@@ -76,9 +76,7 @@ const handleCloseEvaluation = async (id) => {
     defaultMessage: "A fechar avaliação..."
   }));
   try {
-    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.close(id), {
-      method: "PUT",
-    });
+    await evaluationAPI.closeEvaluation(id, sessionStorage.getItem("authToken"));
 
     showToast("toast.closeSuccess", "Avaliação fechada com sucesso.", "success", toastId);
 
@@ -94,9 +92,7 @@ const handleReopenEvaluation = async (id) => {
     defaultMessage: "A reabrir avaliação..."
   }));
   try {
-    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.reopen(id), {
-      method: "PUT",
-    });
+    await evaluationAPI.reopenEvaluation(id, sessionStorage.getItem("authToken"));
 
    showToast("toast.reopenSuccess", "Avaliação reaberta com sucesso.", "success", toastId);
 
@@ -118,9 +114,7 @@ const handleCloseAllEvaluations = async () => {
   }));
 
   try {
-    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.bulkClose, {
-      method: "PUT",
-    });
+    await evaluationAPI.bulkCloseEvaluations(sessionStorage.getItem("authToken"));
 
    showToast("toast.closeAllSuccess", "Todos os processos foram fechados com sucesso.", "success", toastId);
 
@@ -134,31 +128,19 @@ const handleFillEvaluation = (email) => {
   navigate(`/evaluationform/${email}`);
 };
 
-
-
-
 const handleExportCSV = async () => {
   try {
-    // Loads fields from state (name, office, manager)
-    const params = new URLSearchParams();
-    if (name) params.append("name", name); 
-    if (evaluationState) params.append("state", evaluationState);
-    if (grade) params.append("grade", grade);
-    if (cycleEnd) params.append("cycleEnd", cycleEnd);
-
-    const url = `${apiConfig.API_ENDPOINTS.evaluations.exportCsv}?${params.toString()}`;
-
     const token = sessionStorage.getItem("authToken");
 
-    // Apply fetch directly for blobs
-    const response = await fetch(url, {
-      headers: {
-        sessionToken: token,
-        token,
-      },
-    });
-    if (!response.ok) throw new Error("Erro ao exportar CSV");
-    const blob = await response.blob();
+    const exportFilters = {
+      name,
+      state: evaluationState,
+      grade,
+      cycleEnd: cycleEnd,
+    };
+
+    const blob = await evaluationAPI.exportEvaluationsCsv(exportFilters, token);
+
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "users_export.csv";
@@ -169,8 +151,6 @@ const handleExportCSV = async () => {
     alert("Erro ao exportar ficheiro.");
   }
 };
-
-
 
 
 

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import AppForm from "../components/AppForm";
 import { FormattedMessage } from "react-intl";
-import { apiConfig } from "../api/apiConfig";
+import { evaluationAPI } from "../api/evaluationAPI";
 import { toast } from "react-toastify";
 import { userStore } from "../stores/userStore";
 import profileIcon from "../images/profile_icon.png";
@@ -44,9 +44,7 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
   useEffect(() => {
     const fetchEvaluation = async () => {
       try {
-        const result = await apiConfig.apiCall(
-          apiConfig.API_ENDPOINTS.evaluations.load(email)
-        );
+        const result = await evaluationAPI.loadEvaluation(email, sessionStorage.getItem("authToken"));
         const evaluation = result.evaluation;
 
         setName(evaluation.evaluatedName || "");
@@ -70,7 +68,7 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
     const fetchDropdownUsers = async () => {
       if (!isAdmin) return;
       try {
-        const result = await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.managerDropdown);
+        const result = await evaluationAPI.getManagerDropdown();
         setDropdownUsers(result);
       } catch (err) {
         showToast("toast.loadManagersError", "Erro ao carregar lista de gestores disponíveis.");
@@ -81,42 +79,50 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
   }, [isAdmin]);
 
   const handleSubmit = async () => {
+
     try {
-      await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.update, {
-        method: "PUT",
-        body: JSON.stringify({
+
+      await evaluationAPI.updateEvaluation(
+
+        {
+
           evaluatedEmail: email,
+
           grade: parseInt(grade),
+
           feedback,
-        }),
+
+        },
+
+        sessionStorage.getItem("authToken")
+
+      );
+
+
+
+      showToast("toast.updateSuccess", "Avaliação atualizada com sucesso.", "success", {
+
+        onClose: () => navigate("/evaluationlist"),
+
+        autoClose: 2000,
+
       });
-    showToast(
-  "toast.updateSuccess",
-  "Avaliação atualizada com sucesso.",
-  "success",
-  {
-    onClose: () => navigate("/evaluationlist"), 
-    autoClose: 2000,
-  }
-);
-      console.log("TOAST TRIGGERED")
-      
+
     } catch (err) {
+
       showToast("toast.updateError", "Erro ao salvar avaliação.");
+
     }
+
   };
+
+
 
   const handleAssignManager = async () => {
     if (!selectedManager || selectedManager === managerEmail) return;
     setUpdatingManager(true);
     try {
-      await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.assignManager, {
-        method: "POST",
-        body: JSON.stringify({
-          userEmail: email,
-          managerEmail: selectedManager,
-        }),
-      });
+      await evaluationAPI.assignManager({ userEmail: email, managerEmail: selectedManager });
       showToast("toast.managerUpdateSuccess", "Gestor atualizado com sucesso.", "success");
       setManagerEmail(selectedManager);
       const newManager = dropdownUsers.find((u) => u.email === selectedManager);

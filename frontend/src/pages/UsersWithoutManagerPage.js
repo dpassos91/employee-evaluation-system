@@ -3,7 +3,7 @@ import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
 import { formatWorkplace } from "../utils/formatWorkplace";
 import { useUsersWithoutManagerList } from "../hooks/useUsersWithoutManagerList";
-import { apiConfig } from "../api/apiConfig";
+import { evaluationAPI } from "../api/evaluationAPI";
 import { userStore } from "../stores/userStore";
 import { toast } from "react-toastify";
 import { useIntl } from "react-intl";
@@ -44,7 +44,7 @@ const showToast = (id, defaultMessage, type = "error") => {
       const fetchDropdownUsers = async () => {
         if (!isAdmin) return;
         try {
-          const result = await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.managerDropdown);
+          const result = await evaluationAPI.getManagerDropdown();
           setDropdownUsers(result);
         } catch (err) {
           showToast("toast.loadManagersError", "Erro ao carregar lista de gestores disponíveis.");
@@ -78,10 +78,8 @@ const showToast = (id, defaultMessage, type = "error") => {
 
   setUpdatingManager(true);
   try {
-    await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.assignManager, {
-      method: "POST",
-      body: JSON.stringify({ userEmail, managerEmail: selectedManager }),
-    });
+    await evaluationAPI.assignManager({ userEmail, managerEmail: selectedManager });
+
 
     showToast("toast.assignManagerSuccess", "Gestor atribuído com sucesso.", "success");
 

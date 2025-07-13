@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { apiConfig } from "../api/apiConfig";
+import { evaluationAPI } from "../api/evaluationAPI";
 
 /**
  * Hook to fetch evaluation history with filters.
@@ -20,17 +20,9 @@ export function useEvaluationHistoryWithFilters(email, filters) {
     setLoading(true);
     setError(null);
 
-    const params = new URLSearchParams();
-    params.append("email", email);
-    if (filters.cycleId) params.append("cycle", filters.cycleId);
-    if (filters.cycleEndDate) params.append("cycleEndDate", filters.cycleEndDate);
-    if (filters.grade) params.append("grade", filters.grade);
-    if (filters.page) params.append("page", filters.page);
-
     try {
-      const result = await apiConfig.apiCall(
-        `${apiConfig.API_ENDPOINTS.evaluations.historyWithFilters}?${params.toString()}`
-      );
+      const token = sessionStorage.getItem("authToken");
+      const result = await evaluationAPI.getEvaluationHistoryWithFilters(email, filters, token);
 
       const mapped = (result.evaluations || []).map((e) => ({
         id: e.evaluationId,
@@ -45,7 +37,7 @@ export function useEvaluationHistoryWithFilters(email, filters) {
       setTotalCount(result.totalCount || 0);
       setCurrentPage(result.currentPage || filters.page || 1);
     } catch (err) {
-      setError(err.message || "Failed to load evaluations.");
+      setError(err.message || "Erro ao carregar histórico de avaliações.");
       setEvaluations([]);
     } finally {
       setLoading(false);

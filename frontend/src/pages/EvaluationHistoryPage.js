@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import { FormattedMessage } from "react-intl";
-import { apiConfig } from "../api/apiConfig";
+import { evaluationAPI } from "../api/evaluationAPI";
 import { useEvaluationHistoryWithFilters } from "../hooks/useEvaluationHistoryWithFilters";
 import { toast } from "react-toastify";
 import { useIntl } from "react-intl";
@@ -32,25 +32,16 @@ const intl = useIntl();
   } = useEvaluationHistoryWithFilters(email, filters);
 
   const handleExportPDF = async (evaluationId) => {
-    try {
-      const token = sessionStorage.getItem("authToken");
-      const url = apiConfig.API_ENDPOINTS.evaluations.exportPdf(evaluationId);
-      const response = await fetch(url, apiConfig.authInterceptor());
-      const blob = await response.blob();
-const file = new Blob([blob], { type: "application/pdf" });
-const link = document.createElement("a");
-link.href = URL.createObjectURL(file);
-link.download = `avaliacao_${evaluationId}.pdf`;
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
-    } catch {
-      toast.error(intl.formatMessage({
-  id: "toast.exportPdfError",
-  defaultMessage: "Erro ao exportar avaliação para PDF."
-}));
-    }
-  };
+  try {
+    const token = sessionStorage.getItem("authToken");
+    await evaluationAPI.downloadEvaluationPdf(evaluationId, token);
+  } catch {
+    toast.error(intl.formatMessage({
+      id: "toast.exportPdfError",
+      defaultMessage: "Erro ao exportar avaliação para PDF."
+    }));
+  }
+};
 
   return (
     <PageLayout title={<FormattedMessage id="evaluations.history.title" defaultMessage="Histórico de Avaliações" />}>
