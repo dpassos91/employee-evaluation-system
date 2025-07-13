@@ -152,7 +152,7 @@
 "toast.reopenSuccess": "Avaliação reaberta com sucesso.",
 "toast.reopenError": "Erro ao reabrir avaliação.",
 "toast.closingAll": "A fechar todos os processos...",
-"toast.closeAllSuccess": "Todos os processos foram fechados com sucesso.",
+"toast.closeAllSuccess": "Todos os processos foram fechados com sucesso. O ciclo terminou!",
 "toast.closeAllError": "Erro ao fechar os processos.",
 "toast.confirmBulkClose": "Tens a certeza que queres fechar todos os processos?",
 "toast.onlyAdmins": "Apenas administradores podem aceder a esta página.",

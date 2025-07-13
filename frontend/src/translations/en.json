@@ -150,7 +150,7 @@
 "toast.reopenSuccess": "Evaluation reopened successfully.",
 "toast.reopenError": "Error reopening evaluation.",
 "toast.closingAll": "Closing all evaluations...",
-"toast.closeAllSuccess": "All evaluations were closed successfully.",
+"toast.closeAllSuccess": "All evaluations were closed successfully. The cycle is over!",
 "toast.closeAllError": "Failed to close evaluations.",
 "toast.confirmBulkClose": "Are you sure you want to close all evaluations?",
 "toast.onlyAdmins": "Only administrators can access this page.",
