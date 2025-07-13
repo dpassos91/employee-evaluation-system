@@ -7,6 +7,7 @@ import { apiConfig } from "../api/apiConfig";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useIntl } from "react-intl";
 
 
 
@@ -20,6 +21,24 @@ export default function EvaluationListPage() {
   const [hover, setHover] = useState(null);
   const [page, setPage] = useState(1);
   const navigate = useNavigate(); 
+
+const intl = useIntl();
+
+const showToast = (id, defaultMessage, type = "success", toastId = null) => {
+  const msg = intl.formatMessage({ id, defaultMessage });
+
+  if (toastId) {
+    toast.update(toastId, {
+      render: msg,
+      type,
+      isLoading: false,
+      autoClose: 3000,
+    });
+  } else {
+    toast[type](msg);
+  }
+};
+
 
 
 /**
@@ -52,80 +71,62 @@ export default function EvaluationListPage() {
 // Functions to change evaluation states and lead to the evaluation page
 
 const handleCloseEvaluation = async (id) => {
-  const toastId = toast.loading("A fechar avaliação...");
+  const toastId = toast.loading(intl.formatMessage({
+    id: "toast.closingEvaluation",
+    defaultMessage: "A fechar avaliação..."
+  }));
   try {
     await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.close(id), {
       method: "PUT",
     });
 
-    toast.update(toastId, {
-      render: "Avaliação fechada com sucesso.",
-      type: "success",
-      isLoading: false,
-      autoClose: 3000,
-    });
+    showToast("toast.closeSuccess", "Avaliação fechada com sucesso.", "success", toastId);
 
     refetch();
   } catch (err) {
-    toast.update(toastId, {
-      render: "Erro ao fechar avaliação.",
-      type: "error",
-      isLoading: false,
-      autoClose: 3000,
-    });
+   showToast("toast.closeError", "Erro ao fechar avaliação.", "error", toastId);
   }
 };
 
 const handleReopenEvaluation = async (id) => {
-  const toastId = toast.loading("A reabrir avaliação...");
+  const toastId = toast.loading(intl.formatMessage({
+    id: "toast.reopeningEvaluation",
+    defaultMessage: "A reabrir avaliação..."
+  }));
   try {
     await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.reopen(id), {
       method: "PUT",
     });
 
-    toast.update(toastId, {
-      render: "Avaliação reaberta com sucesso.",
-      type: "success",
-      isLoading: false,
-      autoClose: 3000,
-    });
+   showToast("toast.reopenSuccess", "Avaliação reaberta com sucesso.", "success", toastId);
 
     refetch();
   } catch (err) {
-    toast.update(toastId, {
-      render: "Erro ao reabrir avaliação.",
-      type: "error",
-      isLoading: false,
-      autoClose: 3000,
-    });
+     showToast("toast.reopenError", "Erro ao reabrir avaliação.", "error", toastId);
   }
 };
 
 const handleCloseAllEvaluations = async () => {
-  if (!window.confirm("Tens a certeza que queres fechar todos os processos?")) return;
+  if (!window.confirm(intl.formatMessage({
+    id: "toast.confirmBulkClose",
+    defaultMessage: "Tens a certeza que queres fechar todos os processos?"
+  }))) return;
 
-  const toastId = toast.loading("A fechar todos os processos...");
+  const toastId = toast.loading(intl.formatMessage({
+    id: "toast.closingAll",
+    defaultMessage: "A fechar todos os processos..."
+  }));
 
   try {
     await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.bulkClose, {
       method: "PUT",
     });
 
-    toast.update(toastId, {
-      render: "Todos os processos foram fechados com sucesso.",
-      type: "success",
-      isLoading: false,
-      autoClose: 3000,
-    });
+   showToast("toast.closeAllSuccess", "Todos os processos foram fechados com sucesso.", "success", toastId);
 
     refetch();
   } catch (err) {
-    toast.update(toastId, {
-      render: "Erro ao fechar os processos.",
-      type: "error",
-      isLoading: false,
-      autoClose: 3000,
-    });
+    showToast("toast.closeAllError", "Erro ao fechar os processos.", "error", toastId);
   }
 };
 
@@ -377,7 +378,11 @@ const handleExportCSV = async () => {
 
 
 {/*  show the bulk close button only if the user is admin and all evaluations are at evaluated-state*/}
-{isAdmin && evaluations.length > 0 && evaluations.every((e) => e.state === "EVALUATED") && (
+{isAdmin &&
+ evaluations.length > 0 &&
+ evaluations.some((e) => e.state === "EVALUATED") && 
+ evaluations.every((e) => e.state === "EVALUATED" || e.state === "CLOSED") && 
+ ( 
   <div className="flex justify-center mt-10">
     <button
       onClick={handleCloseAllEvaluations}

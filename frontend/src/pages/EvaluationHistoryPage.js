@@ -5,9 +5,12 @@ import { FormattedMessage } from "react-intl";
 import { apiConfig } from "../api/apiConfig";
 import { useEvaluationHistoryWithFilters } from "../hooks/useEvaluationHistoryWithFilters";
 import { toast } from "react-toastify";
+import { useIntl } from "react-intl";
 
 export default function EvaluationHistoryPage() {
   const { email } = useParams();
+
+const intl = useIntl();
 
   const [cycleId, setCycleId] = useState("");
   const [cycleEndDate, setCycleEndDate] = useState("");
@@ -42,7 +45,10 @@ document.body.appendChild(link);
 link.click();
 document.body.removeChild(link);
     } catch {
-      toast.error("Erro ao exportar avaliação para PDF.");
+      toast.error(intl.formatMessage({
+  id: "toast.exportPdfError",
+  defaultMessage: "Erro ao exportar avaliação para PDF."
+}));
     }
   };
 

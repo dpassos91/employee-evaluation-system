@@ -136,6 +136,34 @@
    "table.endDate": "Ending Date",
    "table.grade": "Grade",
    "table.export": "Export PDF",
+
+   "toast.loadEvaluationError": "Failed to load evaluation data.",
+"toast.loadManagersError": "Failed to load available managers.",
+"toast.updateSuccess": "Evaluation updated successfully.",
+"toast.updateError": "Error saving evaluation.",
+"toast.managerUpdateSuccess": "Manager updated successfully.",
+"toast.managerUpdateError": "Error updating manager.",
+"toast.closingEvaluation": "Closing evaluation...",
+"toast.closeSuccess": "Evaluation closed successfully.",
+"toast.closeError": "Error closing evaluation.",
+"toast.reopeningEvaluation": "Reopening evaluation...",
+"toast.reopenSuccess": "Evaluation reopened successfully.",
+"toast.reopenError": "Error reopening evaluation.",
+"toast.closingAll": "Closing all evaluations...",
+"toast.closeAllSuccess": "All evaluations were closed successfully.",
+"toast.closeAllError": "Failed to close evaluations.",
+"toast.confirmBulkClose": "Are you sure you want to close all evaluations?",
+"toast.onlyAdmins": "Only administrators can access this page.",
+"toast.loadCycleStatsError": "Error loading cycle data.",
+"toast.missingEndDate": "Please select an end date.",
+"toast.newCycleSuccess": "New cycle started successfully!",
+"toast.newCycleError": "Failed to start new cycle.",
+"toast.assignManagerSuccess": "Manager successfully assigned.",
+  "toast.assignManagerError": "Failed to assign manager.",
+  "toast.exportPdfError": "Failed to export evaluation to PDF.",
+
+
+
     
  
 "accessDenied.title": "Access restricted",

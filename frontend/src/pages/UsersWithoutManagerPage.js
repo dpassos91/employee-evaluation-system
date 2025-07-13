@@ -6,6 +6,7 @@ import { useUsersWithoutManagerList } from "../hooks/useUsersWithoutManagerList"
 import { apiConfig } from "../api/apiConfig";
 import { userStore } from "../stores/userStore";
 import { toast } from "react-toastify";
+import { useIntl } from "react-intl";
 
 
 export default function UsersWithoutManagerPage() {
@@ -13,6 +14,13 @@ export default function UsersWithoutManagerPage() {
   const [officeFilter, setOfficeFilter] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 10;
+
+  const intl = useIntl();
+
+const showToast = (id, defaultMessage, type = "error") => {
+  const msg = intl.formatMessage({ id, defaultMessage });
+  toast[type](msg);
+};
 
   const user = userStore((state) => state.user);
   const isAdmin = user?.role === "ADMIN";
@@ -39,7 +47,8 @@ export default function UsersWithoutManagerPage() {
           const result = await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.managerDropdown);
           setDropdownUsers(result);
         } catch (err) {
-          toast.error("Erro ao carregar lista de gestores disponíveis.");
+          showToast("toast.loadManagersError", "Erro ao carregar lista de gestores disponíveis.");
+
         }
       };
   
@@ -74,10 +83,12 @@ export default function UsersWithoutManagerPage() {
       body: JSON.stringify({ userEmail, managerEmail: selectedManager }),
     });
 
-    toast.success("Gestor atribuído com sucesso.");
+    showToast("toast.assignManagerSuccess", "Gestor atribuído com sucesso.", "success");
+
     refetch();
   } catch (err) {
-    toast.error("Erro ao atribuir gestor.");
+    showToast("toast.assignManagerError", "Erro ao atribuir gestor.");
+
   } finally {
     setUpdatingManager(false);
   }

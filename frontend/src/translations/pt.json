@@ -139,6 +139,34 @@
   "table.grade": "Avaliação",
   "table.export": "Exportar PDF",
 
+  "toast.loadEvaluationError": "Erro ao carregar dados da avaliação.",
+"toast.loadManagersError": "Erro ao carregar lista de gestores disponíveis.",
+"toast.updateSuccess": "Avaliação atualizada com sucesso.",
+"toast.updateError": "Erro ao salvar avaliação.",
+"toast.managerUpdateSuccess": "Gestor atualizado com sucesso.",
+"toast.managerUpdateError": "Erro ao atualizar gestor.",
+"toast.closingEvaluation": "A fechar avaliação...",
+"toast.closeSuccess": "Avaliação fechada com sucesso.",
+"toast.closeError": "Erro ao fechar avaliação.",
+"toast.reopeningEvaluation": "A reabrir avaliação...",
+"toast.reopenSuccess": "Avaliação reaberta com sucesso.",
+"toast.reopenError": "Erro ao reabrir avaliação.",
+"toast.closingAll": "A fechar todos os processos...",
+"toast.closeAllSuccess": "Todos os processos foram fechados com sucesso.",
+"toast.closeAllError": "Erro ao fechar os processos.",
+"toast.confirmBulkClose": "Tens a certeza que queres fechar todos os processos?",
+"toast.onlyAdmins": "Apenas administradores podem aceder a esta página.",
+"toast.loadCycleStatsError": "Erro ao carregar dados do ciclo.",
+"toast.missingEndDate": "Por favor, seleciona uma data de fim.",
+"toast.newCycleSuccess": "Novo ciclo iniciado com sucesso!",
+"toast.newCycleError": "Erro ao iniciar novo ciclo.",
+   "toast.assignManagerSuccess": "Gestor atribuído com sucesso.",
+  "toast.assignManagerError": "Erro ao atribuir gestor.",
+  "toast.exportPdfError": "Erro ao exportar avaliação para PDF.",
+
+
+
+
 
 "accessDenied.title": "Acesso restrito",
 "accessDenied.message": "Não tens permissão para aceder a esta página.\nSerás redirecionado para o dashboard.",

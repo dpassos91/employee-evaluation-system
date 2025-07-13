@@ -7,11 +7,22 @@ import { apiConfig } from "../api/apiConfig";
 import { toast } from "react-toastify";
 import { userStore } from "../stores/userStore";
 import profileIcon from "../images/profile_icon.png";
+import { useIntl } from "react-intl";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 export default function EvaluationFormPage() {
   const { email } = useParams();
   const navigate = useNavigate();
   const user = userStore((state) => state.user);
+
+const intl = useIntl();
+
+const showToast = (id, defaultMessage, type = "error", options = {}) => {
+  const msg = intl.formatMessage({ id, defaultMessage });
+  toast[type](msg, options); 
+};
+
 
   const isAdmin = user?.role === "ADMIN";
 
@@ -46,7 +57,7 @@ export default function EvaluationFormPage() {
         setManagerEmail(evaluation.evaluatorEmail || "");
         setSelectedManager(evaluation.evaluatorEmail || "");
       } catch (err) {
-        toast.error("Erro ao carregar dados da avaliação.");
+        showToast("toast.loadEvaluationError", "Erro ao carregar dados da avaliação.");
       } finally {
         setLoading(false);
       }
@@ -62,7 +73,7 @@ export default function EvaluationFormPage() {
         const result = await apiConfig.apiCall(apiConfig.API_ENDPOINTS.evaluations.managerDropdown);
         setDropdownUsers(result);
       } catch (err) {
-        toast.error("Erro ao carregar lista de gestores disponíveis.");
+        showToast("toast.loadManagersError", "Erro ao carregar lista de gestores disponíveis.");
       }
     };
 
@@ -79,10 +90,19 @@ export default function EvaluationFormPage() {
           feedback,
         }),
       });
-      toast.success("Avaliação atualizada com sucesso.");
-      navigate("/evaluationlist");
+    showToast(
+  "toast.updateSuccess",
+  "Avaliação atualizada com sucesso.",
+  "success",
+  {
+    onClose: () => navigate("/evaluationlist"), 
+    autoClose: 2000,
+  }
+);
+      console.log("TOAST TRIGGERED")
+      
     } catch (err) {
-      toast.error("Erro ao salvar avaliação.");
+      showToast("toast.updateError", "Erro ao salvar avaliação.");
     }
   };
 
@@ -97,7 +117,7 @@ export default function EvaluationFormPage() {
           managerEmail: selectedManager,
         }),
       });
-      toast.success("Gestor atualizado com sucesso.");
+      showToast("toast.managerUpdateSuccess", "Gestor atualizado com sucesso.", "success");
       setManagerEmail(selectedManager);
       const newManager = dropdownUsers.find((u) => u.email === selectedManager);
       setManagerName(`${newManager.firstName} ${newManager.lastName}`);
@@ -107,6 +127,9 @@ export default function EvaluationFormPage() {
       setUpdatingManager(false);
     }
   };
+
+
+  
 
   return (
   <PageLayout title={<FormattedMessage id="evaluations.form.title" defaultMessage="Formulário de Avaliação" />}>
@@ -238,7 +261,13 @@ export default function EvaluationFormPage() {
           </div>
         </div>
       </div>
+
+
+
     )}
+
+<ToastContainer position="top-center" autoClose={3000} />
+
   </PageLayout>
 );
 

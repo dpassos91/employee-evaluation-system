@@ -6,6 +6,8 @@ import { FormattedMessage } from "react-intl";
 import { toast } from "react-toastify";
 import { evaluationCycleAPI } from "../api/evaluationCycleAPI";
 import { userStore } from "../stores/userStore";
+import { useIntl } from "react-intl";
+
 
 export default function NewEvaluationCyclePage() {
   const navigate = useNavigate();
@@ -14,12 +16,28 @@ export default function NewEvaluationCyclePage() {
   const [openEvaluations, setOpenEvaluations] = useState(0);
   const [loading, setLoading] = useState(false);
 
+const intl = useIntl();
+
+const showToast = (id, defaultMessage, type = "error", toastId = null) => {
+    const msg = intl.formatMessage({ id, defaultMessage });
+    if (toastId) {
+      toast.update(toastId, {
+        render: msg,
+        type,
+        isLoading: false,
+        autoClose: 3000,
+      });
+    } else {
+      toast[type](msg);
+    }
+  };
+
   const user = userStore((state) => state.user);
   const isAdmin = user?.role === "ADMIN";
 
   useEffect(() => {
     if (!isAdmin) {
-      toast.error("Apenas administradores podem aceder a esta página.");
+      showToast("toast.onlyAdmins", "Apenas administradores podem aceder a esta página.");
       navigate("/dashboard");
       return;
     }
@@ -36,8 +54,8 @@ export default function NewEvaluationCyclePage() {
     setUsersWithoutManager(noManagerRes.numberOfUsersWithoutManager || 0);
     setOpenEvaluations(openCyclesRes.totalUsersWithIncompleteEvaluations || 0);
   } catch (error) {
-    toast.error("Erro ao carregar dados do ciclo.");
-  }
+    showToast("toast.loadCycleStatsError", "Erro ao carregar dados do ciclo.");
+      }
 };
 
 
@@ -46,17 +64,18 @@ export default function NewEvaluationCyclePage() {
 
   const handleSubmit = async () => {
     if (!endDate) {
-      toast.error("Por favor, seleciona uma data de fim.");
+      showToast("toast.missingEndDate", "Por favor, seleciona uma data de fim.");
       return;
     }
 
     setLoading(true);
     try {
       await evaluationCycleAPI.createCycle({ endDate }, sessionStorage.getItem("authToken"));
-      toast.success("Novo ciclo iniciado com sucesso!");
+      showToast("toast.newCycleSuccess", "Novo ciclo iniciado com sucesso!", "success");
       navigate("/evaluationlist");
+      
     } catch (error) {
-      toast.error("Erro ao iniciar novo ciclo.");
+      showToast("toast.newCycleError", "Erro ao iniciar novo ciclo.");
     } finally {
       setLoading(false);
     }
