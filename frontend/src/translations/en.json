@@ -25,6 +25,7 @@
   "sidebar.profile": "Profile",
   "sidebar.users": "Users List",
   "sidebar.logout": "Sign Out",
+  "sidebar.settings": "Settings",
 
   "dashboard.greeting": "Hello, Firstname Lastname 👋",
   "dashboard.subtitle": "Ready to keep growing?",
@@ -164,6 +165,7 @@
   "evaluation.intermediary.title": "Evalation Management",
   "button.newCycle": "New Evaluation Cycle",
   "button.evaluationList": "Evaluation List",
+  "toast.accessDenied": "Only admins can access this feature.",
 
 
 

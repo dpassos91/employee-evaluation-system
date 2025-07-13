@@ -7,7 +7,8 @@ import dashboardIcon from "../images/dashboard_icon.png";
 import miniprofileIcon from "../images/miniprofile_icon.png";
 import usersIcon from "../images/users_icon.png";
 import coursesIcon from "../images/courses_icon.png";
-import evaluationsIcon from "../images/evaluations_icon.png"
+import evaluationsIcon from "../images/evaluations_icon.png";
+import settingsIcon from "../images/settings_icon.png";
 import { FaSignOutAlt } from "react-icons/fa";
 import { useAuth } from "../hooks/useAuth";
 import { userStore } from "../stores/userStore";
@@ -48,9 +49,25 @@ if (isAdmin) {
       id: "sidebar.evaluations",
       icon: evaluationsIcon,
       path: "/evaluations"
+    },
+    {
+      id: "sidebar.settings",
+      icon: settingsIcon,
+      path: "/settings"
     }
   );
 }
+
+if (isManager) {
+  menuItems.push(
+    {
+      id: "sidebar.evaluations",
+      icon: evaluationsIcon,
+      path: "/evaluations"
+    }
+  );
+}
+
 
 
   // Novo: calcula o url da foto só a partir do user global

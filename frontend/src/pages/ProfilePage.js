@@ -65,6 +65,9 @@ export default function ProfilePage() {
   // True if current user is viewing own profile or is admin (can edit)
   const canEdit = user?.role === "ADMIN" || String(user?.id) === String(userId);
 
+
+
+
   // Only ADMIN can edit MANAGER on USER profiles
 const canEditManager = user?.role === "ADMIN" && String(user?.id) !== String(userId);
 
@@ -395,9 +398,15 @@ const handlePhotoUpload = async () => {
       <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
         <FormattedMessage id="profile.trainingHistory" defaultMessage="Training History" />
       </AppButton>
-      <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center">
-        <FormattedMessage id="profile.evaluationHistory" defaultMessage="Evaluation History" />
-      </AppButton>
+
+      
+      <AppButton
+  variant="secondary"
+  className="w-full px-3 py-1.5 text-sm justify-center text-center"
+  onClick={() => navigate(`/profile/${userId}/evaluationhistory`)}
+>
+  <FormattedMessage id="profile.evaluationHistory" defaultMessage="Evaluation History" />
+</AppButton>
     </>
   ) : (
     // If not edit, show "Send Message" only

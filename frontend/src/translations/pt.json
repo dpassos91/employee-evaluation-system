@@ -26,6 +26,7 @@
   "sidebar.profile": "Perfil",
   "sidebar.users": "Lista de Utilizadores",
   "sidebar.logout": "Sair",
+  "sidebar.settings": "Definições",
 
   "dashboard.greeting": "Olá, Nome Apelido 👋",
   "dashboard.subtitle": "Pronto para continuar a crescer?",
@@ -166,6 +167,7 @@
   "evaluation.intermediary.title": "Gestão de Avaliações",
   "button.newCycle": "Novo Ciclo de Avaliação",
   "button.evaluationList": "Lista de Avaliações",
+  "toast.accessDenied": "Apenas administradores têm acesso a esta funcionalidade.",
 
 
 

@@ -168,7 +168,7 @@ const showToast = (id, defaultMessage, type = "error", toastId = null) => {
     />: <strong className="ml-1">{openEvaluations}</strong>
     {openEvaluations > 0 && (
       <button
-        onClick={() => navigate("/incomplete-evaluations")}
+        onClick={() => navigate("/evaluationlist")}
         className="ml-3 mr-4 bg-gray-200 hover:bg-gray-300 text-sm text-gray-700 font-medium py-1 px-3 rounded shadow-sm transition"
       >
         <FormattedMessage id="button.viewDetails" defaultMessage="Ver Detalhes" />

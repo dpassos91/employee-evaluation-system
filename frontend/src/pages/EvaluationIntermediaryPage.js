@@ -1,20 +1,49 @@
-/**
- * EvaluationIntermediaryPage component acts as a hub for evaluation-related actions.
- * It allows navigation to key areas like evaluation list and new cycle creation.
- * Icons and routes are customizable.
- */
-
 import { useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import AppButton from "../components/AppButton";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
+import { toast } from "react-toastify";
+import { userStore } from "../stores/userStore";
 
-// Import your local icons
 import cycleIcon from "../images/evaluation_cycle_icon.png";
-import listIcon from "../images/evaluations_icon.png"; 
+import listIcon from "../images/evaluations_icon.png";
 
 export default function EvaluationIntermediaryPage() {
   const navigate = useNavigate();
+  const intl = useIntl();
+  const user = userStore((state) => state.user);
+
+  /**
+   * Shows a translated toast error when access is denied.
+   */
+  const showAccessDeniedToast = () => {
+    toast.error(
+      intl.formatMessage({
+        id: "toast.accessDenied",
+        defaultMessage: "Apenas administradores têm acesso a esta funcionalidade."
+      })
+    );
+  };
+
+  /**
+   * Handles click on "Novo Ciclo" button.
+   * Only admins can access this.
+   */
+  const handleNewCycleClick = () => {
+    if (user?.role === "ADMIN") {
+      navigate("/newevaluationcycle");
+    } else {
+      showAccessDeniedToast();
+    }
+  };
+
+  /**
+   * Handles click on "Listagem de Avaliações" (accessible to admin and manager).
+   */
+  const handleEvaluationListClick = () => {
+    navigate("/evaluationlist");
+  };
+
 
   return (
     <PageLayout
@@ -29,7 +58,7 @@ export default function EvaluationIntermediaryPage() {
         {/* Button 1: create new cycle */}
         <AppButton
           variant="primary"
-          onClick={() => navigate("/newevaluationcycle")}
+          onClick={handleNewCycleClick}
           className="w-56 h-32 flex flex-col items-center justify-center gap-3 text-center"
         >
           <img
@@ -46,7 +75,7 @@ export default function EvaluationIntermediaryPage() {
         {/* Button 2 : list of evaluations */}
         <AppButton
           variant="primary"
-          onClick={() => navigate("/evaluationlist")}
+          onClick={handleEvaluationListClick}
            className="w-56 h-32 flex flex-col items-center justify-center gap-3 text-center"
         >
           <img
