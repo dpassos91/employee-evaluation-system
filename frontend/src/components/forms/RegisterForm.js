@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Link, useNavigate } from "react-router-dom";
-
+import { toast } from "react-toastify";
 import AuthFormLayout from "../../components/AuthFormLayout";
 import InputField from "../../components/InputField";
 import SubmitButton from "../../components/SubmitButton";
-import { authAPI } from "../../api/authAPI"; // IMPORTANTE
+import { authAPI } from "../../api/authAPI"; 
+import { useIntl } from "react-intl";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -22,35 +23,55 @@ export default function RegisterForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
+  const { formatMessage } = useIntl();
 
-    // 1. Validação básica
-    if (formData.password !== formData.confirmPassword) {
-      setError("As passwords não coincidem.");
-      return;
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError(null);
 
-    setLoading(true);
+  if (formData.password !== formData.confirmPassword) {
+    setError(
+      formatMessage({
+        id: "register.error.password_mismatch",
+        defaultMessage: "Passwords do not match."
+      })
+    );
+    return;
+  }
 
-    try {
-      // 2. Chamar API (só enviar os campos que o backend espera)
-      const response = await authAPI.registerUser({
-        email: formData.email,
-        password: formData.password
-      });
-      // 3. (Opcional) Redirecionar ou mostrar mensagem de sucesso
-      navigate("/login?registered=1");
-    } catch (err) {
-      setError(
-        err.message ||
-        "Ocorreu um erro ao registar. Tente novamente."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+
+  try {
+    await authAPI.registerUser({
+      email: formData.email,
+      password: formData.password,
+    });
+
+    toast.info(
+      formatMessage({
+        id: "register.confirmation_required",
+        defaultMessage:
+          "Registration not complete. Please confirm your account through the email we sent you."
+      }),
+      { autoClose: 6000 }
+    );
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 2000);
+
+  } catch (err) {
+    setError(
+      err.message ||
+        formatMessage({
+          id: "register.error.generic",
+          defaultMessage: "An error occurred during registration. Please try again."
+        })
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <AuthFormLayout
