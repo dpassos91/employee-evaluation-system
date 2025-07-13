@@ -135,6 +135,18 @@ if (lastMessage != null) {
         conversations.size()
     );
 
+    // Sort conversations by lastMessageTime descending (most recent on top)
+conversations.sort((a, b) -> {
+    // If both dates are null, keep order
+    if (a.getLastMessageTime() == null && b.getLastMessageTime() == null) return 0;
+    // If only a is null, place it after b
+    if (a.getLastMessageTime() == null) return 1;
+    // If only b is null, place it after a
+    if (b.getLastMessageTime() == null) return -1;
+    // If both are non-null, compare as strings (ISO format is safe for lexicographical comparison)
+    return b.getLastMessageTime().compareTo(a.getLastMessageTime());
+});
+
     return conversations;
 }
 

@@ -108,7 +108,54 @@
 
 "accessDenied.title": "Access restricted",
 "accessDenied.message": "You do not have permission to access this page.\nYou will be redirected to the dashboard.",
-"accessDenied.redirecting": "Redirecting..."
+"accessDenied.redirecting": "Redirecting...",
 
+"courses.language.PT": "Portuguese",
+"courses.language.EN": "English",
+"courses.language.IT": "Italian",
+"courses.language.FR": "French",
+"courses.language.ES": "Spanish",
+"courses.category.FRONTEND": "Frontend",
+"courses.category.BACKEND": "Backend",
+"courses.category.INFRAESTRUTURA": "Infraestrutures",
+"courses.category.UX_UI": "UX/UI",
+
+"users.table.actions": "Actions",
+  "users.table.noResults": "No users found.",
+  "users.table.empty": "No users found with these filters.",
+
+  "users.editUser.title": "Edit User",
+  "users.field.role": "Role",
+  "users.field.manager": "Manager",
+  "modal.cancel": "Cancel",
+  "modal.save": "Save",
+
+    "courses.list.title": "Courses List",
+  "courses.create.button": "Create Course",
+  "courses.filter.name": "Name",
+  "courses.filter.duration": "Duration (hours)",
+  "courses.language.any": "Language",
+
+  "courses.category.any": "Area",
+
+  "courses.button.excel": "Excel CSV",
+  "courses.table.name": "Name",
+  "courses.table.timeSpan": "Duration (hours)",
+  "courses.table.language": "Language",
+  "courses.table.category": "Area",
+  "courses.table.active": "Active",
+  "courses.table.actions": "Actions",
+  "courses.button.edit": "Edit",
+  "courses.button.deactivate": "Deactivate",
+  "courses.table.empty": "No courses found with these filters.",
+  "courses.create.title": "New Course",
+  "courses.edit.title": "Edit Course",
+  "courses.field.name": "Name",
+  "courses.field.timeSpan": "Duration (hours)",
+  "courses.field.description": "Description",
+  "courses.field.link": "Link",
+  "courses.field.language": "Language",
+  "courses.field.category": "Area",
+  "courses.field.active": "Active"
   
 }

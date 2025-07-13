@@ -3,132 +3,155 @@ import { useState, useEffect, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { messageAPI } from "../api/messageAPI";
 import { userStore } from "../stores/userStore";
-import { useChatStore } from "../stores/chatStore"; 
+import { useChatStore } from "../stores/chatStore";
 import { notificationAPI } from "../api/notificationAPI";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { profileAPI } from "../api/profileAPI";
+import profileIcon from "../images/profile_icon.png";
 
-/**
- * ChatPage component.
- * Handles the sidebar conversations, main chat thread, and message input UI.
- * Messages are always read from the global chatStore, which is kept in sync with backend and WebSocket events.
- */
 export default function ChatPage() {
-  /** Sidebar state: list of conversations (not messages) */
+  // Sidebar: lista de conversas
   const [sidebarConversations, setSidebarConversations] = useState([]);
-  /** Currently selected conversation ID */
-  const [selectedConvId, setSelectedConvId] = useState(null);
-  /** Loading flags for sidebar and messages */
-  const [loadingMessages, setLoadingMessages] = useState(false);
   const [loadingSidebar, setLoadingSidebar] = useState(true);
-  /** Input and error state */
+  const [tempContact, setTempContact] = useState(null);
+
+  const intl = useIntl();
+  const { user } = userStore();
+  const navigate = useNavigate();
+
+  // ChatStore (Zustand) - só hooks!
+  
+  const addMessage = useChatStore((s) => s.addMessage);
+  const clearMessages = useChatStore((s) => s.clearMessages);
+  const setActiveConversation = useChatStore((s) => s.setActiveConversation);
+  const setMessagesForConversation = useChatStore((s) => s.setMessagesForConversation);
+  const activeConversationId = useChatStore((s) => s.activeConversationId);
+  const messagesByConversation = useChatStore((s) => s.messagesByConversation);
+const messages = messagesByConversation[activeConversationId] || [];
+  // UI
   const [input, setInput] = useState("");
   const [error, setError] = useState(null);
-  /** i18n */
-  const intl = useIntl();
-  /** Current authenticated user */
-  const { user } = userStore();
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
-  /** --------- Chat store integration --------- */
-  /**
-   * Read messages from the global chatStore.
-   * All chat updates (live or via API) should flow through this store.
-   */
-  const messages = useChatStore((s) => s.messages);
-  const clearMessages = useChatStore((s) => s.clearMessages);
-  const addMessage = useChatStore((s) => s.addMessage);
-  const sendMessage = useChatStore((s) => s.sendMessage);
-
-  /** Refs to keep selectedConvId and user.id updated inside async callbacks */
-  const selectedConvIdRef = useRef(selectedConvId);
-  const userIdRef = useRef(user?.id);
-
+  // URL para nova conversa
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const userIdFromQuery = searchParams.get("user");
 
-  useEffect(() => { selectedConvIdRef.current = selectedConvId; }, [selectedConvId]);
-  useEffect(() => { userIdRef.current = user?.id; }, [user]);
-
-  /**
-   * Fetch sidebar conversations on mount.
-   * Sets the initial selected conversation.
-   */
-useEffect(() => {
-  setLoadingSidebar(true);
-  messageAPI.chatSidebarConversations()
-    .then(convs => {
-      setSidebarConversations(convs || []);
-      if (userIdFromQuery) {
-        setSelectedConvId(userIdFromQuery);
-      } else if (convs && convs.length > 0) {
-        setSelectedConvId(convs[0].otherUserId);
-      }
-    })
-    .catch(() => setError("Failed to load conversations"))
-    .finally(() => setLoadingSidebar(false));
-}, [userIdFromQuery]);
-
-
-  /**
-   * Fetch messages for the selected conversation.
-   * Populates the global chatStore (not local state!).
-   * Also marks messages as read and refreshes sidebar.
-   */
+  // 1. Carrega conversas da sidebar (histórico) ao montar ou mudar a query
   useEffect(() => {
-    if (!selectedConvId) return;
+    setLoadingSidebar(true);
+    messageAPI.chatSidebarConversations()
+      .then(convs => {
+        setSidebarConversations(convs || []);
+        // Define conversa ativa só aqui!
+        const current = useChatStore.getState().activeConversationId;
+        if (userIdFromQuery && current !== userIdFromQuery) {
+          useChatStore.getState().setActiveConversation(userIdFromQuery);
+        } else if (!userIdFromQuery && convs && convs.length > 0 && current !== convs[0].otherUserId) {
+          useChatStore.getState().setActiveConversation(convs[0].otherUserId);
+        } else if (!userIdFromQuery && (!convs || convs.length === 0) && current !== null) {
+          useChatStore.getState().setActiveConversation(null);
+        }
+      })
+      .catch(() => setError("Failed to load conversations"))
+      .finally(() => setLoadingSidebar(false));
+  }, [userIdFromQuery]);
+
+  // 2. Ao mudar de conversa ativa, carrega o histórico (só se ainda não existir)
+  const messagesExist = (messagesByConversation[activeConversationId] || []).length > 0;
+
+  useEffect(() => {
+    if (!activeConversationId) return;
     setLoadingMessages(true);
-    clearMessages(); // Reset messages in the store
     setError(null);
 
-    // Mark messages as read and refresh sidebar
-    messageAPI.markMessagesAsRead(selectedConvId)
-      .then(() => {
-      return notificationAPI.markAllMessageNotificationsAsRead();
-    })
-      .then(() => messageAPI.chatSidebarConversations())
-      .then(convs => setSidebarConversations(convs || []))
+    // Marca mensagens como lidas
+    messageAPI.markMessagesAsRead(activeConversationId)
+      .then(() => notificationAPI.markAllMessageNotificationsAsRead())
       .catch(() => setError("Failed to update read state"));
 
-    // Fetch messages and add to store
-    messageAPI.getConversation(selectedConvId)
-      .then((msgs) => {
-        (msgs || []).forEach(m => addMessage(m));
-      })
-      .catch(() => setError("Failed to load messages"))
-      .finally(() => setLoadingMessages(false));
-  }, [selectedConvId, clearMessages, addMessage]);
+    if (!messagesExist) {
+      messageAPI.getConversation(activeConversationId)
+        .then((msgs) => {
+          setMessagesForConversation(activeConversationId, msgs || []);
+        })
+        .catch(() => setError("Failed to load messages"))
+        .finally(() => setLoadingMessages(false));
+    } else {
+      setLoadingMessages(false);
+    }
+  }, [activeConversationId, setMessagesForConversation, messagesExist]);
 
-  /** 
-   * Ref to scroll to the bottom of the messages list.
-   * Keeps scroll always at the latest message.
-   */
+  // 3. Contacto selecionado
+  const selectedContact = sidebarConversations.find(c => c.otherUserId === activeConversationId);
+  const contactInfo = selectedContact || tempContact;
+
+  // 4. Fetch tempContact se nova conversa
+  useEffect(() => {
+    if (
+      activeConversationId &&
+      !sidebarConversations.some(c => c.otherUserId === activeConversationId)
+    ) {
+      profileAPI.getProfileById(activeConversationId, sessionStorage.getItem("authToken"))
+        .then(data => {
+          setTempContact({
+            otherUserId: data.id,
+            otherUserName: data.name || `${data.firstName || ""} ${data.lastName || ""}`.trim(),
+            otherUserAvatar: data.photograph,
+          });
+        })
+        .catch(() => setTempContact(null));
+    } else {
+      setTempContact(null);
+    }
+  }, [activeConversationId, sidebarConversations]);
+
+  // 5. Handler para enviar mensagem
+function fetchSidebarConversations() {
+  setLoadingSidebar(true);
+  messageAPI.chatSidebarConversations()
+    .then(convs => setSidebarConversations(convs || []))
+    .catch(() => setError("Failed to load conversations"))
+    .finally(() => setLoadingSidebar(false));
+}
+
+function updateSidebarWithLastMessageOptimistically(userId, content) {
+  setSidebarConversations(prev =>
+    prev.map(conv =>
+      conv.otherUserId === userId
+        ? {
+            ...conv,
+            lastMessage: content,
+            lastMessageTime: new Date().toISOString(), // ou Date.now(), conforme mostras na UI
+          }
+        : conv
+    )
+  );
+}
+
+  const sendMessage = useChatStore((s) => s.sendMessage);
+  
+const handleSend = () => {
+  if (!input.trim()) return;
+  const msg = {
+    senderId: user.id,
+    receiverId: activeConversationId,
+    content: input,
+  };
+  sendMessage(msg);
+  addMessage(msg);
+  setInput("");
+  updateSidebarWithLastMessageOptimistically(activeConversationId, input);
+};
+
+  // 6. Scroll always to last message
   const messagesEndRef = useRef(null);
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
     }
   }, [messages]);
-
-  /**
-   * Finds the selected contact details (avatar, name) for the chat header.
-   */
-  const selectedContact = sidebarConversations.find(c => c.otherUserId === selectedConvId);
-
-  /**
- * Handles sending a chat message.
- * Validates input, then sends the message to the backend via the global WebSocket,
- * using the sendMessage function from the chat store.
- * After sending, clears the input field.
- */
-const handleSend = () => {
-  if (!input.trim()) return;
-  sendMessage({
-    senderId: user.id,
-    receiverId: selectedConvId,
-    content: input
-  });
-  setInput("");
-};
 
   return (
     <PageLayout
@@ -150,11 +173,27 @@ const handleSend = () => {
                 key={conv.otherUserId}
                 className={`
                   flex items-center w-full px-4 py-3 gap-3 hover:bg-gray-200
-                  ${selectedConvId === conv.otherUserId ? "bg-gray-300" : ""}
+                  ${activeConversationId === conv.otherUserId ? "bg-gray-300" : ""}
                 `}
-                onClick={() => setSelectedConvId(conv.otherUserId)}
+                onClick={() => {
+                  setActiveConversation(conv.otherUserId);
+                  if (userIdFromQuery) navigate("/chat", { replace: true });
+                }}
               >
-                <img src={conv.otherUserAvatar} alt="" className="w-10 h-10 rounded-full object-cover border" />
+                <img
+                  src={
+                    conv.otherUserAvatar && conv.otherUserAvatar.trim() !== ""
+                      ? profileAPI.getPhoto(conv.otherUserAvatar)
+                      : profileIcon
+                  }
+                  alt={conv.otherUserName}
+                  className="w-10 h-10 rounded-full border object-cover"
+                  style={{ display: "block" }}
+                  onError={e => {
+                    e.target.onerror = null;
+                    e.target.src = profileIcon;
+                  }}
+                />
                 <div className="flex-1 text-left">
                   <div className="font-medium">{conv.otherUserName}</div>
                   <div className="text-xs text-gray-500 truncate">{conv.lastMessage}</div>
@@ -177,26 +216,42 @@ const handleSend = () => {
         <section className="flex-1 flex flex-col">
           {/* Header */}
           <div className="flex items-center gap-3 px-6 py-4 border-b">
-            {selectedContact && (
+            {contactInfo && (
               <>
-                <img src={selectedContact.otherUserAvatar} alt="" className="w-10 h-10 rounded-full border" />
+                <img
+                  src={
+                    contactInfo.otherUserAvatar && contactInfo.otherUserAvatar.trim() !== ""
+                      ? profileAPI.getPhoto(contactInfo.otherUserAvatar)
+                      : profileIcon
+                  }
+                  alt={contactInfo.otherUserName || ""}
+                  className="w-10 h-10 rounded-full border object-cover"
+                  style={{ display: "block" }}
+                  onError={e => {
+                    e.target.onerror = null;
+                    e.target.src = profileIcon;
+                  }}
+                />
                 <div>
-                  <div className="font-semibold">{selectedContact.otherUserName}</div>
-                  <div className="text-xs text-gray-400">
-                    {selectedContact.online
-                      ? <FormattedMessage id="chat.online" defaultMessage="Online" />
-                      : selectedContact.role
-                        ? selectedContact.role.charAt(0).toUpperCase() + selectedContact.role.slice(1).toLowerCase()
-                        : ""}
-                  </div>
+                  <div className="font-semibold">{contactInfo.otherUserName}</div>
+                  {/* Só mostra status/role se vierem da sidebar */}
+                  {selectedContact ? (
+                    <div className="text-xs text-gray-400">
+                      {selectedContact.online
+                        ? <FormattedMessage id="chat.online" defaultMessage="Online" />
+                        : selectedContact.role
+                          ? selectedContact.role.charAt(0).toUpperCase() + selectedContact.role.slice(1).toLowerCase()
+                          : ""}
+                    </div>
+                  ) : null}
                 </div>
               </>
             )}
           </div>
           {/* Mensagens */}
-          <div 
-          ref={messagesEndRef}
-          className="flex-1 px-6 py-4 overflow-y-auto bg-gray-50 space-y-2">
+          <div
+            ref={messagesEndRef}
+            className="flex-1 px-6 py-4 overflow-y-auto bg-gray-50 space-y-2">
             {loadingMessages && <div className="text-center text-gray-400">A carregar...</div>}
             {error && <div className="text-center text-red-500">{error}</div>}
             {messages.map((msg, idx) => {
@@ -243,6 +298,7 @@ const handleSend = () => {
     </PageLayout>
   );
 }
+
 
 
 

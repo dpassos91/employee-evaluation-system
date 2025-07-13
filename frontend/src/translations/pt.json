@@ -121,6 +121,43 @@
 "courses.category.FRONTEND": "Frontend",
 "courses.category.BACKEND": "Backend",
 "courses.category.INFRAESTRUTURA": "Infraestrutura",
-"courses.category.UX_UI": "UX/UI"
+"courses.category.UX_UI": "UX/UI",
+
+
+  "users.table.noResults": "Nenhum utilizador encontrado.",
+  "users.table.empty": "Nenhum utilizador encontrado com estes filtros.",
+  "users.editUser.title": "Editar Utilizador",
+  "users.field.role": "Papel",
+  "users.field.manager": "Gestor",
+  "modal.cancel": "Cancelar",
+  "modal.save": "Guardar",
+
+    "courses.list.title": "Listagem de Formações",
+  "courses.create.button": "Criar Formação",
+  "courses.filter.name": "Nome",
+  "courses.filter.duration": "Duração (horas)",
+  "courses.language.any": "Idioma",
+
+  "courses.category.any": "Área",
+
+  "courses.button.excel": "Excel CSV",
+  "courses.table.name": "Nome",
+  "courses.table.timeSpan": "Duração (horas)",
+  "courses.table.language": "Idioma",
+  "courses.table.category": "Área",
+  "courses.table.active": "Ativo",
+  "courses.table.actions": "Ações",
+  "courses.button.edit": "Editar",
+  "courses.button.deactivate": "Desativar",
+  "courses.table.empty": "Nenhuma formação encontrada com estes filtros.",
+  "courses.create.title": "Nova Formação",
+  "courses.edit.title": "Editar Formação",
+  "courses.field.name": "Nome",
+  "courses.field.timeSpan": "Duração (horas)",
+  "courses.field.description": "Descrição",
+  "courses.field.link": "Link",
+  "courses.field.language": "Idioma",
+  "courses.field.category": "Área",
+  "courses.field.active": "Ativo"
 
 }

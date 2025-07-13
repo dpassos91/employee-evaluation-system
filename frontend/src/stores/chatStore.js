@@ -1,60 +1,63 @@
 import { create } from "zustand";
+import { userStore } from "./userStore";
 
 /**
- * Global sendMessage function reference for sending chat messages.
- * This will be set once in the App after the WebSocket is created.
- * @type {function|null}
+ * Global sendMessage function reference for sending chat messages via WebSocket.
+ * Será definida na App depois do WebSocket ser criado.
  */
 let sendMessageRef = null;
 
 /**
- * Sets the global sendMessage function used by the chat store to send messages.
- * Should be called from the App after establishing the WebSocket connection.
- * @param {Object} obj - An object containing the sendMessage function ({ sendMessage }).
+ * Setter global para guardar a função que envia mensagens pelo WebSocket.
+ * Chama isto na App depois de criares o WebSocket!
  */
-export const setWebSocketRef = (obj) => { 
-  sendMessageRef = obj.sendMessage; 
+export const setWebSocketRef = (obj) => {
+  sendMessageRef = obj.sendMessage;
 };
 
-/**
- * Zustand store for chat messages.
- * Provides methods for managing and sending chat messages in real time.
- *
- * @returns {object} Chat store state and actions
- * @property {Array} messages - Array of chat message objects.
- * @property {function} addMessage - Adds a single message to the chat.
- * @property {function} clearMessages - Clears all messages in the chat.
- * @property {function} sendMessage - Sends a chat message via the global sendMessage function.
- */
-export const useChatStore = create((set) => ({
-  /**
-   * Array of messages in the current chat.
-   * @type {Array}
-   */
-  messages: [],
+export const useChatStore = create((set, get) => ({
+  messagesByConversation: {},  // { [userId]: [msg, msg, ...] }
+  activeConversationId: null,
+
+  setActiveConversation: (userId) => set({ activeConversationId: userId }),
+
+  getMessagesForActiveConversation: () => {
+    const { messagesByConversation, activeConversationId } = get();
+    return messagesByConversation[activeConversationId] || [];
+  },
+
+  setMessagesForConversation: (userId, messages) =>
+    set((state) => ({
+      messagesByConversation: {
+        ...state.messagesByConversation,
+        [userId]: messages
+      }
+    })),
+
+  addMessage: (msg) => {
+    const myId = userStore.getState().user.id;
+    // Determina qual o outro user na conversa (sender ou receiver)
+    const otherId = msg.senderId === myId ? msg.receiverId : msg.senderId;
+    set((state) => {
+      const msgs = state.messagesByConversation[otherId] || [];
+      return {
+        messagesByConversation: {
+          ...state.messagesByConversation,
+          [otherId]: [...msgs, msg]
+        }
+      };
+    });
+  },
 
   /**
-   * Adds a single message to the messages array.
-   * @param {object} msg - The message object to add.
-   */
-  addMessage: (msg) =>
-    set((state) => ({ messages: [...state.messages, msg] })),
-
-  /**
-   * Clears all messages from the chat.
-   */
-  clearMessages: () => set({ messages: [] }),
-
-  /**
-   * Sends a chat message via the global sendMessage function.
-   * Does nothing if the function is not available.
-   * @param {object} msg - The message object to send (must be serializable).
+   * Envia uma mensagem via WebSocket global (se estiver disponível).
+   * Usa o sendMessageRef que é definido pelo setWebSocketRef na App.
    */
   sendMessage: (msg) => {
     if (typeof sendMessageRef === "function") {
       sendMessageRef(msg);
     }
-  }
+  },
 }));
 
 
