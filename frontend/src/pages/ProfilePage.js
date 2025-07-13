@@ -133,15 +133,9 @@ useEffect(() => {
    */
   useEffect(() => {
     fetchProfile();
+
   }, [fetchProfile]);
 
-useEffect(() => {
-  if (canEditManager) {
-    authAPI.fetchManagers()
-      .then(setManagers)
-      .catch(() => setManagers([]));
-  }
-}, [canEditManager]);
 
 const [originalManagerId, setOriginalManagerId] = useState(null);
 
@@ -186,37 +180,46 @@ useEffect(() => {
   /**
    * Local profile edit handlers (used for editing inputs)
    */
- const handleChange = (field, value) => {
+const handleChange = (field, value) => {
+  if (field === "managerId") {
+    console.log("Novo valor managerId:", value === "" ? null : Number(value));
+  }
   setProfile((prev) => ({
     ...prev,
-    [field]: field === "managerId" ? Number(value) || null : value, // converte apenas para o managerId
+    [field]: field === "managerId"
+      ? value === "" ? null : Number(value)
+      : value,
   }));
 };
+
 
   /**
    * Handler for form submission to save profile changes.
    */
 const handleSubmit = async (e) => {
   e.preventDefault();
+  console.log("HANDLE SUBMIT CHAMADO!");
+
   try {
     const sessionToken = sessionStorage.getItem("authToken");
     let didUpdateManager = false;
 
-    // Só ADMIN pode alterar manager, e só se mudou
-    if (
-      canEditManager &&
-      String(profile.managerId ?? "") !== String(originalManagerId ?? "")
-    ) {
+    // Tira a comparação, força sempre o update (apenas para testes)
+    if (canEditManager) {
+      console.log("Vai atualizar role/manager (forçado):", {
+        userId: profile.userId,
+        role: profile.role,
+        managerId: profile.managerId
+      });
       await authAPI.updateUserRoleAndManager(
         profile.userId,
         profile.role,
         profile.managerId
       );
       didUpdateManager = true;
-      setOriginalManagerId(profile.managerId); // Atualiza o original
+      setOriginalManagerId(profile.managerId);
     }
-
-    // Só envia campos do ProfileDto
+    // Resto do código...
     const profileToUpdate = {
       firstName: profile.firstName,
       lastName: profile.lastName,
@@ -226,7 +229,6 @@ const handleSubmit = async (e) => {
       phone: profile.phone,
       bio: profile.bio,
       usualWorkplace: profile.usualWorkplace
-      // Não envies: userId, managerId, managerName, role, etc.
     };
 
     await profileAPI.updateProfile(
@@ -250,6 +252,7 @@ const handleSubmit = async (e) => {
     );
   }
 };
+
 
 
   /**
@@ -439,10 +442,10 @@ const handlePhotoUpload = async () => {
       onChange={e => handleChange("managerId", e.target.value)}
       className="border border-gray-300 rounded px-2 py-1.5 text-sm"
     >
-      <option value="">---</option>
+      <option value=""></option>
       {managers.map(manager => (
         <option key={manager.id} value={manager.id}>
-          {manager.firstName} {manager.lastName} ({manager.email})
+          {manager.firstName} {manager.lastName}
         </option>
       ))}
     </select>
@@ -582,14 +585,14 @@ const handlePhotoUpload = async () => {
                   onClick={() => setPasswordModalOpen(true)}
                 >
                   <LockClosedIcon className="w-5 h-5" />
-                  <FormattedMessage id="profile.changePassword" defaultMessage="Change Password" />
+                  <FormattedMessage id="profile.changePassword" defaultMessage="Altear password" />
                 </AppButton>
                 <AppButton
                   type="submit"
                   variant="primary"
                   className="w-full flex items-center justify-center px-4 py-2 text-base font-semibold"
                 >
-                  <FormattedMessage id="profile.save" defaultMessage="Save" />
+                  <FormattedMessage id="profile.save" defaultMessage="Guardar" />
                 </AppButton>
               </div>
             )}
