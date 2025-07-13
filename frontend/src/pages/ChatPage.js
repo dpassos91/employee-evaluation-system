@@ -5,6 +5,7 @@ import { messageAPI } from "../api/messageAPI";
 import { userStore } from "../stores/userStore";
 import { useChatStore } from "../stores/chatStore"; 
 import { notificationAPI } from "../api/notificationAPI";
+import { useLocation } from "react-router-dom";
 
 /**
  * ChatPage component.
@@ -41,6 +42,10 @@ export default function ChatPage() {
   const selectedConvIdRef = useRef(selectedConvId);
   const userIdRef = useRef(user?.id);
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const userIdFromQuery = searchParams.get("user");
+
   useEffect(() => { selectedConvIdRef.current = selectedConvId; }, [selectedConvId]);
   useEffect(() => { userIdRef.current = user?.id; }, [user]);
 
@@ -48,18 +53,21 @@ export default function ChatPage() {
    * Fetch sidebar conversations on mount.
    * Sets the initial selected conversation.
    */
-  useEffect(() => {
-    setLoadingSidebar(true);
-    messageAPI.chatSidebarConversations()
-      .then(convs => {
-        setSidebarConversations(convs || []);
-        if (convs && convs.length > 0) {
-          setSelectedConvId(convs[0].otherUserId);
-        }
-      })
-      .catch(() => setError("Failed to load conversations"))
-      .finally(() => setLoadingSidebar(false));
-  }, []);
+useEffect(() => {
+  setLoadingSidebar(true);
+  messageAPI.chatSidebarConversations()
+    .then(convs => {
+      setSidebarConversations(convs || []);
+      if (userIdFromQuery) {
+        setSelectedConvId(userIdFromQuery);
+      } else if (convs && convs.length > 0) {
+        setSelectedConvId(convs[0].otherUserId);
+      }
+    })
+    .catch(() => setError("Failed to load conversations"))
+    .finally(() => setLoadingSidebar(false));
+}, [userIdFromQuery]);
+
 
   /**
    * Fetch messages for the selected conversation.

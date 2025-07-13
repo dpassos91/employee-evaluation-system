@@ -245,23 +245,53 @@ public Response updateUserPassword(
 
 
 
-    // Criar novo utilizador
-    @POST
-    @Path("/createUser")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser(LoginUserDto loginUserDto) {
+/**
+ * Registers a new user in the system and immediately sends an account confirmation email
+ * with a unique confirmation token.
+ *
+ * @param loginUserDto The DTO containing the user's registration data (email, password, etc.).
+ * @return HTTP 200 response with the created user data if successful.
+ *
+ * The method workflow is as follows:
+ * 1. Calls the userBean to register the new user (persists in the database).
+ * 2. Generates or retrieves a confirmation token for the user.
+ * 3. Constructs the confirmation link using the generated token.
+ * 4. Sends a confirmation email to the user with the link.
+ * 5. Returns a 200 OK response with the user data.
+ */
+@POST
+@Path("/createUser")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public Response createUser(LoginUserDto loginUserDto) {
 
-        logger.info("User: {} | IP: {} - Registration attempt for email: {}",
-                RequestContext.getAuthor(), RequestContext.getIp(), loginUserDto.getEmail());
+    // Log the registration attempt
+    logger.info("User: {} | IP: {} - Registration attempt for email: {}",
+            RequestContext.getAuthor(), RequestContext.getIp(), loginUserDto.getEmail());
 
-        UserDto createdUser = userBean.registerUser(loginUserDto);
+    // 1. Register the new user (persists in the database)
+    UserDto createdUser = userBean.registerUser(loginUserDto);
 
-        logger.info("User: {} | IP: {} - Successfully registered user with email: {}",
-                RequestContext.getAuthor(), RequestContext.getIp(), loginUserDto.getEmail());
+    // 2. Generate or retrieve a confirmation token for the user
+    String confirmToken = userBean.getConfirmToken(createdUser.getEmail());
 
-        return Response.ok(createdUser).build();
-    }
+    // 3. Build the confirmation link containing the token
+    String confirmationLink = "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=" + confirmToken;
+
+    // 4. Send the confirmation email with the link
+    EmailUtil.sendEmail(
+        createdUser.getEmail(),
+        "Confirm your account",
+        "Welcome! To confirm your account, please click this link: " + confirmationLink
+    );
+
+    // Log the successful registration
+    logger.info("User: {} | IP: {} - Successfully registered user with email: {}",
+            RequestContext.getAuthor(), RequestContext.getIp(), loginUserDto.getEmail());
+
+    // 5. Return 200 OK with the created user data
+    return Response.ok(createdUser).build();
+}
 
 
     /**

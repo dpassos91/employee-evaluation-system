@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import AuthFormLayout from "../../components/AuthFormLayout";
 import InputField from "../../components/InputField";
 import SubmitButton from "../../components/SubmitButton";
+import { authAPI } from "../../api/authAPI"; // IMPORTANTE
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -12,16 +13,43 @@ export default function RegisterForm() {
     password: "",
     confirmPassword: ""
   });
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aqui podes incluir lógica de validação e submissão
-    console.log("Registo:", formData);
+    setError(null);
+
+    // 1. Validação básica
+    if (formData.password !== formData.confirmPassword) {
+      setError("As passwords não coincidem.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // 2. Chamar API (só enviar os campos que o backend espera)
+      const response = await authAPI.registerUser({
+        email: formData.email,
+        password: formData.password
+      });
+      // 3. (Opcional) Redirecionar ou mostrar mensagem de sucesso
+      navigate("/login?registered=1");
+    } catch (err) {
+      setError(
+        err.message ||
+        "Ocorreu um erro ao registar. Tente novamente."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,11 +87,16 @@ export default function RegisterForm() {
           value={formData.confirmPassword}
           onChange={handleChange}
         />
+        {error && (
+          <div className="text-red-500">{error}</div>
+        )}
         <SubmitButton
           id="register.form.submit"
-          defaultLabel="Registar"
+          defaultLabel={loading ? "A registar..." : "Registar"}
+          disabled={loading}
         />
       </form>
     </AuthFormLayout>
   );
 }
+
