@@ -1,11 +1,15 @@
 package aor.projetofinal.service;
 
+import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.bean.UserCourseBean;
-import aor.projetofinal.dto.CreateUserCourseDto;
-import aor.projetofinal.dto.UserCourseDto;
+import aor.projetofinal.dao.SessionTokenDao;
+import aor.projetofinal.dao.UserDao;
+import aor.projetofinal.dto.*;
+import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
-import aor.projetofinal.context.RequestContext; 
+import aor.projetofinal.context.RequestContext;
 
+import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,6 +32,18 @@ public class UserCourseService {
 
     @jakarta.inject.Inject
     private UserCourseBean userCourseBean;
+
+    @Inject
+    UserBean userBean;
+
+    @Inject
+    private SessionTokenDao sessionTokenDao;
+
+    @Inject
+    private UserDao userDao;
+
+
+
 
     @POST
     public Response addUserCourse(CreateUserCourseDto dto) {
@@ -109,5 +125,179 @@ public class UserCourseService {
                 .header("Content-Disposition", "attachment; filename=\"user_courses_" + userId + "_" + year + ".csv\"")
                 .build();
     }
+
+
+    /**
+     * REST endpoint to retrieve the distinct years in which a user has participated in courses.
+     * Accessible by:
+     * - the user themselves
+     * - their assigned manager
+     * - an administrator
+     *
+     * @param userId the ID of the target user
+     * @param token  the session token for authentication
+     * @return list of distinct years as integers (e.g., [2022, 2023, 2024])
+     */
+    @GET
+    @Path("/user/{userId}/years")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getParticipationYearsByUser(@PathParam("userId") int userId,
+                                                @HeaderParam("sessionToken") String token) {
+
+        logger.info("User: {} | IP: {} - Requesting participation years for user ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), userId);
+
+        // 1. Validate and refresh session token
+        SessionStatusDto sessionStatus = userBean.validateAndRefreshSessionToken(token);
+        if (sessionStatus == null) {
+            logger.warn("User: {} | IP: {} - Session expired while requesting participation years for user ID {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), userId);
+
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Session expired. Please, log in again.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // 2. Validate token and user
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("IP: {} - Invalid or expired session token when accessing participation years for user ID {}.",
+                    RequestContext.getIp(), userId);
+
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity requester = tokenEntity.getUser();
+        UserEntity targetUser = userDao.findById(userId);
+
+        if (targetUser == null) {
+            logger.warn("User: {} | IP: {} - Target user ID {} not found.",
+                    requester.getEmail(), RequestContext.getIp(), userId);
+
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"message\": \"User not found.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // 3. Authorization
+        boolean isAdmin = requester.getRole().getName().equalsIgnoreCase("admin");
+        boolean isSelf = requester.getId() == targetUser.getId();
+        boolean isManager = targetUser.getManager() != null &&
+                targetUser.getManager().getId() == requester.getId();
+
+        if (!isAdmin && !isSelf && !isManager) {
+            logger.warn("User: {} | IP: {} - Forbidden access to participation years for user ID {}.",
+                    requester.getEmail(), RequestContext.getIp(), userId);
+
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Access denied. You must be admin, the user, or their manager.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // 4. Build response
+        logger.info("User: {} | IP: {} - Authorized access. Fetching participation years for user ID {}.",
+                requester.getEmail(), RequestContext.getIp(), userId);
+
+        List<Integer> years = userCourseBean.listParticipationYearsByUser(userId);
+        return Response.ok(years).build();
+    }
+
+
+
+
+
+    /**
+     * REST endpoint to retrieve the yearly training summary (total hours per year)
+     * for a specific user. Accessible by:
+     * - the user themselves
+     * - their assigned manager
+     * - an administrator
+     *
+     * @param dto   the request body containing the target user's ID
+     * @param token the session token passed in the header for authentication
+     * @return HTTP response containing a list of UserCourseYearSummaryDto or an error message
+     */
+    @POST
+    @Path("/user/summary")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserCourseSummaryByYear(UserSummaryRequestDto dto,
+                                               @HeaderParam("sessionToken") String token) {
+
+        logger.info("User: {} | IP: {} - Requesting training summary by year for user ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), dto.getUserId());
+
+        // 1. Validate and refresh session token
+        SessionStatusDto sessionStatus = userBean.validateAndRefreshSessionToken(token);
+        if (sessionStatus == null) {
+            logger.warn("User: {} | IP: {} - Session expired while requesting summary for user ID {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), dto.getUserId());
+
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Session expired. Please, log in again.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // 2. Validate session token and retrieve user
+        SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
+        if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("IP: {} - Invalid or expired session token when accessing summary for user ID {}.",
+                    RequestContext.getIp(), dto.getUserId());
+
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Invalid or expired session.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        UserEntity requester = tokenEntity.getUser();
+        UserEntity targetUser = userDao.findById(dto.getUserId());
+
+        if (targetUser == null) {
+            logger.warn("User: {} | IP: {} - Target user ID {} not found.",
+                    requester.getEmail(), RequestContext.getIp(), dto.getUserId());
+
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"message\": \"User not found.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // 3. Authorization: Admin, self, or user's manager
+        boolean isAdmin = requester.getRole().getName().equalsIgnoreCase("admin");
+        boolean isSelf = requester.getId() == targetUser.getId();
+        boolean isManager = targetUser.getManager() != null &&
+                targetUser.getManager().getId() == requester.getId();
+
+        if (!isAdmin && !isSelf && !isManager) {
+            logger.warn("User: {} | IP: {} - Forbidden access to training summary of user ID {}.",
+                    requester.getEmail(), RequestContext.getIp(), dto.getUserId());
+
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Access denied. You must be admin, the user, or their manager.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // 4. Build response with summary
+        logger.info("User: {} | IP: {} - Authorized access. Generating training summary for user ID {}.",
+                requester.getEmail(), RequestContext.getIp(), dto.getUserId());
+
+        List<UserCourseYearSummaryDto> summary = userCourseBean.summarizeUserCoursesByYear(dto.getUserId());
+        return Response.ok(summary).build();
+    }
+
+
+
+
+
+
 }
 

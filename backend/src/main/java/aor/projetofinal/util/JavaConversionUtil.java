@@ -1,15 +1,16 @@
 package aor.projetofinal.util;
 
+import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.*;
-import aor.projetofinal.entity.EvaluationEntity;
-import aor.projetofinal.entity.ProfileEntity;
-import aor.projetofinal.entity.SessionTokenEntity;
-import aor.projetofinal.entity.UserEntity;
+import aor.projetofinal.entity.*;
 import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 
+import aor.projetofinal.service.UserService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -24,6 +25,9 @@ import java.util.List;
  */
 @ApplicationScoped
 public class JavaConversionUtil {
+
+    private static final Logger logger = LogManager.getLogger(JavaConversionUtil.class);
+
 
     @Inject
     UserDao userDao;
@@ -208,6 +212,54 @@ public static FlatProfileDto convertProfileEntityToFlatProfileDto(ProfileEntity 
 
     return flat;
 }
+
+
+
+    /**
+     * Converts a list of UserCourseEntity objects into a list of
+     * UserCourseYearSummaryDto, where each entry represents the total
+     * training hours for a given year.
+     * <p>
+     * Assumes the input list is already sorted if chronological order is desired.
+     *
+     * @param participations list of user-course participation entities
+     * @return list of year-based training summaries (DTOs)
+     */
+    public static List<UserCourseYearSummaryDto> convertUserCourseEntityToUserCourseYearSummaryDto(List<UserCourseEntity> participations) {
+        Logger logger = LogManager.getLogger(JavaConversionUtil.class);
+
+        logger.info("User: {} | IP: {} - Converting {} participations into UserCourseYearSummaryDto.",
+                RequestContext.getAuthor(), RequestContext.getIp(), participations.size());
+
+        List<UserCourseYearSummaryDto> result = new ArrayList<>();
+
+        for (UserCourseEntity uc : participations) {
+            int year = uc.getParticipationDate().getYear();
+            double hours = uc.getCourse().getTimeSpan();
+
+            UserCourseYearSummaryDto existing = null;
+            for (UserCourseYearSummaryDto dto : result) {
+                if (dto.getYear() == year) {
+                    existing = dto;
+                    break;
+                }
+            }
+
+            if (existing != null) {
+                existing.setTotalHours(existing.getTotalHours() + hours);
+            } else {
+                result.add(new UserCourseYearSummaryDto(year, hours));
+            }
+        }
+
+        logger.info("User: {} | IP: {} - Conversion complete. {} years found.",
+                RequestContext.getAuthor(), RequestContext.getIp(), result.size());
+
+        return result;
+    }
+
+
+
 
 
  /**

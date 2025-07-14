@@ -1,5 +1,6 @@
 package aor.projetofinal.dao;
 
+import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.entity.UserCourseEntity;
 import aor.projetofinal.entity.UserCourseIdEntity;
 
@@ -8,6 +9,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 import jakarta.transaction.Transactional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,6 +26,10 @@ public class UserCourseDao {
     @PersistenceContext
     private EntityManager em;
 
+
+    private static final Logger logger = LogManager.getLogger(UserCourseDao.class);
+
+
     /**
      * Deletes a user-course participation record by its composite ID.
      *
@@ -35,6 +42,33 @@ public class UserCourseDao {
             em.remove(uc);
         }
     }
+
+
+    /**
+     * Retrieves all course participations for a given user,
+     * ordered by the participation date in ascending order.
+     * <p>
+     * This method logs the access attempt using RequestContext metadata.
+     *
+     * @param userId ID of the user to retrieve participation records for
+     * @return List of UserCourseEntity objects for the specified user
+     */
+    public List<UserCourseEntity> findAllParticipationsInCoursesByUserId(int userId) {
+        Logger logger = LogManager.getLogger(UserCourseDao.class);
+
+        logger.info("User: {} | IP: {} - Fetching all course participations for user ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), userId);
+
+        return em.createQuery(
+                        "SELECT uc FROM UserCourseEntity uc WHERE uc.user.id = :userId ORDER BY uc.participationDate",
+                        UserCourseEntity.class)
+                .setParameter("userId", userId)
+                .getResultList();
+    }
+
+
+
+
 
     /**
      * Finds all user-course records for a given course.
@@ -91,6 +125,34 @@ public class UserCourseDao {
     public UserCourseEntity findById(UserCourseIdEntity id) {
         return em.find(UserCourseEntity.class, id);
     }
+
+    /**
+     * Retrieves all distinct years in which the specified user has participated in training courses.
+     * Results are ordered chronologically.
+     *
+     * @param userId ID of the user
+     * @return List of distinct years (as integers) where the user has course participation
+     */
+    public List<Integer> findDistinctParticipationYearsByUserId(int userId) {
+        Logger logger = LogManager.getLogger(UserCourseDao.class);
+
+        logger.info("User: {} | IP: {} - Fetching distinct participation years for user ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), userId);
+
+        return em.createQuery(
+                        "SELECT DISTINCT YEAR(uc.participationDate) " +
+                                "FROM UserCourseEntity uc " +
+                                "WHERE uc.user.id = :userId " +
+                                "ORDER BY YEAR(uc.participationDate)",
+                        Integer.class)
+                .setParameter("userId", userId)
+                .getResultList();
+    }
+
+
+
+
+
 
     /**
      * Persists a new user-course participation record.
