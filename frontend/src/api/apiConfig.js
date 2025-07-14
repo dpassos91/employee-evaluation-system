@@ -81,7 +81,13 @@ validateSessionStatus: `${API_BASE_URL}/users/session-status`,
     /** @function Get a user's training history for a specific year */
     userHistoryYear: (userId, year) => `${API_BASE_URL}/user-courses/user/${userId}/year/${year}`,
     /** @function Export a user's training history for a specific year to CSV */
-    userHistoryYearExport: (userId, year) => `${API_BASE_URL}/user-courses/user/${userId}/year/${year}/export/csv`
+    userHistoryYearExport: (userId, year) => `${API_BASE_URL}/user-courses/user/${userId}/year/${year}/export/csv`,
+/** @function Get yearly summary of training hours for a user */
+summaryByYear: `${API_BASE_URL}/user-courses/user/summary`,
+
+/** @function Get list of distinct years the user has training participation */
+userYears: (userId) => `${API_BASE_URL}/user-courses/user/${userId}/years`,
+
   },
 
   /** Dashboard endpoint */
