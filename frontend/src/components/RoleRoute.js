@@ -13,38 +13,30 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { userStore } from "../stores/userStore";
+import Spinner from "../components/Spinner"; // O novo componente corporativo!
 import logo from "../images/logo_red.png";
 import { FormattedMessage } from "react-intl";
 
-// How long to show the denied card and progress bar (ms)
-const REDIRECT_DURATION = 6000; // e.g., 6s for user to read the card
-// How long to show the spinner/logo after card fades out (ms)
-const SPINNER_DURATION = 1300;  // e.g., 1.3s for a smooth transition
-// How long the fade-out of the card lasts (ms)
-const FADE_DURATION = 600;      // e.g., 0.6s
+// Timing constants
+const REDIRECT_DURATION = 6000;
+const SPINNER_DURATION = 1300;
+const FADE_DURATION = 600;
 
 export default function RoleRoute({ allowedRoles = [], children }) {
-  // Get current user from the store
   const user = userStore((state) => state.user);
   const location = useLocation();
 
-  // Local state for UI flow
-  const [redirect, setRedirect] = useState(false); // when to actually redirect
-  const [fadeOut, setFadeOut] = useState(false);   // when to fade out card and show spinner
-  const [progress, setProgress] = useState(false); // when to animate progress bar
+  const [redirect, setRedirect] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
+  const [progress, setProgress] = useState(false);
 
   useEffect(() => {
-    // Only trigger denied card logic if user is authenticated and NOT in allowedRoles
     if (user && user.id && !allowedRoles.includes(user.role)) {
-      setProgress(true); // start animating progress bar
+      setProgress(true);
 
-      // Fade out card a bit before full duration (so spinner shows before redirect)
       const fadeTimer = setTimeout(() => setFadeOut(true), REDIRECT_DURATION - FADE_DURATION);
-
-      // After full duration + spinner time, perform redirect to dashboard
       const timer = setTimeout(() => setRedirect(true), REDIRECT_DURATION + SPINNER_DURATION);
 
-      // Clean up timers on unmount or if dependencies change
       return () => {
         clearTimeout(timer);
         clearTimeout(fadeTimer);
@@ -59,29 +51,21 @@ export default function RoleRoute({ allowedRoles = [], children }) {
 
   // 2. If role is not allowed, show denied card > spinner > redirect
   if (!allowedRoles.includes(user.role)) {
-    // When time's up, redirect to dashboard
     if (redirect) {
       return <Navigate to="/dashboard" replace />;
     }
-    // When fading out, show only spinner/logo (no card)
     if (fadeOut) {
       return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
-          <div className="flex flex-col items-center">
-            <img
-              src={logo}
-              alt="Logo"
-              className="w-16 h-16 mb-4 animate-spin"
-              style={{ animationDuration: "2.2s" }} // slower rotation
-            />
-            <span className="text-gray-700 text-lg font-semibold mt-2">
-              <FormattedMessage id="accessDenied.redirecting" defaultMessage="Redirecting..." />
-            </span>
-          </div>
-        </div>
+        <Spinner
+          messageId="accessDenied.redirecting"
+          messageDefault="Redirecting..."
+          minHeight="100vh"
+          spinDuration="2.2s"
+          showLogo={true}
+        />
       );
     }
-    // Otherwise, show denied card with fade in/out and progress bar
+    // Denied card with progress bar
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
         <div
@@ -103,7 +87,6 @@ export default function RoleRoute({ allowedRoles = [], children }) {
               }
             />
           </p>
-          {/* Animated progress bar */}
           <div className="w-full h-2 bg-red-100 rounded-full mt-4 mb-2 overflow-hidden">
             <div
               className="h-2 bg-red-500 rounded-full"
@@ -121,6 +104,7 @@ export default function RoleRoute({ allowedRoles = [], children }) {
   // 3. If role is allowed, render the children (protected route)
   return children;
 }
+
 
 
 

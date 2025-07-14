@@ -28,16 +28,20 @@
   "sidebar.logout": "Sair",
   "sidebar.settings": "Definições",
 
-  "dashboard.greeting": "Olá, Nome Apelido 👋",
+  "dashboard.greeting": "Olá, {name} 👋",
   "dashboard.subtitle": "Pronto para continuar a crescer?",
-  "dashboard.cards.activeTrainings": "Formações ativas",
-  "dashboard.cards.trainingsOngoing": "2 formações em curso",
+    "dashboard.cards.activeTrainings": "Formações ativas",
+  "dashboard.cards.trainingsOngoing": "em curso",
   "dashboard.cards.pendingEvaluations": "Avaliações em aberto",
-  "dashboard.cards.evaluationsToFill": "1 avaliação por preencher",
+  "dashboard.cards.evaluationsToFill": "por preencher",
   "dashboard.cards.lastEvaluation": "Última avaliação",
-  "dashboard.cards.lastEvaluationDate": "Feita a 27/05/2025",
+  "dashboard.cards.noEvaluation": "Sem registo",
   "dashboard.cards.totalTrainingHours": "Total de horas de formação",
-  "dashboard.cards.trainingHours": "24h acumuladas este ano",
+  "dashboard.cards.trainingHours": "acumuladas este ano",
+  "dashboard.cards.teamSize": "Colaboradores em equipa",
+  "dashboard.cards.teamPendingEvaluations": "Avaliações da equipa em aberto",
+  "dashboard.cards.totalUsers": "Utilizadores totais",
+  "dashboard.cards.totalPendingEvaluations": "Avaliações pendentes (global)",
   "dashboard.agenda.title": "Agenda",
   "dashboard.agenda.currentEvaluationEnds": "Avaliação atual termina a 29/05",
   "dashboard.agenda.trainingSession": "Sessão de formação ",
@@ -259,6 +263,8 @@
   "profile.loading": "A carregar perfil...",
 
   "auth.session.expired": "Token de sessão expirado. A redirecionar para login."
+
+
 
   
 

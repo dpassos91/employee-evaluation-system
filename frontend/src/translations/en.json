@@ -27,7 +27,7 @@
   "sidebar.logout": "Sign Out",
   "sidebar.settings": "Settings",
 
-  "dashboard.greeting": "Hello, Firstname Lastname 👋",
+  "dashboard.greeting": "Hello, {name} 👋",
   "dashboard.subtitle": "Ready to keep growing?",
   "dashboard.cards.activeTrainings": "Active trainings",
   "dashboard.cards.trainingsOngoing": "2 trainings ongoing",

@@ -84,8 +84,11 @@ validateSessionStatus: `${API_BASE_URL}/users/session-status`,
     userHistoryYearExport: (userId, year) => `${API_BASE_URL}/user-courses/user/${userId}/year/${year}/export/csv`
   },
 
-  /** Dashboard endpoint */
-  dashboardOverview: `${API_BASE_URL}/dashboard/overview`,
+/** Dashboard endpoint */ 
+dashboard: { 
+  /**@function Get dashboard summary  */ 
+  dashboardSummary: `${API_BASE_URL}/dashboard/summary` 
+},
 
 /** Evaluation endpoints */
 evaluations: {
