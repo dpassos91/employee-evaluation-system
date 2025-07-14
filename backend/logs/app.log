@@ -16,3 +16,20 @@
 14/07/2025-05:00:35 [main] INFO  aor.projetofinal.bean.EvaluationBean - L324 - User: Anonymous | IP: Unknown - Listing users with incomplete evaluations from previous cycle.
 14/07/2025-05:00:35 [main] INFO  aor.projetofinal.bean.EvaluationBean - L287 - User: Anonymous | IP: Unknown - Retrieving incomplete evaluations for cycle ID: 1
 14/07/2025-05:00:35 [main] INFO  aor.projetofinal.bean.EvaluationBean - L355 - User: Anonymous | IP: Unknown - Found 2 users with incomplete evaluations.
+14/07/2025-05:14:45 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L58 - User: Anonymous | IP: Unknown - Active evaluation cycle found with ID 1.
+14/07/2025-05:14:45 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L76 - User: Anonymous | IP: Unknown - Starting bulk close of evaluations for active cycle (ID: 1).
+14/07/2025-05:14:45 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L90 - User: Anonymous | IP: Unknown - 2 evaluations closed successfully.
+14/07/2025-05:14:45 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L188 - User: Anonymous | IP: Unknown - New evaluation cycle created with end date: 2025-08-13.
+14/07/2025-05:14:45 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L219 - User: Anonymous | IP: Unknown - Created 1 placeholder evaluations for the new cycle.
+14/07/2025-05:14:45 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L315 - User: Anonymous | IP: Unknown - Admins and managers notified by email about the opening of a new evaluation cycle.
+14/07/2025-05:14:45 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L135 - User: Anonymous | IP: Unknown - Evaluation ID 10 closed.
+14/07/2025-05:14:45 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L274 - User: Anonymous | IP: Unknown - Unique emails sent to all involved (admins, managers, evaluated). Total: 0
+14/07/2025-05:14:45 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L360 - User: Anonymous | IP: Unknown - Notifications created for all users in cycle ID 1.
+14/07/2025-05:14:45 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L164 - User: Anonymous | IP: Unknown - Cycle ID 1 closed. All evaluations marked with date 2025-07-14T05:14:45.600331900.
+14/07/2025-05:14:45 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L58 - User: Anonymous | IP: Unknown - Active evaluation cycle found with ID 1.
+14/07/2025-05:14:45 [main] WARN  aor.projetofinal.bean.EvaluationCycleBean - L53 - User: Anonymous | IP: Unknown - No active evaluation cycle found.
+14/07/2025-05:17:25 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L188 - User: Anonymous | IP: Unknown - New evaluation cycle created with end date: 2025-08-13.
+14/07/2025-05:17:25 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L219 - User: Anonymous | IP: Unknown - Created 1 placeholder evaluations for the new cycle.
+14/07/2025-05:17:25 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L315 - User: Anonymous | IP: Unknown - Admins and managers notified by email about the opening of a new evaluation cycle.
+14/07/2025-05:17:25 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L58 - User: Anonymous | IP: Unknown - Active evaluation cycle found with ID 1.
+14/07/2025-05:17:25 [main] WARN  aor.projetofinal.bean.EvaluationCycleBean - L53 - User: Anonymous | IP: Unknown - No active evaluation cycle found.
