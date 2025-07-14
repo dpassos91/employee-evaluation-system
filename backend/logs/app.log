@@ -1,0 +1,18 @@
+14/07/2025-05:00:34 [main] INFO  aor.projetofinal.bean.EvaluationBean - L52 - User: Anonymous | IP: Unknown - All evaluations in cycle ID 1 evaluated: false.
+14/07/2025-05:00:34 [main] INFO  aor.projetofinal.bean.EvaluationBean - L324 - User: Anonymous | IP: Unknown - Listing users with incomplete evaluations from previous cycle.
+14/07/2025-05:00:34 [main] WARN  aor.projetofinal.bean.EvaluationBean - L330 - User: Anonymous | IP: Unknown - No active evaluation cycle found.
+14/07/2025-05:00:34 [main] INFO  aor.projetofinal.bean.EvaluationBean - L414 - User: Anonymous | IP: Unknown - Evaluation updated for user eval@example.com by null.
+14/07/2025-05:00:34 [main] INFO  aor.projetofinal.bean.EvaluationBean - L414 - User: Anonymous | IP: Unknown - Evaluation updated for user eval@example.com by null.
+14/07/2025-05:00:34 [main] INFO  aor.projetofinal.bean.EvaluationBean - L68 - User: Anonymous | IP: Unknown - Building UpdateEvaluationDto from evaluation ID 10.
+14/07/2025-05:00:34 [main] INFO  aor.projetofinal.bean.EvaluationBean - L102 - User: Anonymous | IP: Unknown - DTO built successfully from evaluation ID 10.
+14/07/2025-05:00:34 [main] INFO  aor.projetofinal.bean.EvaluationBean - L272 - User: Anonymous | IP: Unknown - Retrieving evaluation by ID: 5
+14/07/2025-05:00:34 [main] INFO  aor.projetofinal.bean.EvaluationBean - L287 - User: Anonymous | IP: Unknown - Retrieving incomplete evaluations for cycle ID: 1
+14/07/2025-05:00:34 [main] INFO  aor.projetofinal.bean.EvaluationBean - L429 - User: Anonymous | IP: Unknown - Checking if user user@example.com has already been evaluated in cycle ID null.
+14/07/2025-05:00:34 [main] INFO  aor.projetofinal.bean.EvaluationBean - L311 - User: Anonymous | IP: Unknown - Evaluation found for user user@example.com in cycle ID 1.
+14/07/2025-05:00:34 [main] INFO  aor.projetofinal.bean.EvaluationBean - L52 - User: Anonymous | IP: Unknown - All evaluations in cycle ID 1 evaluated: true.
+14/07/2025-05:00:34 [main] WARN  aor.projetofinal.bean.EvaluationBean - L370 - User: Anonymous | IP: Unknown - Cannot revert evaluation ID 1 because it's not in EVALUATED state.
+14/07/2025-05:00:34 [main] WARN  aor.projetofinal.bean.EvaluationBean - L306 - User: Anonymous | IP: Unknown - No evaluation found for user user@example.com in cycle ID 1.
+14/07/2025-05:00:34 [main] INFO  aor.projetofinal.bean.EvaluationBean - L287 - User: Anonymous | IP: Unknown - Retrieving incomplete evaluations for cycle ID: 1
+14/07/2025-05:00:35 [main] INFO  aor.projetofinal.bean.EvaluationBean - L324 - User: Anonymous | IP: Unknown - Listing users with incomplete evaluations from previous cycle.
+14/07/2025-05:00:35 [main] INFO  aor.projetofinal.bean.EvaluationBean - L287 - User: Anonymous | IP: Unknown - Retrieving incomplete evaluations for cycle ID: 1
+14/07/2025-05:00:35 [main] INFO  aor.projetofinal.bean.EvaluationBean - L355 - User: Anonymous | IP: Unknown - Found 2 users with incomplete evaluations.
