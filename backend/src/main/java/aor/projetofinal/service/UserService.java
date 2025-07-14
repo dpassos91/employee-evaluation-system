@@ -148,6 +148,18 @@ public Response updateUserPassword(
         logger.info("User: {} | IP: {} - Attempting to assign manager.",
                 RequestContext.getAuthor(), RequestContext.getIp());
 
+
+        // 1. Validate and refresh session token if close to expiration
+        SessionStatusDto sessionStatus = userBean.validateAndRefreshSessionToken(token);
+
+        if (sessionStatus == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Session expired. Please, log in again.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
         //  Validate session token
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
         if (tokenEntity == null || tokenEntity.getUser() == null) {
@@ -407,6 +419,19 @@ public Response createUser(LoginUserDto loginUserDto) {
         logger.info("User: {} | IP: {} - Requested users without manager (paginated). Filters - Name: '{}', Office: '{}', Page: {}, PageSize: {}",
                 RequestContext.getAuthor(), RequestContext.getIp(), name, officeStr, page, pageSize);
 
+
+        // 1. Validate and refresh session token if close to expiration
+        SessionStatusDto sessionStatus = userBean.validateAndRefreshSessionToken(token);
+
+        if (sessionStatus == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Session expired. Please, log in again.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
+
         // Validate session token
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
         if (tokenEntity == null || tokenEntity.getUser() == null) {
@@ -631,6 +656,18 @@ public Response logoutUser(@HeaderParam("Authorization") String authorization) {
     public Response promoteToAdmin(@QueryParam("email") String targetEmail,
                                    @HeaderParam("sessionToken") String token) {
 
+
+        // 1. Validate and refresh session token if close to expiration
+        SessionStatusDto sessionStatus = userBean.validateAndRefreshSessionToken(token);
+
+        if (sessionStatus == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Session expired. Please, log in again.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
         if (tokenEntity == null || tokenEntity.getUser() == null) {
             logger.warn(
@@ -698,6 +735,18 @@ public Response updateUserRoleAndManager(
         RoleUpdaterDto dto,
         @HeaderParam("sessionToken") String token
 ) {
+
+    // 1. Validate and refresh session token if close to expiration
+    SessionStatusDto sessionStatus = userBean.validateAndRefreshSessionToken(token);
+
+    if (sessionStatus == null) {
+        return Response.status(Response.Status.UNAUTHORIZED)
+                .entity("{\"message\": \"Session expired. Please, log in again.\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
+
     // Validate session and authorization
     SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
     if (tokenEntity == null || tokenEntity.getUser() == null) {

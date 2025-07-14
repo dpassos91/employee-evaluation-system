@@ -649,6 +649,16 @@ public class EvaluationService {
     public Response loadEvaluation(@QueryParam("userId") int evaluatedUserId,
                                    @HeaderParam("sessionToken") String token) {
 
+        // 1. Validate and refresh session token if close to expiration
+        SessionStatusDto sessionStatus = userBean.validateAndRefreshSessionToken(token);
+
+        if (sessionStatus == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Session expired. Please, log in again.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
         // valdiate session
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
         if (tokenEntity == null || tokenEntity.getUser() == null) {
@@ -757,6 +767,17 @@ public class EvaluationService {
     public Response reopenEvaluationForEditing(@PathParam("evaluationId") Long evaluationId,
                                                @HeaderParam("sessionToken") String token) {
 
+        // 1. Validate and refresh session token if close to expiration
+        SessionStatusDto sessionStatus = userBean.validateAndRefreshSessionToken(token);
+
+        if (sessionStatus == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Session expired. Please, log in again.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+
         // Validate session
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
         if (tokenEntity == null || tokenEntity.getUser() == null) {
@@ -847,6 +868,17 @@ public class EvaluationService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateEvaluation(UpdateEvaluationDto dto,
                                      @HeaderParam("sessionToken") String token) {
+
+
+        // 1. Validate and refresh session token if close to expiration
+        SessionStatusDto sessionStatus = userBean.validateAndRefreshSessionToken(token);
+
+        if (sessionStatus == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Session expired. Please, log in again.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
 
         // Validate session
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
