@@ -4,6 +4,7 @@ import MessageIcon from "../components/MessageIcon";
 import LanguageIcon from "../components/LanguageIcon";
 import { userStore } from "../stores/userStore";
 import PageFadeIn from "../components/PageFadeIn"; // importa aqui!
+import { useSessionMonitor } from "../hooks/useSessionMonitor";
 
 /**
  * PageLayout
@@ -17,6 +18,13 @@ import PageFadeIn from "../components/PageFadeIn"; // importa aqui!
  */
 export default function PageLayout({ title, subtitle, children }) {
   const { user } = userStore();
+
+
+// ⚠️ Ativa o monitor apenas se houver user/token
+
+  const token = sessionStorage.getItem("authToken");
+
+  useSessionMonitor(!!token); // ativa apenas se estiver logado
 
   return (
     <div className="flex h-screen bg-gray-100">

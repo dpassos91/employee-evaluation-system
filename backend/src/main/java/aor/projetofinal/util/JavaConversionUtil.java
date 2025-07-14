@@ -277,14 +277,14 @@ public static ProfileDto convertProfileEntityToProfileDto(ProfileEntity p) {
     /**
      * Converts a SessionTokenEntity to a SessionStatusDto.
      *
-     * @param sessionTokenEntity The SessionTokenEntity.
-     * @return The SessionStatusDto.
+     * @param sessionTokenEntity The session token entity to convert.
+     * @return A SessionStatusDto containing the token value and expiry date.
      */
     public static SessionStatusDto convertSessionTokenEntityToSessionStatusDto(SessionTokenEntity sessionTokenEntity) {
-        SessionStatusDto sessionStatusDto = new SessionStatusDto(sessionTokenEntity.getTokenValue(), sessionTokenEntity.getExpiryDate());
-        sessionStatusDto.setSessionToken(sessionTokenEntity.getTokenValue());
-        sessionStatusDto.setExpiryDate(sessionTokenEntity.getExpiryDate());
-        return sessionStatusDto;
+        return new SessionStatusDto(
+                sessionTokenEntity.getTokenValue(),
+                sessionTokenEntity.getExpiryDate()
+        );
     }
 
     /**

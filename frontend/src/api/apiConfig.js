@@ -38,7 +38,18 @@ const API_ENDPOINTS = {
     /** @function Update user role and manager by user id */
     roleUpdate: (id) => `${API_BASE_URL}/users/${id}/role-manager`,
     /** @type {string} Validate session endpoint */
-    validateSession: `${API_BASE_URL}/users/validate-session`
+    validateSession: `${API_BASE_URL}/users/validate-session`,
+
+
+    
+    /** 
+ * @type {string} 
+ * Endpoint to check if the session token is still valid (without extending its expiry).
+ * Used by the frontend timer to detect expired sessions and trigger logout.
+ */
+validateSessionStatus: `${API_BASE_URL}/users/session-status`,
+
+
   },
 
   /** Course endpoints*/

@@ -433,6 +433,24 @@ public class UserBean implements Serializable {
 
 
     /**
+     * Forces a logout by deleting the expired session token from the database.
+     *
+     * @param token The expired session token to be invalidated.
+     */
+    public void forcedLogout(SessionTokenEntity token) {
+        logger.info("System | IP: {} - Forced logout for user {} (token {}).",
+                RequestContext.getIp(),
+                token.getUser().getEmail(),
+                token.getTokenValue());
+
+        sessionTokenDao.delete(token); // Removes the token from the database
+    }
+
+
+
+
+
+    /**
      * Generates a new confirmation token for the user with the given email address.
      * If the user is not found or already confirmed, no token is generated.
      * Logs the process and results for auditing purposes.
@@ -1007,7 +1025,8 @@ public class UserBean implements Serializable {
 
 
         // Promote to ADMIN role
-        user.setRole(roleDao.findByName("ADMIN")); // Assume que tens RoleDao
+        user.setRole(roleDao.findByName("ADMIN"));
+        user.setManager(null);
         userDao.save(user);
         logger.info(
                 "User: {} | IP: {} - User {} successfully promoted to ADMIN.",

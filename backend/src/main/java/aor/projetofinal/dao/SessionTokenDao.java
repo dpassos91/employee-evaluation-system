@@ -10,6 +10,9 @@ import jakarta.persistence.PersistenceContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @ApplicationScoped
 public class SessionTokenDao {
 
@@ -42,6 +45,21 @@ public class SessionTokenDao {
             return null;
         }
     }
+
+
+    /**
+     * Retrieves all session tokens that have expired.
+     *
+     * @param now The current timestamp used to compare with expiryDate.
+     * @return A list of expired SessionTokenEntity instances.
+     */
+    public List<SessionTokenEntity> findExpiredSessionTokens(LocalDateTime now) {
+        return em.createQuery(
+                        "SELECT s FROM SessionTokenEntity s WHERE s.expiryDate <= :now", SessionTokenEntity.class)
+                .setParameter("now", now)
+                .getResultList();
+    }
+
 
     public void persist(SessionTokenEntity sessionToken) {
         em.persist(sessionToken);

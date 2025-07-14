@@ -4,6 +4,7 @@ import aor.projetofinal.dto.*;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 import aor.projetofinal.util.EmailUtil;
+import aor.projetofinal.util.JavaConversionUtil;
 import aor.projetofinal.util.ProfileValidator;
 import aor.projetofinal.bean.UserBean;
 import aor.projetofinal.context.RequestContext;
@@ -13,6 +14,8 @@ import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.entity.ProfileEntity;
 
 import aor.projetofinal.entity.UserEntity;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -212,6 +215,34 @@ public Response updateUserPassword(
 
 
 
+    /**
+     * Endpoint to check the current session status and return its expiration info.
+     * Should be called periodically by the frontend to detect automatic logouts.
+     *
+     * @param token The session token from the client.
+     * @return 200 with session info if valid, 401 if expired.
+     */
+    @GET
+    @Path("/session-status")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response checkSessionStatus(@HeaderParam("sessionToken") String token) {
+        SessionTokenEntity session = sessionTokenDao.findBySessionToken(token);
+
+        if (session == null || session.getExpiryDate() == null || session.getExpiryDate().isBefore(LocalDateTime.now())) {
+            logger.warn("User: unknown | IP: {} - Session token expired or not found during session status check.",
+                    RequestContext.getIp());
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Sessão expirada.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        logger.info("User: {} | IP: {} - Session is active. Expiry: {}",
+                session.getUser().getEmail(), RequestContext.getIp(), session.getExpiryDate());
+
+        SessionStatusDto dto = JavaConversionUtil.convertSessionTokenEntityToSessionStatusDto(session);
+        return Response.ok(dto).build();
+    }
 
 
 
