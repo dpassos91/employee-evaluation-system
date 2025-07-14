@@ -255,6 +255,7 @@
   "profile.chooseOtherPhoto": "Choose Another Photo",
   "profile.savePhoto": "Save Photo",
   "profile.uploading": "Uploading...",
+  "profile.loading": "Loading profile...",
 
   "auth.session.expired": "Session token expired. Redirecting to login page."
 

@@ -256,8 +256,11 @@
   "profile.chooseOtherPhoto": "Escolher outra foto",
   "profile.savePhoto": "Guardar foto",
   "profile.uploading": "A fazer upload...",
+  "profile.loading": "A carregar perfil...",
 
   "auth.session.expired": "Token de sessão expirado. A redirecionar para login."
+
+  
 
 
 }

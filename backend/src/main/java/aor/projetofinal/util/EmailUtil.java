@@ -1,7 +1,4 @@
 package aor.projetofinal.util;
-
-import jakarta.ejb.Stateless;
-
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import java.util.Properties;
@@ -20,6 +17,7 @@ public class EmailUtil {
         props.put("mail.smtp.port", "587"); // porta TLS
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true"); // STARTTLS
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 
         Authenticator auth = new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -28,6 +26,7 @@ public class EmailUtil {
         };
 
         Session session = Session.getInstance(props, auth);
+        session.setDebug(true);
 
         try {
             Message msg = new MimeMessage(session);
