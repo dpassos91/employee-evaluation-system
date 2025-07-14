@@ -4,6 +4,11 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+
+/**
+ * Entity representing the many-to-many association between roles and permissions.
+ * Uses a composite key defined in {@link RolePermissionIdEntity}.
+ */
 @Entity
 @Table(name = "role_permission")
 public class RolePermissionEntity implements Serializable {

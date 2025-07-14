@@ -1,5 +1,9 @@
 package aor.projetofinal.dto;
 
+/**
+ * DTO representing a personal message exchanged between users.
+ * Includes sender and receiver information, content, timestamp, and read status.
+ */
 public class MessageDto {
     private Integer id;
     private Integer senderId;

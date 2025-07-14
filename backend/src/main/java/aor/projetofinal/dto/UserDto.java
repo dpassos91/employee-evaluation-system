@@ -2,6 +2,11 @@ package aor.projetofinal.dto;
 
 import java.time.LocalDateTime;
 
+
+/**
+ * DTO representing user information for data transfer between layers.
+ * Contains identification, authentication status, role, and token metadata.
+ */
 public class UserDto {
     private int id;
     private String email;

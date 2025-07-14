@@ -8,7 +8,10 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-
+/**
+ * Entity representing a personal message exchanged between two users.
+ * Includes sender, receiver, content, creation date, and read status.
+ */
 @Entity
 @Table(name = "messages")
 public class MessageEntity implements Serializable {

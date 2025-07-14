@@ -5,6 +5,12 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+
+/**
+ * DTO representing the structure of error responses returned to the client.
+ * Includes status code, error description, message, path, timestamp, IP, author,
+ * and optional validation error details.
+ */
 public class ErrorResponseDto {
     private int status;
     private String error;

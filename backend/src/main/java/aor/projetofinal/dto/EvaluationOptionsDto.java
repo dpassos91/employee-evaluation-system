@@ -1,5 +1,10 @@
 package aor.projetofinal.dto;
 
+
+/**
+ * DTO representing an evaluation option for display in dropdowns or selection components.
+ * Contains the enum name, numeric grade, and a formatted label combining grade and description.
+ */
 public class EvaluationOptionsDto {
 
     private String enumName;

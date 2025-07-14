@@ -7,6 +7,10 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import aor.projetofinal.entity.enums.NotificationEnum;
 
+/**
+ * Entity representing a notification sent to a user.
+ * Stores the notification type, content, creation timestamp, and read status.
+ */
 @Entity
 @Table(name = "notifications")
 public class NotificationEntity implements Serializable {

@@ -18,6 +18,15 @@ import jakarta.ejb.Startup;
 
 import java.time.LocalDateTime;
 
+
+/**
+ * Initializes essential application settings and base user roles when the server starts.
+ *
+ * This includes:
+ * - Default session and token configurations
+ * - Basic roles: ADMIN, MANAGER, USER
+ * - Default administrator account
+ */
 @Singleton
 @Startup
 public class SettingsInitializer {

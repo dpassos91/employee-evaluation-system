@@ -5,6 +5,11 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 import java.util.List;
 
+
+/**
+ * DTO representing a paginated result set of profile data.
+ * Contains the list of profiles and pagination metadata such as total count, pages, and current page.
+ */
 @XmlRootElement
 public class PaginatedProfilesDto {
     private List<FlatProfileDto> profiles;

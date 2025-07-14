@@ -2,6 +2,10 @@ package aor.projetofinal.dto;
 
 import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 
+/**
+ * DTO representing a user who does not have a manager assigned.
+ * Used for listing or assigning managers.
+ */
 public class NoManagerDto {
     private int id;
     private String email;

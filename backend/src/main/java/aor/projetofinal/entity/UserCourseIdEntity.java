@@ -6,6 +6,10 @@ import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Composite key for the {@link UserCourseEntity} representing the many-to-many relationship
+ * between users and courses. Composed of user ID and course ID.
+ */
 @Embeddable
 public class UserCourseIdEntity implements Serializable {
 

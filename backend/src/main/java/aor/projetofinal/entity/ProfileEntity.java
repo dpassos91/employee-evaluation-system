@@ -7,7 +7,10 @@ import java.util.Objects;
 
 import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 
-
+/**
+ * Entity representing a user profile.
+ * This entity stores personal and contact details for a user.
+ */
 @Entity
 @Table(name = "profiles")
 public class ProfileEntity implements Serializable  {

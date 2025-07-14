@@ -41,14 +41,31 @@ public class EvaluationCycleBean implements Serializable {
 
     private static final Logger logger = LogManager.getLogger(EvaluationCycleBean.class);
 
+    /**
+     * Retrieves the currently active evaluation cycle, if any.
+     *
+     * @return The active EvaluationCycleEntity, or null if none is active.
+     */
     public EvaluationCycleEntity findActiveCycle() {
         EvaluationCycleEntity cycle = evaluationCycleDao.findActiveCycle();
+
         if (cycle == null) {
+            logger.warn("User: {} | IP: {} - No active evaluation cycle found.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
             return null;
         }
+
+        logger.info("User: {} | IP: {} - Active evaluation cycle found with ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), cycle.getId());
+
         return cycle;
     }
 
+    /**
+     * Closes all evaluations marked as EVALUATED in the currently active evaluation cycle,
+     * and attempts to close the cycle itself if all evaluations are successfully closed.
+     * Sends notifications upon successful cycle closure.
+     */
     public void bulkCloseEvaluationsAndCycle() {
         EvaluationCycleEntity cycle = findActiveCycle();
         if (cycle == null) {
@@ -103,11 +120,20 @@ public class EvaluationCycleBean implements Serializable {
 
 
 
+    /**
+     * Closes a single evaluation and checks if all evaluations in the associated cycle are closed.
+     * If all are closed, the cycle is deactivated and its end date is set.
+     * Also updates the date of all evaluations in the cycle and sends notifications.
+     *
+     * @param evaluation The evaluation to be closed.
+     */
     public void closeEvaluationAndCheckCycle(EvaluationEntity evaluation) {
         // close the evaluation
         evaluation.setState(EvaluationStateEnum.CLOSED);
         evaluationDao.save(evaluation);
-        logger.info("Evaluation ID {} closed.", evaluation.getId());
+
+        logger.info("User: {} | IP: {} - Evaluation ID {} closed.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluation.getId());
 
         EvaluationCycleEntity cycle = evaluation.getCycle();
 
@@ -119,8 +145,8 @@ public class EvaluationCycleBean implements Serializable {
                 break;
             }
         }
-        // if all processes are closed, just close the cycle
 
+        // if all processes are closed, just close the cycle
         if (allClosed) {
             cycle.setActive(false);
             cycle.setEndDate(LocalDateTime.now());
@@ -133,16 +159,21 @@ public class EvaluationCycleBean implements Serializable {
             }
 
             emailManagersAndEvaluatedOfCycleClosure(cycle);
-
             notifyCycleClosure(cycle);
 
-            logger.info("Cycle ID {} closed. All evaluations marked with date {}.", cycle.getId(), LocalDateTime.now());
+            logger.info("User: {} | IP: {} - Cycle ID {} closed. All evaluations marked with date {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), cycle.getId(), LocalDateTime.now());
         }
-
-
     }
 
 
+
+    /**
+     * Creates a new evaluation cycle with the provided end date and generates blank evaluations
+     * for all users who have a manager assigned. Also sends notifications and emails to the responsible managers.
+     *
+     * @param endDate The end date of the new evaluation cycle (received from frontend).
+     */
     public void createCycleAndCreateBlankEvaluations(LocalDate endDate) {
         //creating cycle with the end date provided by the admin from the frontend
 
@@ -154,11 +185,10 @@ public class EvaluationCycleBean implements Serializable {
 
         evaluationCycleDao.create(newCycle);
 
-        logger.info("New evaluation cycle created with end date: {}", endDate);
-
+        logger.info("User: {} | IP: {} - New evaluation cycle created with end date: {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), endDate);
 
         List<UserEntity> usersToEvaluate = userDao.findConfirmedUsersWithManager();
-
         int createdCount = 0;
 
         for (UserEntity user : usersToEvaluate) {
@@ -175,7 +205,6 @@ public class EvaluationCycleBean implements Serializable {
                 createdCount++;
 
                 // create a notification for the manager
-
                 String evaluatedName = user.getProfile().getFirstName() + " " + user.getProfile().getLastName();
                 String message = String.format("A new evaluation cycle was created. You are responsible for the evaluation of %s.", evaluatedName);
 
@@ -184,21 +213,23 @@ public class EvaluationCycleBean implements Serializable {
                         "SYSTEM",
                         message
                 );
-
-
             }
         }
 
-        logger.info("Created {} placeholder evaluations for the new cycle.", createdCount);
-
+        logger.info("User: {} | IP: {} - Created {} placeholder evaluations for the new cycle.",
+                RequestContext.getAuthor(), RequestContext.getIp(), createdCount);
 
         // Notify managers and admins by email about the new cycle
         emailManagersAndAdminsOfNewCycle(newCycle);
-
-
     }
 
 
+    /**
+     * Sends notification emails to all managers, evaluated users, and administrators involved in the specified cycle.
+     * Each user receives only one email to prevent duplicates.
+     *
+     * @param cycle The evaluation cycle that has been closed.
+     */
     private void emailManagersAndEvaluatedOfCycleClosure(EvaluationCycleEntity cycle) {
         Set<String> sentEmails = new HashSet<>(); // validates that any person is only emailed once
 
@@ -226,21 +257,22 @@ public class EvaluationCycleBean implements Serializable {
                 String subject = "Evaluation Cycle Closed – Results Available";
 
                 String body = String.format("""
-                    Dear %s,
-                    
-                    The evaluation cycle has been officially closed on %s.
-                    
-                    You may now access the platform to consult the final evaluations.
-                    
-                    Best regards,
-                    The board.
-                    """, email, LocalDateTime.now().toLocalDate());
+                Dear %s,
+                
+                The evaluation cycle has been officially closed on %s.
+                
+                You may now access the platform to consult the final evaluations.
+                
+                Best regards,
+                The board.
+                """, email, LocalDateTime.now().toLocalDate());
 
                 EmailUtil.sendEmail(email, subject, body);
             }
         }
 
-        logger.info("Unique emails sent to all involved (admins, managers, evaluated). Total: {}", sentEmails.size());
+        logger.info("User: {} | IP: {} - Unique emails sent to all involved (admins, managers, evaluated). Total: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), sentEmails.size());
     }
 
 
@@ -249,6 +281,11 @@ public class EvaluationCycleBean implements Serializable {
 
 
 
+    /**
+     * Sends an email notification to all managers and administrators informing them of the start of a new evaluation cycle.
+     *
+     * @param cycle The newly created evaluation cycle.
+     */
     private void emailManagersAndAdminsOfNewCycle(EvaluationCycleEntity cycle) {
         List<UserEntity> managers = userDao.findUsersByRole("MANAGER");
         List<UserEntity> admins = userDao.findUsersByRole("ADMIN");
@@ -259,25 +296,26 @@ public class EvaluationCycleBean implements Serializable {
 
         for (UserEntity user : recipients) {
             if (user.getEmail() != null && !user.getEmail().isEmpty()) {
-                String subject = "Start of a New Evalaution Cycle";
-                //Return a formatted string appplying the format method from String class, %s for any type of data
+                String subject = "Start of a New Evaluation Cycle";
                 String body = String.format("""
-                        Dear %s,
-                        
-                        A new evaluation cycle has started, with ending date by %s.
-                        
-                        Plese, access the platform to verify and evaluate processes under  your responsibility. 
-                        
-                        Thank you for ypour consideration and collaboration,
-                        The board.
-                        """, user.getEmail(), cycle.getEndDate().toLocalDate());
+                    Dear %s,
+                    
+                    A new evaluation cycle has started, with ending date by %s.
+                    
+                    Please, access the platform to verify and evaluate processes under your responsibility. 
+                    
+                    Thank you for your consideration and collaboration,
+                    The board.
+                    """, user.getEmail(), cycle.getEndDate().toLocalDate());
 
                 EmailUtil.sendEmail(user.getEmail(), subject, body);
             }
         }
 
-        logger.info("Admins and managers notified by email about the openning of a new evaluation cycle.");
+        logger.info("User: {} | IP: {} - Admins and managers notified by email about the opening of a new evaluation cycle.",
+                RequestContext.getAuthor(), RequestContext.getIp());
     }
+
 
 
     /**

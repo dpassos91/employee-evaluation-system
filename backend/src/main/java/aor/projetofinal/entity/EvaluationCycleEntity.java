@@ -5,6 +5,11 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
+/**
+ * Entity representing an evaluation cycle in the system.
+ * Each cycle has a start and end date, an active status, and a list of evaluations.
+ */
 @Entity
 @Table(name = "evaluation_cycles")
 public class EvaluationCycleEntity implements Serializable {

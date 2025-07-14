@@ -1,5 +1,9 @@
 package aor.projetofinal.dto;
 
+/**
+ * DTO for resetting a user's password.
+ * Contains only the new password to be set.
+ */
 public class ResetPasswordDto {
      private String password;
      

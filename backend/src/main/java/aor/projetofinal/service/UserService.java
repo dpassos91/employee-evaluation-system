@@ -246,11 +246,18 @@ public Response updateUserPassword(
 
 
 
+    /**
+     * Confirms a user account using the provided confirmation token.
+     *
+     * @param confirmToken The token sent to the user's email for confirmation.
+     * @return HTTP response indicating success or failure of account confirmation.
+     */
     @GET
     @Path("/confirmAccount")
     @Produces(MediaType.APPLICATION_JSON)
     public Response confirmAccount(@QueryParam("confirmToken") String confirmToken) {
         if (confirmToken == null || confirmToken.isEmpty()) {
+            logger.warn("Attempted account confirmation with missing token. IP: {}", RequestContext.getIp());
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("{\"message\": \"Token de confirmação de conta em falta.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -260,11 +267,13 @@ public Response updateUserPassword(
         boolean success = userBean.confirmAccount(confirmToken);
 
         if (success) {
+            logger.info("Account confirmed successfully using token. IP: {}", RequestContext.getIp());
             return Response.ok("{\"message\": \"Conta confirmada com sucesso! Já pode fazer login\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
 
         } else {
+            logger.warn("Failed account confirmation with invalid or expired token. IP: {}", RequestContext.getIp());
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("{\"message\": \"Link inválido ou expirado. Foi gerado um novo Link de confirmação de conta." +
                             " Torne a aceder ao seu email registado" +
@@ -276,7 +285,8 @@ public Response updateUserPassword(
 
 
 
-/**
+
+    /**
  * Registers a new user in the system and immediately sends an account confirmation email
  * with a unique confirmation token.
  *
@@ -446,7 +456,15 @@ public Response createUser(LoginUserDto loginUserDto) {
 
 
 
-
+    /**
+     * Handles user login by validating credentials and returning a session token along with user profile info.
+     *
+     * Logs all major steps including missing parameters, failed login attempts, account confirmation,
+     * profile loading, and successful logins.
+     *
+     * @param userLog DTO containing user email and password.
+     * @return HTTP response with login result and session token or error message.
+     */
     // User login
     @POST
 @Path("/login")
@@ -547,6 +565,15 @@ public Response loginUser(LoginUserDto userLog) {
 }
 
 
+    /**
+     * Handles user logout by invalidating the session token.
+     *
+     * Validates the Authorization header for a Bearer token and checks if the session is authorized.
+     * Logs all important events: request received, invalid headers, unauthorized tokens, and successful logout.
+     *
+     * @param authorization The Authorization header containing the Bearer token.
+     * @return HTTP response indicating success or failure.
+     */
     @POST
 @Path("/logout")
 @Produces(MediaType.APPLICATION_JSON)
@@ -708,15 +735,24 @@ public Response updateUserRoleAndManager(
     }
 }
 
+    /**
+     * Handles a password reset request by generating and emailing a recovery link.
+     *
+     * For security, does not reveal whether the email exists in the system.
+     * Logs the request and any invalid email attempts.
+     *
+     * @param userDto DTO containing the user's email address.
+     * @return HTTP response indicating the reset request status.
+     */
     @POST
     @Path("/request-reset")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response requestPasswordReset( UserDto userDto) {
+    public Response requestPasswordReset(UserDto userDto) {
         String email = userDto.getEmail();
 
-
         if (email == null || email.isEmpty()) {
+            logger.warn("Password reset requested with invalid email. IP: {}", RequestContext.getIp());
             return Response.status(400)
                     .entity("{\"message\": \"Email inválido.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -725,15 +761,15 @@ public Response updateUserRoleAndManager(
 
         UserDto user = userBean.findUserByEmail(email);
         if (user == null) {
-            // Por razões de segurança, não revelar se o email existe
-            return Response.ok("{\"message\": \"Se o email existir, o link de recuperação será enviado.\"}").build();
+            logger.info("Password reset requested for non-existent email '{}'. IP: {}", email, RequestContext.getIp());
+            // Do not reveal user existence for security
+            return Response.ok("{\"message\": \"Se o email existir, o link de recuperação será enviado.\"}")
+                    .build();
         }
-
 
         String recoveryToken = userBean.generateRecoveryToken(user.getEmail());
 
         String recoveryLink = "https://127.0.0.1:8443/grupo7/rest/users/reset-password?recoveryToken=" + recoveryToken;
-
 
         EmailUtil.sendEmail(
                 user.getEmail(),
@@ -741,6 +777,7 @@ public Response updateUserRoleAndManager(
                 "Clique neste link para escolher nova password: " + recoveryLink
         );
 
+        logger.info("Password reset link sent to email '{}'. IP: {}", user.getEmail(), RequestContext.getIp());
 
         return Response.ok()
                 .entity("{\"message\": \"Se o email existir, o link de recuperação será enviado.\"}")
@@ -750,92 +787,108 @@ public Response updateUserRoleAndManager(
 
 
 
+
+    /**
+     * Resets the user's password using a valid recovery token.
+     *
+     * Validates the token, password length, and resets the password if all checks pass.
+     * Logs warnings for invalid tokens and weak passwords.
+     *
+     * @param recoveryToken The token provided for password recovery (query parameter).
+     * @param resetDto DTO containing the new password.
+     * @return HTTP response indicating success or failure.
+     */
     @POST
     @Path("/reset-password")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response resetPassword(@QueryParam("recoveryToken") String recoveryToken, ResetPasswordDto resetDto)
- {
+    public Response resetPassword(@QueryParam("recoveryToken") String recoveryToken, ResetPasswordDto resetDto) {
         if (!userBean.isRecoveryTokenValid(recoveryToken)) {
+            logger.warn("User: {} | IP: {} - Invalid or expired recovery token used for password reset.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
             return Response.status(Response.Status.BAD_REQUEST)
-
                     .entity("{\"message\": \"Token expirado ou inválido.\", \"error\": true}")
-
                     .type(MediaType.APPLICATION_JSON)
-
                     .build();
         }
 
         String newPassword = resetDto.getPassword();
 
-        if (newPassword.length() <= 5) {
-            logger.warn("Password com comprimento insuficiente");
+        if (newPassword == null || newPassword.length() <= 5) {
+            logger.warn("User: {} | IP: {} - Password length insufficient during reset attempt.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
             return Response.status(400)
                     .entity("{\"message\": \"A password deve ter mais de 5 caracteres.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-
-
-
         boolean success = userBean.resetPasswordWithToken(recoveryToken, newPassword);
 
         if (!success) {
+            logger.error("User: {} | IP: {} - Failed to reset password with valid token.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
             return Response.status(Response.Status.BAD_REQUEST)
-
                     .entity("{\"message\": \"Erro ao redefinir a senha. Tente novamente.\", \"error\": true}")
-
                     .type(MediaType.APPLICATION_JSON)
-
                     .build();
         }
 
+        logger.info("User: {} | IP: {} - Password reset successfully completed.",
+                RequestContext.getAuthor(), RequestContext.getIp());
+
         return Response.ok()
-
                 .entity("{\"message\": \"Password atualizada com sucesso!\", \"error\": false}")
-
                 .type(MediaType.APPLICATION_JSON)
-
                 .build();
     }
 
 
 
+
+    /**
+     * Validates and refreshes a user's session token.
+     *
+     * Checks if the session token is provided and still valid. If valid, returns updated session info.
+     * Logs attempts with missing or invalid tokens.
+     *
+     * @param sessionToken The session token provided in the HTTP header.
+     * @return HTTP response with session status or error message.
+     */
     @POST
     @Path("/validate-session")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response validateSession(@HeaderParam("sessionToken") String sessionToken) {
 
-        // Verifica se o sessionToken foi fornecido
         if (sessionToken == null || sessionToken.isEmpty()) {
+            logger.warn("Session validation failed: token not provided. IP: {}", RequestContext.getIp());
             return Response.status(400)
                     .entity("{\"message\": \"Token de sessão não fornecido.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-
-        // Analisa se a sessão ainda está válida
         SessionStatusDto sessionStatusDto = userBean.validateAndRefreshSessionToken(sessionToken);
 
-
         if (sessionStatusDto == null) {
-            // Se o sessionToken for inválido ou expirado, retorna erro 401 (Unauthorized)
+            logger.warn("Session validation failed: token invalid or expired. IP: {}", RequestContext.getIp());
             return Response.status(401)
                     .entity("{\"message\": \"Sessão expirada. Faça login novamente.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-        // Se o sessionToken for válido e renovado, retorna a resposta 200 com o SessionStatusDto, convertendo-o em JSON
+        logger.info("Session validated and refreshed successfully. User: {} | IP: {}",
+                RequestContext.getAuthor(), RequestContext.getIp());
+
         return Response.ok(sessionStatusDto)
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }
 
-/**
+
+    /**
  * REST endpoint to retrieve all active and confirmed users with the "MANAGER" role.
  * The returned list is converted to UsersDropdownMenuDto for UI dropdowns.
  *

@@ -1,5 +1,10 @@
 package aor.projetofinal.dto;
 
+
+/**
+ * DTO used to update an evaluation with grade and feedback information.
+ * Includes details about both the evaluated user and the evaluator.
+ */
 public class UpdateEvaluationDto {
     private int evaluatedId;
 

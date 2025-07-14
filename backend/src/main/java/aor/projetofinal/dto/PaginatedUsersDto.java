@@ -2,6 +2,11 @@ package aor.projetofinal.dto;
 
 import java.util.List;
 
+
+/**
+ * DTO representing a paginated list of users without managers,
+ * along with pagination metadata such as total count, current page, and page size.
+ */
 public class PaginatedUsersDto {
     private List<NoManagerDto> users;
     private long total;

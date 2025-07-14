@@ -56,6 +56,22 @@ public class EvaluationService {
 
 
 
+    /**
+     * Closes all evaluations in the currently active evaluation cycle.
+     *
+     * Preconditions:
+     * - The request must include a valid session token.
+     * - The user must have the ADMIN role.
+     * - All evaluations in the active cycle must be in the EVALUATED state.
+     *
+     * If any of these conditions fail, the request is rejected with an appropriate
+     * HTTP status (401 Unauthorized, 403 Forbidden, or 409 Conflict).
+     *
+     * Upon success, this method invokes the logic to close all evaluations and deactivate the cycle.
+     *
+     * @param token The session token of the requesting user, passed in the header.
+     * @return HTTP Response indicating the result of the operation.
+     */
     @PUT
     @Path("/close-all")
     @Produces(MediaType.APPLICATION_JSON)
@@ -64,6 +80,7 @@ public class EvaluationService {
         // validate session
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
         if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("Unauthorized attempt to close evaluations. IP: {}", RequestContext.getIp());
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("{\"message\": \"Invalid or expired session.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -72,8 +89,13 @@ public class EvaluationService {
 
         UserEntity currentUser = tokenEntity.getUser();
 
-        // only and admin can close evaluations in bulk
+        logger.info("User: {} | IP: {} - Attempting to bulk close evaluations.",
+                RequestContext.getAuthor(), RequestContext.getIp());
+
+        // only an admin can close evaluations in bulk
         if (!currentUser.getRole().getName().equalsIgnoreCase("admin")) {
+            logger.warn("User: {} | IP: {} - Forbidden: Non-admin tried to bulk close evaluations.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
             return Response.status(Response.Status.FORBIDDEN)
                     .entity("{\"message\": \"Only admins can close evaluations in bulk.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -82,15 +104,22 @@ public class EvaluationService {
 
         // Validate if all evaluations are EVALUATED
         if (!evaluationBean.areAllEvaluationsInActiveCycleEvaluated()) {
+            logger.warn("User: {} | IP: {} - Not all evaluations are in EVALUATED state.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"message\": \"Not all evaluations are in EVALUATED state. Cannot proceed with bulk close.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
+        // close all evaluations in the current cycle
+        logger.info("User: {} | IP: {} - Proceeding with bulk closure of evaluations.",
+                RequestContext.getAuthor(), RequestContext.getIp());
 
-        //  close in bulk all evaluations in the current cycle
         evaluationCycleBean.bulkCloseEvaluationsAndCycle();
+
+        logger.info("User: {} | IP: {} - Bulk closure completed successfully.",
+                RequestContext.getAuthor(), RequestContext.getIp());
 
         return Response.ok()
                 .entity("{\"message\": \"Bulk close completed.\"}")
@@ -107,6 +136,21 @@ public class EvaluationService {
 
 
 
+    /**
+     * Closes a single evaluation by its ID, only if it is in the 'EVALUATED' state.
+     *
+     * Preconditions:
+     * - The request must include a valid session token.
+     * - The user must have the ADMIN role.
+     * - The evaluation must exist and be in 'EVALUATED' state.
+     *
+     * After closing the evaluation, this method checks whether the associated cycle
+     * can also be closed.
+     *
+     * @param evaluationId The ID of the evaluation to be closed.
+     * @param token The session token of the requesting user (from HTTP header).
+     * @return HTTP Response indicating the result of the operation.
+     */
     @PUT
     @Path("/close/{evaluationId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -116,6 +160,7 @@ public class EvaluationService {
         // validate session
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
         if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("Unauthorized attempt to close evaluation ID {}. IP: {}", evaluationId, RequestContext.getIp());
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("{\"message\": \"Invalid or expired session.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -124,8 +169,13 @@ public class EvaluationService {
 
         UserEntity currentUser = tokenEntity.getUser();
 
+        logger.info("User: {} | IP: {} - Attempting to close evaluation ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluationId);
+
         // only admins can close evaluations
         if (!currentUser.getRole().getName().equalsIgnoreCase("admin")) {
+            logger.warn("User: {} | IP: {} - Forbidden: Non-admin tried to close evaluation ID {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), evaluationId);
             return Response.status(Response.Status.FORBIDDEN)
                     .entity("{\"message\": \"Only admins can close evaluations.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -135,6 +185,8 @@ public class EvaluationService {
         // find the evaluation by ID
         EvaluationEntity evaluation = evaluationBean.findEvaluationById(evaluationId);
         if (evaluation == null) {
+            logger.warn("User: {} | IP: {} - Evaluation ID {} not found.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), evaluationId);
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("{\"message\": \"Evaluation not found.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -143,6 +195,8 @@ public class EvaluationService {
 
         // verify if the evaluation state is 'EVALUATED'
         if (evaluation.getState() != EvaluationStateEnum.EVALUATED) {
+            logger.warn("User: {} | IP: {} - Evaluation ID {} is not in 'EVALUATED' state.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), evaluationId);
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"message\": \"Only evaluations in 'EVALUATED' state can be closed.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -152,11 +206,15 @@ public class EvaluationService {
         // Close the evaluation and check if the cycle can be closed
         evaluationCycleBean.closeEvaluationAndCheckCycle(evaluation);
 
+        logger.info("User: {} | IP: {} - Evaluation ID {} closed successfully.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluationId);
+
         return Response.ok()
                 .entity("{\"message\": \"Evaluation closed successfully.\"}")
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }
+
 
 
     /**
@@ -497,7 +555,19 @@ public class EvaluationService {
 
 
 
-
+    /**
+     * Returns the list of possible evaluation grade options available in the system.
+     *
+     * Accessible only to users with ADMIN or MANAGER roles. Requires a valid session token.
+     *
+     * Logs:
+     * - Unauthorized or expired session access attempts
+     * - Forbidden access for users without proper role
+     * - Successful retrieval of options
+     *
+     * @param sessionToken The session token provided in the request header.
+     * @return A JSON response containing the list of {@link EvaluationOptionsDto}, or an error response.
+     */
     @GET
     @Path("/list-evaluation-options")
     @Produces(MediaType.APPLICATION_JSON)
@@ -550,6 +620,29 @@ public class EvaluationService {
         return Response.ok(options).build();
     }
 
+
+
+
+    /**
+     * Loads the evaluation for a specific user in the current active cycle.
+     *
+     * This endpoint is accessible to:
+     * - ADMINs
+     * - The manager of the evaluated user
+     * - The evaluated user themselves (only if the cycle and evaluation are CLOSED)
+     *
+     * Validates:
+     * - Session token
+     * - User and evaluation existence
+     * - Role-based access
+     * - Whether the cycle is active or closed
+     *
+     * Logs access attempts, permission issues, and successful evaluation loads.
+     *
+     * @param evaluatedUserId ID of the user whose evaluation is to be loaded.
+     * @param token Session token from the request header.
+     * @return A JSON response containing an {@link UpdateEvaluationDto} or an appropriate error message.
+     */
     @GET
     @Path("/load-evaluation")
     @Produces(MediaType.APPLICATION_JSON)
@@ -646,15 +739,28 @@ public class EvaluationService {
 
     }
 
+    /**
+     * Reopens a previously evaluated evaluation for editing by reverting its state to IN_EVALUATION.
+     *
+     * Preconditions:
+     * - The session token must be valid.
+     * - The user must have ADMIN role.
+     * - The evaluation must exist and be currently in the EVALUATED state.
+     *
+     * @param evaluationId The ID of the evaluation to revert.
+     * @param token The session token from the request header.
+     * @return HTTP response indicating success or failure reason.
+     */
     @PUT
     @Path("/reopen-for-editing/{evaluationId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response reopenEvaluationForEditing(@PathParam("evaluationId") Long evaluationId,
                                                @HeaderParam("sessionToken") String token) {
 
-        // validate session
+        // Validate session
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
         if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("Unauthorized attempt to reopen evaluation ID {}. IP: {}", evaluationId, RequestContext.getIp());
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("{\"message\": \"Invalid or expired session.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -663,41 +769,53 @@ public class EvaluationService {
 
         UserEntity currentUser = tokenEntity.getUser();
 
-        // verifies if it is an admin
+        logger.info("User: {} | IP: {} - Attempting to revert evaluation ID {} to IN_EVALUATION.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluationId);
+
+        // Verify admin role
         if (!currentUser.getRole().getName().equalsIgnoreCase("admin")) {
+            logger.warn("User: {} | IP: {} - Forbidden: Non-admin tried to reopen evaluation ID {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), evaluationId);
             return Response.status(Response.Status.FORBIDDEN)
                     .entity("{\"message\": \"Only admins can reopen evaluations for editing.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-        // get correct evaluation by ID
+        // Find evaluation by ID
         EvaluationEntity evaluation = evaluationBean.findEvaluationById(evaluationId);
         if (evaluation == null) {
+            logger.warn("User: {} | IP: {} - Evaluation ID {} not found.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), evaluationId);
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("{\"message\": \"Evaluation not found.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-        // can only open evaluations that are in EVALUATED state
+        // Ensure evaluation is in EVALUATED state
         if (evaluation.getState() != EvaluationStateEnum.EVALUATED) {
+            logger.warn("User: {} | IP: {} - Evaluation ID {} is not in EVALUATED state.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), evaluationId);
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"message\": \"Only evaluations in EVALUATED state can be reverted for editing.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-        // set the evaluation state back to IN_EVALUATION
+        // Revert evaluation state
         boolean reverted = evaluationBean.revertEvaluationToInEvaluation(evaluation);
         if (!reverted) {
+            logger.warn("User: {} | IP: {} - Failed to revert evaluation ID {} state.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), evaluationId);
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"message\": \"Only evaluations in EVALUATED state can be reverted for editing.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-        logger.info("Admin {} reverted evaluation ID {} to IN_EVALUATION.", currentUser.getEmail(), evaluationId);
+        logger.info("User: {} | IP: {} - Evaluation ID {} reverted to IN_EVALUATION successfully.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluationId);
 
         return Response.ok()
                 .entity("{\"message\": \"Evaluation successfully reverted to IN_EVALUATION.\"}")
@@ -708,6 +826,21 @@ public class EvaluationService {
 
 
 
+    /**
+     * Updates an evaluation with grade and feedback based on the provided DTO.
+     *
+     * Preconditions:
+     * - Valid session token.
+     * - Active evaluation cycle exists.
+     * - Evaluated user exists and has an evaluation in the current cycle.
+     * - Evaluation is not closed.
+     * - Evaluator is admin or the manager of the evaluated user.
+     * - Evaluation is still in progress (IN_EVALUATION state).
+     *
+     * @param dto The DTO containing updated evaluation data.
+     * @param token The session token from the request header.
+     * @return HTTP response indicating success or failure.
+     */
     @PUT
     @Path("/update-evaluation")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -715,40 +848,45 @@ public class EvaluationService {
     public Response updateEvaluation(UpdateEvaluationDto dto,
                                      @HeaderParam("sessionToken") String token) {
 
-        // check if the session token is valid
+        // Validate session
         SessionTokenEntity tokenEntity = sessionTokenDao.findBySessionToken(token);
         if (tokenEntity == null || tokenEntity.getUser() == null) {
+            logger.warn("Unauthorized update attempt. IP: {}", RequestContext.getIp());
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("{\"message\": \"Invalid or expired session.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-        // find the manager or admin who's the evaluator
         UserEntity evaluator = tokenEntity.getUser();
 
-        // get the current active cycle
+        // Check active evaluation cycle
         EvaluationCycleEntity cycle = evaluationCycleBean.findActiveCycle();
         if (cycle == null) {
+            logger.warn("User: {} | IP: {} - No active evaluation cycle when updating evaluation.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"message\": \"There is no evaluation cycle currently openned.\"}")
+                    .entity("{\"message\": \"There is no evaluation cycle currently opened.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-        // find the evaluated user by email
+        // Find evaluated user by email
         UserEntity evaluated = userDao.findByEmail(dto.getEvaluatedEmail());
         if (evaluated == null) {
+            logger.warn("User: {} | IP: {} - Evaluated user '{}' not found.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), dto.getEvaluatedEmail());
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("{\"message\": \"Couldn't find evaluated user.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-
-        //search for the correct evaluation in the current cycle
+        // Find evaluation for current cycle and evaluated user
         EvaluationEntity evaluation = evaluationBean.findEvaluationByCycleAndUser(cycle, evaluated);
         if (evaluation == null) {
+            logger.warn("User: {} | IP: {} - Evaluation not found for user '{}' in current cycle.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), dto.getEvaluatedEmail());
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("{\"message\": \"Evaluation not found for this user in current cycle.\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -756,39 +894,42 @@ public class EvaluationService {
         }
 
         if (evaluation.getState() == EvaluationStateEnum.CLOSED) {
+            logger.warn("User: {} | IP: {} - Attempt to modify closed evaluation for user '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), dto.getEvaluatedEmail());
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"message\": \"This evaluation is closed and cannot be modified.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-
-//verify if the evaluator is allowed to evaluate the evaluated user,
-// such that he must be either an admin or the manager of the evaluated user
+        // Check if evaluator is allowed
         boolean isAdmin = evaluator.getRole().getName().equalsIgnoreCase("admin");
         boolean isManagerOfEvaluated = evaluated.getManager() != null &&
                 evaluated.getManager().getEmail().equalsIgnoreCase(evaluator.getEmail());
 
         if (!isAdmin && !isManagerOfEvaluated) {
+            logger.warn("User: {} | IP: {} - Not authorized to evaluate user '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), dto.getEvaluatedEmail());
             return Response.status(Response.Status.FORBIDDEN)
                     .entity("{\"message\": \"You are not allowed to evaluate this user.\"}")
                     .build();
         }
 
-
-//check if the evaluation is still to fill
+        // Check if evaluation is still to fill
         if (evaluation.getState() != EvaluationStateEnum.IN_EVALUATION) {
+            logger.warn("User: {} | IP: {} - Attempt to update completed or closed evaluation for user '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), dto.getEvaluatedEmail());
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"message\": \"This evaluation is already completed or closed.\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
 
-
-
-
-        // create new evaluation based on the data received from the frontend
+        // Update evaluation
         evaluationBean.updateEvaluationWithGradeAndFeedback(dto, evaluation, evaluator);
+
+        logger.info("User: {} | IP: {} - Evaluation updated successfully for user '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), dto.getEvaluatedEmail());
 
         return Response.status(Response.Status.CREATED)
                 .entity("{\"message\": \"Evaluation successfully updated.\"}")

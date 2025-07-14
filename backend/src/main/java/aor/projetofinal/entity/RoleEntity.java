@@ -5,6 +5,11 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+
+/**
+ * Entity representing a user role in the system (e.g., ADMIN, USER).
+ * A role can be associated with many users and permissions.
+ */
 @Entity
 @Table(name = "roles") // agora no plural e minúsculas, para consistência
 public class RoleEntity implements Serializable {

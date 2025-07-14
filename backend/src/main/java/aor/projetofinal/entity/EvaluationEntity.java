@@ -7,6 +7,11 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+
+/**
+ * Entity representing an evaluation of a user within a specific evaluation cycle.
+ * Each user can only be evaluated once per cycle, enforced by a unique constraint.
+ */
 @Entity
 //the unique constraint ensures that a user can only be evaluated once per cycle, so that
 // tehre cannot exist two lines at this table with the same combination of cycle_id and evaluated_user_id

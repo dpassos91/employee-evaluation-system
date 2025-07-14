@@ -1,5 +1,9 @@
 package aor.projetofinal.dto;
 
+
+/**
+ * DTO representing system timeout settings for various authentication-related tokens.
+ */
 public class SettingsDTO {
     private int confirmationTokenTimeout;
     private int recoveryTokenTimeout;

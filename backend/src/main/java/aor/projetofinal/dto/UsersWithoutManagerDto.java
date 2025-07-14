@@ -2,6 +2,10 @@ package aor.projetofinal.dto;
 
 import java.util.List;
 
+/**
+ * DTO representing users who do not have a manager assigned.
+ * Includes the count and the list of affected users.
+ */
 public class UsersWithoutManagerDto {
     private int numberOfUsersWithoutManager;
     private List<UserDto> usersWithoutManager;

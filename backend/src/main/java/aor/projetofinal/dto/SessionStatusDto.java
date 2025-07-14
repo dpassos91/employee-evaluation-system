@@ -2,7 +2,10 @@ package aor.projetofinal.dto;
 
 import java.time.LocalDateTime;
 
-
+/**
+ * DTO representing the status of a user session.
+ * Contains the session token and its expiry date.
+ */
 public class SessionStatusDto {
 
     private String sessionToken;

@@ -7,6 +7,11 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
+/**
+ * Entity representing a system user.
+ * Stores authentication, role, manager relationships, and links to evaluations, courses, messages, and tokens.
+ */
 @Entity
 @Table(name = "users")
 public class UserEntity implements Serializable {

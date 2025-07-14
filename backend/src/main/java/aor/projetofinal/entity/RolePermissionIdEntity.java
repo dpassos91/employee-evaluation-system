@@ -6,6 +6,11 @@ import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
+
+/**
+ * Embeddable composite key for the RolePermissionEntity.
+ * Consists of a role ID and a permission ID.
+ */
 @Embeddable
 public class RolePermissionIdEntity implements Serializable {
 

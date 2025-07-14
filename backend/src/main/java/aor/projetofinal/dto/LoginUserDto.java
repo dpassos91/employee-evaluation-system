@@ -2,6 +2,12 @@ package aor.projetofinal.dto;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+
+
+/**
+ * DTO used for receiving login requests containing user credentials.
+ * This object is typically populated from JSON or XML payloads.
+ */
 @XmlRootElement
 public class LoginUserDto {
     private String email;

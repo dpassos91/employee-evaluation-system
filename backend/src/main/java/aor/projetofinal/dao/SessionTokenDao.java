@@ -1,6 +1,7 @@
 package aor.projetofinal.dao;
 
 
+import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -30,21 +31,45 @@ public class SessionTokenDao {
         }
     }
 
+    /**
+     * Deletes all session tokens associated with the specified user ID.
+     *
+     * @param userId The ID of the user whose session tokens should be deleted.
+     */
     public void deleteByUserId(int userId) {
-        em.createQuery("DELETE FROM SessionTokenEntity s WHERE s.user.id = :userId")
+        int deletedCount = em.createQuery("DELETE FROM SessionTokenEntity s WHERE s.user.id = :userId")
                 .setParameter("userId", userId)
                 .executeUpdate();
+
+        logger.info("User: {} | IP: {} - Deleted {} session tokens for user ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), deletedCount, userId);
     }
 
+
+    /**
+     * Finds a session token entity by its token value.
+     *
+     * @param token The session token string to search for.
+     * @return The corresponding SessionTokenEntity, or null if not found.
+     */
     public SessionTokenEntity findBySessionToken(String token) {
         try {
-            return em.createQuery("SELECT s FROM SessionTokenEntity s WHERE s.tokenValue = :token", SessionTokenEntity.class)
+            SessionTokenEntity result = em.createQuery(
+                            "SELECT s FROM SessionTokenEntity s WHERE s.tokenValue = :token", SessionTokenEntity.class)
                     .setParameter("token", token)
                     .getSingleResult();
+
+            logger.info("User: {} | IP: {} - Session token found for token '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), token);
+
+            return result;
         } catch (NoResultException e) {
+            logger.warn("User: {} | IP: {} - No session token found for token '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), token);
             return null;
         }
     }
+
 
 
     /**
@@ -54,10 +79,15 @@ public class SessionTokenDao {
      * @return A list of expired SessionTokenEntity instances.
      */
     public List<SessionTokenEntity> findExpiredSessionTokens(LocalDateTime now) {
-        return em.createQuery(
+        List<SessionTokenEntity> results = em.createQuery(
                         "SELECT s FROM SessionTokenEntity s WHERE s.expiryDate <= :now", SessionTokenEntity.class)
                 .setParameter("now", now)
                 .getResultList();
+
+        logger.info("User: {} | IP: {} - Retrieved {} expired session tokens as of {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), results.size(), now);
+
+        return results;
     }
 
 

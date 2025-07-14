@@ -35,6 +35,13 @@ public class EvaluationDao {
     }
 
 
+    /**
+     * Checks if the given user has already been evaluated in the specified evaluation cycle.
+     *
+     * @param cycle The evaluation cycle to check.
+     * @param evaluated The user being evaluated.
+     * @return True if the user has already been evaluated in the given cycle; false otherwise.
+     */
     public boolean alreadyEvaluatedAtCurrentCycle(EvaluationCycleEntity cycle, UserEntity evaluated) {
         TypedQuery<Long> query = em.createQuery(
                 "SELECT COUNT(e) FROM EvaluationEntity e WHERE e.cycle = :cycle AND e.evaluated = :evaluated",
@@ -45,8 +52,13 @@ public class EvaluationDao {
         query.setParameter("evaluated", evaluated);
 
         Long count = query.getSingleResult();
+
+        logger.info("User: {} | IP: {} - Checked if user {} has already been evaluated in cycle ID {}: {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluated.getEmail(), cycle.getId(), count > 0 ? "Yes" : "No");
+
         return count > 0;
     }
+
 
 
     /**
@@ -211,6 +223,12 @@ public class EvaluationDao {
 
 
 
+    /**
+     * Deletes the given evaluation entity from the persistence context.
+     * If the entity is detached, it is first merged before removal.
+     *
+     * @param evaluation The evaluation entity to be deleted.
+     */
     public void deleteEvaluation(EvaluationEntity evaluation) {
         if (em.contains(evaluation)) {
             em.remove(evaluation);
@@ -218,7 +236,11 @@ public class EvaluationDao {
             EvaluationEntity attached = em.merge(evaluation);
             em.remove(attached);
         }
+
+        logger.info("User: {} | IP: {} - Evaluation ID {} deleted.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluation.getId());
     }
+
 
 
     /**
@@ -340,7 +362,13 @@ public class EvaluationDao {
     }
 
 
-
+    /**
+     * Finds the evaluation for a specific user within a given evaluation cycle.
+     *
+     * @param cycle The evaluation cycle to search in.
+     * @param evaluated The user being evaluated.
+     * @return The matching EvaluationEntity, or null if no match is found.
+     */
     public EvaluationEntity findEvaluationByCycleAndUser(EvaluationCycleEntity cycle, UserEntity evaluated) {
         try {
             TypedQuery<EvaluationEntity> query = em.createQuery(
@@ -349,11 +377,20 @@ public class EvaluationDao {
             );
             query.setParameter("cycle", cycle);
             query.setParameter("evaluated", evaluated);
-            return query.getSingleResult();
+
+            EvaluationEntity result = query.getSingleResult();
+
+            logger.info("User: {} | IP: {} - Evaluation found for user {} in cycle ID {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), evaluated.getEmail(), cycle.getId());
+
+            return result;
         } catch (NoResultException e) {
+            logger.warn("User: {} | IP: {} - No evaluation found for user {} in cycle ID {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), evaluated.getEmail(), cycle.getId());
             return null;
         }
     }
+
 
 
     /**
@@ -517,6 +554,12 @@ public class EvaluationDao {
 
 
 
+    /**
+     * Retrieves all evaluations from the specified cycle that are not yet closed.
+     *
+     * @param cycle The evaluation cycle to search.
+     * @return A list of incomplete EvaluationEntity objects (not in CLOSED state).
+     */
     public List<EvaluationEntity> findIncompleteEvaluationsByCycle(EvaluationCycleEntity cycle) {
         TypedQuery<EvaluationEntity> query = em.createQuery(
                 "SELECT e FROM EvaluationEntity e WHERE e.cycle = :cycle AND e.state <> :excludedState",
@@ -524,8 +567,15 @@ public class EvaluationDao {
         );
         query.setParameter("cycle", cycle);
         query.setParameter("excludedState", EvaluationStateEnum.CLOSED);
-        return query.getResultList();
+
+        List<EvaluationEntity> results = query.getResultList();
+
+        logger.info("User: {} | IP: {} - Found {} incomplete evaluations in cycle ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), results.size(), cycle.getId());
+
+        return results;
     }
+
 
 
     public void save(EvaluationEntity evaluation) {

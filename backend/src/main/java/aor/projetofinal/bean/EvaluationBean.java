@@ -236,50 +236,90 @@ public class EvaluationBean implements Serializable {
 
 
 
-    //method to list all evaluation options for the dropdown menu in the frontend
+    /**
+     * Retrieves all available evaluation options to be used in a dropdown menu on the frontend.
+     *
+     * @return A list of EvaluationOptionsDto containing enum name, grade, and label.
+     */
     public List<EvaluationOptionsDto> listEvaluationOptions() {
+        logger.info("User: {} | IP: {} - Listing all evaluation options.",
+                RequestContext.getAuthor(), RequestContext.getIp());
+
         List<EvaluationOptionsDto> list = new ArrayList<>();
-        //GradeEvaluationType.values returns all the enum values as an array:
+
         for (GradeEvaluationEnum evaluation : GradeEvaluationEnum.values()) {
             list.add(new EvaluationOptionsDto(
-                    //dto enum name
                     evaluation.name(),
-                    //dto grade
                     evaluation.getGrade(),
-                    //dto label
                     evaluation.getGrade() + " - " + evaluation.getDescription()
             ));
         }
 
+        logger.info("User: {} | IP: {} - Found {} evaluation options.",
+                RequestContext.getAuthor(), RequestContext.getIp(), list.size());
+
         return list;
     }
 
+
+    /**
+     * Finds an evaluation entity by its unique identifier.
+     *
+     * @param id The ID of the evaluation to retrieve.
+     * @return The corresponding EvaluationEntity, or null if not found.
+     */
     public EvaluationEntity findEvaluationById(Long id) {
+        logger.info("User: {} | IP: {} - Retrieving evaluation by ID: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), id);
+
         return evaluationDao.findById(id);
     }
 
 
+
+    /**
+     * Retrieves all incomplete evaluations for a given evaluation cycle.
+     *
+     * @param cycle The evaluation cycle to search for incomplete evaluations.
+     * @return A list of EvaluationEntity objects that are incomplete within the specified cycle.
+     */
     public List<EvaluationEntity> getIncompleteEvaluationsForCycle(EvaluationCycleEntity cycle) {
+        logger.info("User: {} | IP: {} - Retrieving incomplete evaluations for cycle ID: {}",
+                RequestContext.getAuthor(), RequestContext.getIp(), cycle.getId());
+
         return evaluationDao.findIncompleteEvaluationsByCycle(cycle);
     }
 
 
+
+    /**
+     * Finds an evaluation for a specific user within a given evaluation cycle.
+     *
+     * @param cycle The evaluation cycle to search within.
+     * @param evaluated The user being evaluated.
+     * @return The matching EvaluationEntity, or null if not found.
+     */
     public EvaluationEntity findEvaluationByCycleAndUser(EvaluationCycleEntity cycle, UserEntity evaluated) {
         EvaluationEntity evaluation = evaluationDao.findEvaluationByCycleAndUser(cycle, evaluated);
 
         if (evaluation == null) {
-            logger.warn("No evaluation found for user {} in cycle ID {}.",
-                    evaluated.getEmail(), cycle.getId());
+            logger.warn("User: {} | IP: {} - No evaluation found for user {} in cycle ID {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), evaluated.getEmail(), cycle.getId());
             return null;
         }
 
-        logger.info("Evaluation found for user {} in cycle ID {}.",
-                evaluated.getEmail(), cycle.getId());
+        logger.info("User: {} | IP: {} - Evaluation found for user {} in cycle ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluated.getEmail(), cycle.getId());
 
         return evaluation;
     }
 
 
+    /**
+     * Retrieves a list of users who have incomplete evaluations in the currently active evaluation cycle.
+     *
+     * @return A DTO containing the list of users with incomplete evaluations and the total count.
+     */
     public UsersWithIncompleteEvaluationsDto listUsersWithIncompleteEvaluationsFromLastCycle() {
         logger.info("User: {} | IP: {} - Listing users with incomplete evaluations from previous cycle.",
                 RequestContext.getAuthor(), RequestContext.getIp());
@@ -319,16 +359,24 @@ public class EvaluationBean implements Serializable {
     }
 
 
+    /**
+     * Reverts the state of an evaluation from EVALUATED to IN_EVALUATION.
+     *
+     * @param evaluation The evaluation entity to revert.
+     * @return True if the evaluation was successfully reverted; false otherwise.
+     */
     public boolean revertEvaluationToInEvaluation(EvaluationEntity evaluation) {
         if (evaluation.getState() != EvaluationStateEnum.EVALUATED) {
-            logger.warn("Cannot revert evaluation ID {} because it's not in EVALUATED state.", evaluation.getId());
+            logger.warn("User: {} | IP: {} - Cannot revert evaluation ID {} because it's not in EVALUATED state.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), evaluation.getId());
             return false;
         }
 
         evaluation.setState(EvaluationStateEnum.IN_EVALUATION);
         evaluationDao.save(evaluation);
 
-        logger.info("Evaluation ID {} reverted to IN_EVALUATION.", evaluation.getId());
+        logger.info("User: {} | IP: {} - Evaluation ID {} reverted to IN_EVALUATION.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluation.getId());
         return true;
     }
 
@@ -336,16 +384,23 @@ public class EvaluationBean implements Serializable {
 
 
 
+
+    /**
+     * Updates an evaluation with the given grade and feedback. Also sets the evaluator and current timestamp.
+     * The evaluation state is set to EVALUATED only if feedback is provided; otherwise, it remains IN_EVALUATION.
+     *
+     * @param updateEvaluationDto The DTO containing the new grade and feedback.
+     * @param evaluation The evaluation entity to update.
+     * @param evaluator The user performing the evaluation.
+     */
     public void updateEvaluationWithGradeAndFeedback(UpdateEvaluationDto updateEvaluationDto,
                                                      EvaluationEntity evaluation,
                                                      UserEntity evaluator) {
-
 
         evaluation.setGrade(GradeEvaluationEnum.getEnumfromGrade(updateEvaluationDto.getGrade()));
         evaluation.setFeedback(updateEvaluationDto.getFeedback());
         evaluation.setDate(LocalDateTime.now());
         evaluation.setEvaluator(evaluator);
-
 
         // Update the evaluation state only if feedback was provided
         if (updateEvaluationDto.getFeedback() != null && !updateEvaluationDto.getFeedback().trim().isEmpty()) {
@@ -356,14 +411,27 @@ public class EvaluationBean implements Serializable {
 
         evaluationDao.save(evaluation);
 
-        logger.info("Evaluation updated for user {} by {}.",
+        logger.info("User: {} | IP: {} - Evaluation updated for user {} by {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(),
                 evaluation.getEvaluated().getEmail(), evaluator.getEmail());
     }
 
 
+
+    /**
+     * Checks if the given user has already been evaluated in the specified evaluation cycle.
+     *
+     * @param cycle The evaluation cycle to check.
+     * @param evaluated The user being evaluated.
+     * @return True if the user has already been evaluated in the cycle; false otherwise.
+     */
     public boolean alreadyEvaluatedAtCurrentCycle(EvaluationCycleEntity cycle, UserEntity evaluated) {
+        logger.info("User: {} | IP: {} - Checking if user {} has already been evaluated in cycle ID {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), evaluated.getEmail(), cycle.getId());
+
         return evaluationDao.alreadyEvaluatedAtCurrentCycle(cycle, evaluated);
     }
+
 
 
 }

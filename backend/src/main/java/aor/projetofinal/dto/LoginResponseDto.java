@@ -2,6 +2,11 @@ package aor.projetofinal.dto;
 
 import java.util.List;
 
+
+/**
+ * DTO representing the response returned after a successful login.
+ * Contains session token, user identity, role, profile completeness, and any missing profile fields.
+ */
 public class LoginResponseDto {
     private String sessionToken;
     private int id;

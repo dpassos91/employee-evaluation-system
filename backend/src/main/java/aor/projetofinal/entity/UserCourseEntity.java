@@ -6,6 +6,10 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Entity representing the participation of a user in a course.
+ * This is a many-to-many association between users and courses with additional metadata.
+ */
 @Entity
 @Table(name = "user_courses")
 public class UserCourseEntity implements Serializable {

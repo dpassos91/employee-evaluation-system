@@ -3,7 +3,10 @@ package aor.projetofinal.entity;
 import jakarta.persistence.*;
 import java.io.Serializable;
 
-
+/**
+ * Entity representing system-wide configuration settings for token expiration.
+ * This includes confirmation, recovery, and session token timeouts (in minutes).
+ */
 @Entity
 @Table(name = "settings")
 public class SettingsEntity implements Serializable {

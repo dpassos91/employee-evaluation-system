@@ -2,6 +2,11 @@ package aor.projetofinal.dto;
 
 import java.util.List;
 
+
+/**
+ * DTO representing users who have not yet completed their evaluations.
+ * Includes the total number of such users and the list itself.
+ */
 public class UsersWithIncompleteEvaluationsDto {
     private int totalUsersWithIncompleteEvaluations;
     private List<UserDto> users;

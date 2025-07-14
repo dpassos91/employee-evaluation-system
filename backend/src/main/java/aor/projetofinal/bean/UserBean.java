@@ -804,7 +804,15 @@ public class UserBean implements Serializable {
     }
 
 
+    /**
+     * Retrieves a list of users who are currently assigned as their own manager.
+     *
+     * @return A DTO containing the list of such users and their total count.
+     */
     public UsersManagingThemselvesDto listUsersManagingThemselves() {
+        logger.info("User: {} | IP: {} - Listing users who are managing themselves.",
+                RequestContext.getAuthor(), RequestContext.getIp());
+
         List<UserEntity> selfManagedUsers = userDao.findUsersManagingThemselves();
 
         List<UserDto> userDtos = new ArrayList<>();
@@ -816,8 +824,12 @@ public class UserBean implements Serializable {
         dto.setUsers(userDtos);
         dto.setNumberOfUsers(userDtos.size());
 
+        logger.info("User: {} | IP: {} - Found {} users managing themselves.",
+                RequestContext.getAuthor(), RequestContext.getIp(), userDtos.size());
+
         return dto;
     }
+
 
 
     /**

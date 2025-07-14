@@ -39,7 +39,25 @@ public class EvaluationCycleService {
     private EvaluationCycleBean evaluationCycleBean;
 
 
-
+    /**
+     * Creates a new evaluation cycle, if and only if all preconditions are met.
+     *
+     * Preconditions checked:
+     * - Valid session token
+     * - User is an administrator
+     * - End date is valid and in the future
+     * - No active evaluation cycle exists
+     * - All confirmed users have managers assigned
+     * - No user is managing themselves
+     * - All evaluations from previous cycle are completed
+     *
+     * If any condition fails, a corresponding error response (HTTP 400, 401, 403, or 409)
+     * is returned with detailed information or DTO.
+     *
+     * @param dto   DTO containing the end date for the new evaluation cycle.
+     * @param token Session token of the user making the request (provided via HTTP header).
+     * @return HTTP Response indicating success (201 Created) or the reason for rejection.
+     */
     @POST
     @Path("/create-cycle")
     @Consumes(MediaType.APPLICATION_JSON)

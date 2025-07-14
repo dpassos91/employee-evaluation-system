@@ -6,6 +6,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * Entity representing a session token issued to a user.
+ * Each user may have multiple session tokens for different devices or sessions.
+ */
 @Entity
 @Table(name = "session_token")
 public class SessionTokenEntity implements Serializable {

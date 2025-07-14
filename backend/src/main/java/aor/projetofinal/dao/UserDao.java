@@ -24,12 +24,23 @@ public class UserDao {
 
     private static final Logger logger = LogManager.getLogger(UserDao.class);
 
+    /**
+     * Counts the number of users with the ADMIN role.
+     *
+     * @return The total number of users assigned to the ADMIN role.
+     */
     public long countAdmins() {
-        return em.createQuery(
+        long count = em.createQuery(
                         "SELECT COUNT(u) FROM UserEntity u WHERE u.role.name = :roleName", Long.class)
                 .setParameter("roleName", "ADMIN")
                 .getSingleResult();
+
+        logger.info("User: {} | IP: {} - Counted {} admin users.",
+                RequestContext.getAuthor(), RequestContext.getIp(), count);
+
+        return count;
     }
+
 
 
     /**
@@ -77,46 +88,110 @@ public class UserDao {
         em.persist(user);
     }
 
+    /**
+     * Finds a user by their confirmation token.
+     *
+     * @param confirmToken The confirmation token to search for.
+     * @return The corresponding UserEntity, or null if not found.
+     */
     public UserEntity findByConfirmToken(String confirmToken) {
         try {
             TypedQuery<UserEntity> query = em.createQuery(
                     "SELECT u FROM UserEntity u WHERE u.confirmationToken = :token", UserEntity.class);
             query.setParameter("token", confirmToken);
-            return query.getSingleResult();
+
+            UserEntity result = query.getSingleResult();
+
+            logger.info("User: {} | IP: {} - User found with confirmation token '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), confirmToken);
+
+            return result;
         } catch (NoResultException e) {
+            logger.warn("User: {} | IP: {} - No user found with confirmation token '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), confirmToken);
             return null;
         }
-    }    
-    
-    public UserEntity findById(int id) {
-    try {
-        return em.find(UserEntity.class, id);
-    } catch (Exception e) {
-        return null;
     }
-}
 
+
+    /**
+     * Finds a user by their unique ID.
+     *
+     * @param id The ID of the user to retrieve.
+     * @return The corresponding UserEntity, or null if not found or on error.
+     */
+    public UserEntity findById(int id) {
+        try {
+            UserEntity result = em.find(UserEntity.class, id);
+
+            if (result != null) {
+                logger.info("User: {} | IP: {} - User found with ID {}.",
+                        RequestContext.getAuthor(), RequestContext.getIp(), id);
+            } else {
+                logger.warn("User: {} | IP: {} - No user found with ID {}.",
+                        RequestContext.getAuthor(), RequestContext.getIp(), id);
+            }
+
+            return result;
+        } catch (Exception e) {
+            logger.error("User: {} | IP: {} - Error retrieving user with ID {}: {}",
+                    RequestContext.getAuthor(), RequestContext.getIp(), id, e.getMessage());
+            return null;
+        }
+    }
+
+
+    /**
+     * Finds a user by their email address.
+     *
+     * @param email The email of the user to search for.
+     * @return The corresponding UserEntity, or null if not found.
+     */
     public UserEntity findByEmail(String email) {
         try {
             TypedQuery<UserEntity> query = em.createQuery(
                     "SELECT u FROM UserEntity u WHERE u.email = :email", UserEntity.class);
             query.setParameter("email", email);
-            return query.getSingleResult();
+
+            UserEntity result = query.getSingleResult();
+
+            logger.info("User: {} | IP: {} - User found with email '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), email);
+
+            return result;
         } catch (NoResultException e) {
+            logger.warn("User: {} | IP: {} - No user found with email '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), email);
             return null;
         }
     }
 
+
+    /**
+     * Finds a user by their password recovery token.
+     *
+     * @param recoveryToken The recovery token to search for.
+     * @return The corresponding UserEntity, or null if not found.
+     */
     public UserEntity findByRecoveryToken(String recoveryToken) {
         try {
             TypedQuery<UserEntity> query = em.createQuery(
                     "SELECT u FROM UserEntity u WHERE u.recoveryToken = :token", UserEntity.class);
             query.setParameter("token", recoveryToken);
-            return query.getSingleResult();
+
+            UserEntity result = query.getSingleResult();
+
+            logger.info("User: {} | IP: {} - User found with recovery token '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), recoveryToken);
+
+            return result;
         } catch (NoResultException e) {
+            logger.warn("User: {} | IP: {} - No user found with recovery token '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), recoveryToken);
             return null;
         }
     }
+
 
 
 
@@ -170,18 +245,38 @@ public class UserDao {
 
 
 
+    /**
+     * Retrieves the user associated with a given session token.
+     *
+     * @param token The session token string.
+     * @return The corresponding UserEntity, or null if not found.
+     */
     public UserEntity findBySessionToken(String token) {
-    try {
-        TypedQuery<UserEntity> query = em.createQuery(
-            "SELECT st.user FROM SessionTokenEntity st WHERE st.tokenValue = :token", UserEntity.class);
-        query.setParameter("token", token);
-        return query.getSingleResult();
-    } catch (NoResultException e) {
-        return null;
+        try {
+            TypedQuery<UserEntity> query = em.createQuery(
+                    "SELECT st.user FROM SessionTokenEntity st WHERE st.tokenValue = :token", UserEntity.class);
+            query.setParameter("token", token);
+
+            UserEntity result = query.getSingleResult();
+
+            logger.info("User: {} | IP: {} - User found by session token '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), token);
+
+            return result;
+        } catch (NoResultException e) {
+            logger.warn("User: {} | IP: {} - No user found for session token '{}'.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), token);
+            return null;
+        }
     }
-}
 
 
+
+    /**
+     * Retrieves all active and confirmed users who have a manager assigned and are not administrators.
+     *
+     * @return A list of confirmed UserEntity objects with managers assigned.
+     */
     public List<UserEntity> findConfirmedUsersWithManager() {
         TypedQuery<UserEntity> query = em.createQuery(
                 "SELECT u FROM UserEntity u " +
@@ -191,18 +286,35 @@ public class UserDao {
                         "AND LOWER(u.role.name) <> 'admin'",
                 UserEntity.class
         );
-        return query.getResultList();
+
+        List<UserEntity> users = query.getResultList();
+
+        logger.info("User: {} | IP: {} - Retrieved {} confirmed users with managers (excluding admins).",
+                RequestContext.getAuthor(), RequestContext.getIp(), users.size());
+
+        return users;
     }
 
 
 
+    /**
+     * Retrieves all confirmed users who do not have a manager assigned and are not administrators.
+     *
+     * @return A list of confirmed UserEntity objects without managers.
+     */
     public List<UserEntity> findConfirmedUsersWithoutManager() {
         TypedQuery<UserEntity> query = em.createQuery(
                 "SELECT u FROM UserEntity u " +
                         "WHERE u.confirmed = true AND u.manager IS NULL AND LOWER(u.role.name) <> 'admin'",
                 UserEntity.class
         );
-        return query.getResultList();
+
+        List<UserEntity> users = query.getResultList();
+
+        logger.info("User: {} | IP: {} - Retrieved {} confirmed users without managers (excluding admins).",
+                RequestContext.getAuthor(), RequestContext.getIp(), users.size());
+
+        return users;
     }
 
 
@@ -230,6 +342,14 @@ public class UserDao {
         return resultList;
     }
 
+    /**
+     * Finds a list of confirmed and active users that can be assigned as a manager,
+     * excluding the specified user and their former manager. Administrators are also excluded.
+     *
+     * @param excluded The user who should not be included in the result.
+     * @param formerManager The previous manager to be excluded from the result.
+     * @return A list of suitable UserEntity candidates for manager assignment.
+     */
     public List<UserEntity> findSuitableManager(UserEntity excluded, UserEntity formerManager) {
         TypedQuery<UserEntity> query = em.createQuery(
                 "SELECT u FROM UserEntity u WHERE u.confirmed = true AND u.active = true " +
@@ -240,9 +360,24 @@ public class UserDao {
         );
         query.setParameter("excludedEmail", excluded.getEmail());
         query.setParameter("formerManagerEmail", formerManager.getEmail());
-        return query.getResultList();
+
+        List<UserEntity> results = query.getResultList();
+
+        logger.info("User: {} | IP: {} - Retrieved {} suitable manager candidates excluding '{}' and former manager '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), results.size(),
+                excluded.getEmail(), formerManager.getEmail());
+
+        return results;
     }
 
+
+    /**
+     * Retrieves all confirmed and active users managed by the given manager,
+     * excluding users with the ADMIN role.
+     *
+     * @param manager The manager whose direct reports are to be retrieved.
+     * @return A list of UserEntity objects managed by the specified manager.
+     */
     public List<UserEntity> findUsersByManager(UserEntity manager) {
         TypedQuery<UserEntity> query = em.createQuery(
                 "SELECT u FROM UserEntity u WHERE u.manager = :manager " +
@@ -251,11 +386,24 @@ public class UserDao {
                 UserEntity.class
         );
         query.setParameter("manager", manager);
-        return query.getResultList();
+
+        List<UserEntity> results = query.getResultList();
+
+        logger.info("User: {} | IP: {} - Retrieved {} users managed by '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), results.size(), manager.getEmail());
+
+        return results;
     }
 
 
 
+
+    /**
+     * Retrieves all confirmed and active users with the specified role.
+     *
+     * @param roleName The name of the role to filter users by.
+     * @return A list of UserEntity objects matching the given role.
+     */
     public List<UserEntity> findUsersByRole(String roleName) {
         TypedQuery<UserEntity> query = em.createQuery(
                 "SELECT u FROM UserEntity u " +
@@ -265,10 +413,21 @@ public class UserDao {
                 UserEntity.class
         );
         query.setParameter("roleName", roleName);
-        return query.getResultList();
+
+        List<UserEntity> results = query.getResultList();
+
+        logger.info("User: {} | IP: {} - Retrieved {} users with role '{}'.",
+                RequestContext.getAuthor(), RequestContext.getIp(), results.size(), roleName);
+
+        return results;
     }
 
 
+    /**
+     * Retrieves all confirmed and active users who are assigned as their own manager.
+     *
+     * @return A list of UserEntity objects managing themselves.
+     */
     public List<UserEntity> findUsersManagingThemselves() {
         TypedQuery<UserEntity> query = em.createQuery(
                 "SELECT u FROM UserEntity u " +
@@ -277,8 +436,15 @@ public class UserDao {
                         "AND u = u.manager",
                 UserEntity.class
         );
-        return query.getResultList();
+
+        List<UserEntity> results = query.getResultList();
+
+        logger.info("User: {} | IP: {} - Retrieved {} users managing themselves.",
+                RequestContext.getAuthor(), RequestContext.getIp(), results.size());
+
+        return results;
     }
+
 
 
 

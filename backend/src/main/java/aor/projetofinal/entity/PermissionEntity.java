@@ -5,6 +5,11 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+
+/**
+ * Entity representing a system permission, defining an allowed action.
+ * Each permission can be associated with multiple roles via RolePermissionEntity.
+ */
 @Entity
 @Table(name = "permissions")
 public class PermissionEntity implements Serializable {

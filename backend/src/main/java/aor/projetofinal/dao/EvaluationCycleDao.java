@@ -25,14 +25,27 @@ public class EvaluationCycleDao {
 
     private static final Logger logger = LogManager.getLogger(EvaluationCycleDao.class);
 
+    /**
+     * Retrieves the currently active evaluation cycle from the database.
+     *
+     * @return The active EvaluationCycleEntity, or null if no active cycle exists.
+     */
     public EvaluationCycleEntity findActiveCycle() {
         try {
             TypedQuery<EvaluationCycleEntity> query = em.createQuery(
                     "SELECT c FROM EvaluationCycleEntity c WHERE c.active = true", EvaluationCycleEntity.class
             );
             query.setMaxResults(1);
-            return query.getSingleResult();
+
+            EvaluationCycleEntity result = query.getSingleResult();
+
+            logger.info("User: {} | IP: {} - Active evaluation cycle retrieved with ID: {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), result.getId());
+
+            return result;
         } catch (NoResultException e) {
+            logger.warn("User: {} | IP: {} - No active evaluation cycle found.",
+                    RequestContext.getAuthor(), RequestContext.getIp());
             return null;
         }
     }
@@ -43,13 +56,24 @@ public class EvaluationCycleDao {
 
 
 
+
+    /**
+     * Checks whether there is at least one active evaluation cycle in the system.
+     *
+     * @return True if an active cycle exists; false otherwise.
+     */
     public boolean isThereAnActiveCycle() {
         TypedQuery<Long> query = em.createQuery(
                 "SELECT COUNT(c) FROM EvaluationCycleEntity c WHERE c.active = true", Long.class
         );
         Long count = query.getSingleResult();
+
+        logger.info("User: {} | IP: {} - Checked for active evaluation cycle: {} found.",
+                RequestContext.getAuthor(), RequestContext.getIp(), count > 0 ? "Yes" : "No");
+
         return count > 0;
     }
+
 
     public void create(EvaluationCycleEntity evaluationCycle) {
         em.persist(evaluationCycle);
