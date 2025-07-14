@@ -389,3 +389,316 @@ java.lang.RuntimeException: DB error
 14/07/2025-05:39:45 [main] WARN  aor.projetofinal.bean.UserBean - L78 - User: Anonymous | IP: Unknown - User or manager not found. Assignment skipped.
 14/07/2025-05:39:45 [main] INFO  aor.projetofinal.bean.UserBean - L229 - User: Anonymous | IP: Unknown - Authorization request received.
 14/07/2025-05:39:45 [main] INFO  aor.projetofinal.bean.UserBean - L265 - User: Anonymous | IP: Unknown - Authorization granted for user: null.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L52 - User: Anonymous | IP: Unknown - All evaluations in cycle ID 1 evaluated: false.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L324 - User: Anonymous | IP: Unknown - Listing users with incomplete evaluations from previous cycle.
+14/07/2025-09:39:03 [main] WARN  aor.projetofinal.bean.EvaluationBean - L330 - User: Anonymous | IP: Unknown - No active evaluation cycle found.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L414 - User: Anonymous | IP: Unknown - Evaluation updated for user eval@example.com by null.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L414 - User: Anonymous | IP: Unknown - Evaluation updated for user eval@example.com by null.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L68 - User: Anonymous | IP: Unknown - Building UpdateEvaluationDto from evaluation ID 10.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L102 - User: Anonymous | IP: Unknown - DTO built successfully from evaluation ID 10.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L272 - User: Anonymous | IP: Unknown - Retrieving evaluation by ID: 5
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L287 - User: Anonymous | IP: Unknown - Retrieving incomplete evaluations for cycle ID: 1
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L429 - User: Anonymous | IP: Unknown - Checking if user user@example.com has already been evaluated in cycle ID null.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L311 - User: Anonymous | IP: Unknown - Evaluation found for user user@example.com in cycle ID 1.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L52 - User: Anonymous | IP: Unknown - All evaluations in cycle ID 1 evaluated: true.
+14/07/2025-09:39:03 [main] WARN  aor.projetofinal.bean.EvaluationBean - L370 - User: Anonymous | IP: Unknown - Cannot revert evaluation ID 1 because it's not in EVALUATED state.
+14/07/2025-09:39:03 [main] WARN  aor.projetofinal.bean.EvaluationBean - L306 - User: Anonymous | IP: Unknown - No evaluation found for user user@example.com in cycle ID 1.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L287 - User: Anonymous | IP: Unknown - Retrieving incomplete evaluations for cycle ID: 1
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L324 - User: Anonymous | IP: Unknown - Listing users with incomplete evaluations from previous cycle.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L287 - User: Anonymous | IP: Unknown - Retrieving incomplete evaluations for cycle ID: 1
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationBean - L355 - User: Anonymous | IP: Unknown - Found 2 users with incomplete evaluations.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L188 - User: Anonymous | IP: Unknown - New evaluation cycle created with end date: 2025-08-13.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L219 - User: Anonymous | IP: Unknown - Created 1 placeholder evaluations for the new cycle.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L315 - User: Anonymous | IP: Unknown - Admins and managers notified by email about the opening of a new evaluation cycle.
+14/07/2025-09:39:03 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L58 - User: Anonymous | IP: Unknown - Active evaluation cycle found with ID 1.
+14/07/2025-09:39:03 [main] WARN  aor.projetofinal.bean.EvaluationCycleBean - L53 - User: Anonymous | IP: Unknown - No active evaluation cycle found.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.ProfileBean - L175 - User: Anonymous | IP: Unknown - 5 messages marked as read (SenderId: 1, ReceiverId: 2).
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.ProfileBean - L203 - User: Anonymous | IP: Unknown - Invalid sender (1) or receiver (2). Message not saved.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.ProfileBean - L165 - User: Anonymous | IP: Unknown - Invalid sender (1) or receiver (2). Cannot mark as read.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.ProfileBean - L69 - User: Anonymous | IP: Unknown - Fetching conversations for userId 1.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.ProfileBean - L119 - User: Anonymous | IP: Unknown - Added conversation with userId 2 (unread: 0, role: null, online: false).
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.ProfileBean - L119 - User: Anonymous | IP: Unknown - Added conversation with userId 3 (unread: 0, role: null, online: false).
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.ProfileBean - L130 - User: Anonymous | IP: Unknown - Total conversations found for userId 1: 2.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.ProfileBean - L192 - User: Anonymous | IP: Unknown - Attempted to save null MessageDto. Operation aborted.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.ProfileBean - L219 - User: Anonymous | IP: Unknown - Message persisted. SenderId: 1, ReceiverId: 2
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.ProfileBean - L236 - User: Anonymous | IP: Unknown - Attempted to convert null MessageEntity to DTO.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.ProfileBean - L45 - User: Anonymous | IP: Unknown - Invalid users in getConversation(). Operation aborted.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.NotificationBean - L194 - User: Anonymous | IP: Unknown - Attempted to convert null NotificationEntity to DTO.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.NotificationBean - L79 - User: Anonymous | IP: Unknown - Invalid notification type 'INVALID_TYPE'. Operation aborted.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.NotificationBean - L84 - User: Anonymous | IP: Unknown - Notification created. UserId: 1, Type: MESSAGE, Message: 'Test message'.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.NotificationBean - L102 - User: Anonymous | IP: Unknown - Tried to get notifications for non-existent user (userId: 1).
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.NotificationBean - L141 - User: Anonymous | IP: Unknown - Tried to get unread notifications for non-existent user (userId: 1).
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.NotificationBean - L182 - User: Anonymous | IP: Unknown - Marked 5 notifications as read for userId: 1.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.NotificationBean - L178 - User: Anonymous | IP: Unknown - Tried to mark notifications as read for non-existent user (userId: 1).
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.NotificationBean - L65 - User: Anonymous | IP: Unknown - Attempted to create notification for non-existent user (userId: 99). Operation aborted.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.ProfileBean - L53 - User: Anonymous | IP: Unknown | Email: unknown - Attempted to update photograph for null user. Operation aborted.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.ProfileBean - L72 - User: Anonymous | IP: Unknown - Attempted to convert a null ProfileEntity to DTO. Operation aborted.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.ProfileBean - L59 - User: Anonymous | IP: Unknown | Email: user@example.com - Successfully updated profile photograph.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.ProfileBean - L172 - User: Anonymous | IP: Unknown | Email: unknown@example.com - Could not find user to update.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.ProfileBean - L233 - User: Anonymous | IP: Unknown | Email: null - No profile entity found for user.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.ProfileBean - L228 - User: Anonymous | IP: Unknown | Email: unknown - Attempted to update photo for null user.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.ProfileBean - L147 - User: Anonymous | IP: Unknown | Filters -> Employee Name: name, Workplace: COIMBRA, Manager Email: manager@example.com | Page: 1 - Searching paginated profiles with filters.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.ProfileBean - L128 - User: Anonymous | IP: Unknown | Filters -> Employee Name: name, Workplace: COIMBRA, Manager Email: manager@example.com - Searching profiles with filters.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.ProfileBean - L238 - User: Anonymous | IP: Unknown | Email: user@example.com - Profile photo updated to 'photo.png'.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.ProfileBean - L181 - User: Anonymous | IP: Unknown | Email: user@example.com - Created new profile for user.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.ProfileBean - L207 - User: Anonymous | IP: Unknown | Email: user@example.com - Missing required usualWorkplace field.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.ProfileBean - L181 - User: Anonymous | IP: Unknown | Email: user@example.com - Created new profile for user.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.ProfileBean - L202 - User: Anonymous | IP: Unknown | Email: user@example.com | Value: INVALID - Invalid usualWorkplace value received.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L43 - System | IP: Unknown - Running session token cleanup at 2025-07-14T09:39:04.435530100
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L55 - System | IP: Unknown - No expired session tokens found.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L43 - System | IP: Unknown - Running session token cleanup at 2025-07-14T09:39:04.441556300
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L55 - System | IP: Unknown - No expired session tokens found.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L90 - User: Anonymous | IP: Unknown - Accessing application settings.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L147 - User: Anonymous | IP: Unknown - Successfully updated recovery token timeout to 10 minutes.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L90 - User: Anonymous | IP: Unknown - Accessing application settings.
+14/07/2025-09:39:04 [main] ERROR aor.projetofinal.bean.SettingsBean - L155 - User: Anonymous | IP: Unknown - Failed to update recovery token timeout to 10 minutes.
+java.lang.RuntimeException: DB error
+	at aor.projetofinal.dao.SettingsDao.save(SettingsDao.java:36) ~[classes/:?]
+	at aor.projetofinal.bean.SettingsBean.updateRecoveryTokenTimeout(SettingsBean.java:146) ~[classes/:?]
+	at aor.projetofinal.bean.SettingsBeanTest.updateRecoveryTokenTimeout_exceptionReturnsFalse(SettingsBeanTest.java:115) ~[test-classes/:?]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[?:?]
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:767) ~[junit-platform-commons-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$8(TestMethodTestDescriptor.java:217) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[?:?]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[?:?]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) [surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184) [surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148) [surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122) [surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) [surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) [surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) [surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) [surefire-booter-3.5.2.jar:3.5.2]
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L90 - User: Anonymous | IP: Unknown - Accessing application settings.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L181 - User: Anonymous | IP: Unknown - Successfully updated session timeout to 25 minutes.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L90 - User: Anonymous | IP: Unknown - Accessing application settings.
+14/07/2025-09:39:04 [main] ERROR aor.projetofinal.bean.SettingsBean - L190 - User: Anonymous | IP: Unknown - Failed to update session timeout to 25 minutes.
+java.lang.RuntimeException: DB error
+	at aor.projetofinal.dao.SettingsDao.save(SettingsDao.java:36) ~[classes/:?]
+	at aor.projetofinal.bean.SettingsBean.updateSessionTimeoutMinutes(SettingsBean.java:179) ~[classes/:?]
+	at aor.projetofinal.bean.SettingsBeanTest.updateSessionTimeoutMinutes_exceptionReturnsFalse(SettingsBeanTest.java:139) ~[test-classes/:?]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[?:?]
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:767) ~[junit-platform-commons-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$8(TestMethodTestDescriptor.java:217) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[?:?]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[?:?]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) [surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184) [surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148) [surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122) [surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) [surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) [surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) [surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) [surefire-booter-3.5.2.jar:3.5.2]
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L90 - User: Anonymous | IP: Unknown - Accessing application settings.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L114 - User: Anonymous | IP: Unknown - Successfully updated confirmation token timeout to 15 minutes.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L90 - User: Anonymous | IP: Unknown - Accessing application settings.
+14/07/2025-09:39:04 [main] ERROR aor.projetofinal.bean.SettingsBean - L123 - User: Anonymous | IP: Unknown - Failed to update confirmation token timeout to 15 minutes.
+java.lang.RuntimeException: DB error
+	at aor.projetofinal.dao.SettingsDao.save(SettingsDao.java:36) ~[classes/:?]
+	at aor.projetofinal.bean.SettingsBean.updateConfirmationTokenTimeout(SettingsBean.java:112) ~[classes/:?]
+	at aor.projetofinal.bean.SettingsBeanTest.updateConfirmationTokenTimeout_exceptionReturnsFalse(SettingsBeanTest.java:91) ~[test-classes/:?]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[?:?]
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:767) ~[junit-platform-commons-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$8(TestMethodTestDescriptor.java:217) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[?:?]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[?:?]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) [junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) [surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184) [surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148) [surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122) [surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) [surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) [surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) [surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) [surefire-booter-3.5.2.jar:3.5.2]
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L90 - User: Anonymous | IP: Unknown - Accessing application settings.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L51 - User: Anonymous | IP: Unknown - Retrieved recovery token timeout value: 20.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L90 - User: Anonymous | IP: Unknown - Accessing application settings.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L71 - User: Anonymous | IP: Unknown - Retrieved session timeout value: 45 minutes.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L90 - User: Anonymous | IP: Unknown - Accessing application settings.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L90 - User: Anonymous | IP: Unknown - Accessing application settings.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.SettingsBean - L31 - User: Anonymous | IP: Unknown - Retrieved confirmation token timeout value: 30.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.UserBean - L312 - User: Anonymous | IP: Unknown - Account confirmation attempt received.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.UserBean - L321 - User: Anonymous | IP: Unknown - Account confirmation failed. Token invalid or account already confirmed.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.UserBean - L372 - User: Anonymous | IP: Unknown - Attempting to find user by email: email@example.com.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.UserBean - L381 - User: Anonymous | IP: Unknown - No user found for email: email@example.com.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.UserBean - L229 - User: Anonymous | IP: Unknown - Authorization request received.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.UserBean - L246 - User: Anonymous | IP: Unknown - Authorization denied: session token has expired.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.UserBean - L1216 - User: Anonymous | IP: Unknown - Password reset attempt using recovery token: token.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.UserBean - L1238 - User: Anonymous | IP: Unknown - Password reset failed: token expired for user: null.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.UserBean - L312 - User: Anonymous | IP: Unknown - Account confirmation attempt received.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.UserBean - L354 - User: Anonymous | IP: Unknown - Account successfully confirmed for user: user@example.com.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.UserBean - L1216 - User: Anonymous | IP: Unknown - Password reset attempt using recovery token: token.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.UserBean - L642 - User: Anonymous | IP: Unknown - Hashing password.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.UserBean - L1254 - User: Anonymous | IP: Unknown - Password successfully reset for user: email@example.com.
+14/07/2025-09:39:04 [main] WARN  aor.projetofinal.bean.UserBean - L78 - User: Anonymous | IP: Unknown - User or manager not found. Assignment skipped.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.UserBean - L229 - User: Anonymous | IP: Unknown - Authorization request received.
+14/07/2025-09:39:04 [main] INFO  aor.projetofinal.bean.UserBean - L265 - User: Anonymous | IP: Unknown - Authorization granted for user: null.

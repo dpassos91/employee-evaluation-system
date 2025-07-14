@@ -155,7 +155,7 @@ useEffect(() => {
 
   <div className="flex items-center gap-4">
     <select
-      className="border px-2 py-1 rounded w-72"
+      className="border px-2 py-1 rounded w-[446px]"
       value={selectedAdminEmail}
       onChange={(e) => setSelectedAdminEmail(e.target.value)}
     >
