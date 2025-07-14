@@ -5,6 +5,9 @@
  * For usage, import { apiConfig } from 'api/apiConfig';
  */
 
+import { toast } from "react-toastify";
+import { userStore } from "../stores/userStore";
+
 /** 
  * The base URL for all API requests.
  * @type {string}
@@ -242,6 +245,11 @@ export const handleApiError = (error) => {
   // showToast(error.message || "Ocorreu um erro inesperado.");
 };
 
+export function getUserTranslation(key) {
+  const translations = userStore.getState().translations;
+  return translations?.[key] || key;
+}
+
 /**
  * Makes a generic API call using fetch, automatically injecting headers and the auth token.
  * Handles session expiration (401), error reporting, and JSON parsing.
@@ -252,10 +260,7 @@ export const handleApiError = (error) => {
  * @returns {Promise<object|string|null>} The API response, parsed as JSON if possible, or raw text/null.
  * @throws {Error} If the request fails or the API returns an error status.
  */
-/**
- * Makes a generic API call using fetch, with fine control over 401 behavior.
- * By default, forces logout on 401. To disable auto-logout for a call, pass { forceLogoutOn401: false } in options.
- */
+
 export const apiCall = async (url, options = {}) => {
   // If not specified, auto-logout on 401 is enabled
   const forceLogoutOn401 = options.forceLogoutOn401 !== false;
@@ -276,17 +281,19 @@ export const apiCall = async (url, options = {}) => {
     const response = await fetch(url, finalOptions);
 
     // Handle expired session (unauthorized)
-    if (
-      response.status === 401 &&
-      !(url.endsWith("/logout") || url.includes("/logout")) &&
-      forceLogoutOn401
-    ) {
-      alert("Sessão expirada. Por favor faça login novamente.");
-      sessionStorage.removeItem("authToken");
-      localStorage.removeItem("userData");
-      window.location.href = "/login";
-      return;
-    }
+if (
+  response.status === 401 &&
+  !(url.endsWith("/logout") || url.includes("/logout")) &&
+  forceLogoutOn401
+) {
+  const token = sessionStorage.getItem("authToken");
+  if (token) {
+    sessionStorage.removeItem("authToken");
+    localStorage.removeItem("userData");
+  }
+  
+  return;
+}
 
     const contentType = response.headers.get("content-type");
     let responseBody = await response.text();

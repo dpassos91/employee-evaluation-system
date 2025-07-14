@@ -254,7 +254,9 @@
   "profile.previewPhoto": "Preview Photo",
   "profile.chooseOtherPhoto": "Choose Another Photo",
   "profile.savePhoto": "Save Photo",
-  "profile.uploading": "Uploading..."
+  "profile.uploading": "Uploading...",
+
+  "auth.session.expired": "Session token expired. Redirecting to login page."
 
   
 }

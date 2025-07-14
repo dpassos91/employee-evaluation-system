@@ -243,7 +243,6 @@
   "courses.field.language": "Idioma",
   "courses.field.category": "Área",
   "courses.field.active": "Ativo",
-
     
   "profile.manager.update.success": "Gestor atualizado com sucesso!",
   "profile.currentPassword": "Password atual",
@@ -256,7 +255,9 @@
   "profile.previewPhoto": "Pré-visualização da Foto",
   "profile.chooseOtherPhoto": "Escolher outra foto",
   "profile.savePhoto": "Guardar foto",
-  "profile.uploading": "A fazer upload..."
+  "profile.uploading": "A fazer upload...",
+
+  "auth.session.expired": "Token de sessão expirado. A redirecionar para login."
 
 
 }
