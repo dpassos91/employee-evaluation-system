@@ -52,3 +52,32 @@
 14/07/2025-05:23:44 [main] INFO  aor.projetofinal.bean.NotificationBean - L182 - User: Anonymous | IP: Unknown - Marked 5 notifications as read for userId: 1.
 14/07/2025-05:23:44 [main] WARN  aor.projetofinal.bean.NotificationBean - L178 - User: Anonymous | IP: Unknown - Tried to mark notifications as read for non-existent user (userId: 1).
 14/07/2025-05:23:44 [main] WARN  aor.projetofinal.bean.NotificationBean - L65 - User: Anonymous | IP: Unknown - Attempted to create notification for non-existent user (userId: 99). Operation aborted.
+14/07/2025-05:27:17 [main] WARN  aor.projetofinal.bean.ProfileBean - L53 - User: Anonymous | IP: Unknown | Email: unknown - Attempted to update photograph for null user. Operation aborted.
+14/07/2025-05:27:17 [main] INFO  aor.projetofinal.bean.ProfileBean - L76 - User: Anonymous | IP: Unknown - Converting ProfileEntity to ProfileDto.
+14/07/2025-05:27:17 [main] INFO  aor.projetofinal.bean.ProfileBean - L181 - User: Anonymous | IP: Unknown | Email: user@example.com - Created new profile for user.
+14/07/2025-05:27:17 [main] WARN  aor.projetofinal.bean.ProfileBean - L202 - User: Anonymous | IP: Unknown | Email: user@example.com | Value: OFFICE - Invalid usualWorkplace value received.
+14/07/2025-05:27:17 [main] WARN  aor.projetofinal.bean.ProfileBean - L72 - User: Anonymous | IP: Unknown - Attempted to convert a null ProfileEntity to DTO. Operation aborted.
+14/07/2025-05:27:17 [main] INFO  aor.projetofinal.bean.ProfileBean - L59 - User: Anonymous | IP: Unknown | Email: user@example.com - Successfully updated profile photograph.
+14/07/2025-05:27:17 [main] WARN  aor.projetofinal.bean.ProfileBean - L172 - User: Anonymous | IP: Unknown | Email: unknown@example.com - Could not find user to update.
+14/07/2025-05:27:17 [main] WARN  aor.projetofinal.bean.ProfileBean - L233 - User: Anonymous | IP: Unknown | Email: null - No profile entity found for user.
+14/07/2025-05:27:17 [main] WARN  aor.projetofinal.bean.ProfileBean - L228 - User: Anonymous | IP: Unknown | Email: unknown - Attempted to update photo for null user.
+14/07/2025-05:27:17 [main] INFO  aor.projetofinal.bean.ProfileBean - L147 - User: Anonymous | IP: Unknown | Filters -> Employee Name: name, Workplace: COIMBRA, Manager Email: manager@example.com | Page: 1 - Searching paginated profiles with filters.
+14/07/2025-05:27:17 [main] INFO  aor.projetofinal.bean.ProfileBean - L128 - User: Anonymous | IP: Unknown | Filters -> Employee Name: name, Workplace: COIMBRA, Manager Email: manager@example.com - Searching profiles with filters.
+14/07/2025-05:27:17 [main] INFO  aor.projetofinal.bean.ProfileBean - L238 - User: Anonymous | IP: Unknown | Email: user@example.com - Profile photo updated to 'photo.png'.
+14/07/2025-05:27:17 [main] INFO  aor.projetofinal.bean.ProfileBean - L181 - User: Anonymous | IP: Unknown | Email: user@example.com - Created new profile for user.
+14/07/2025-05:27:17 [main] WARN  aor.projetofinal.bean.ProfileBean - L207 - User: Anonymous | IP: Unknown | Email: user@example.com - Missing required usualWorkplace field.
+14/07/2025-05:27:17 [main] INFO  aor.projetofinal.bean.ProfileBean - L181 - User: Anonymous | IP: Unknown | Email: user@example.com - Created new profile for user.
+14/07/2025-05:27:17 [main] WARN  aor.projetofinal.bean.ProfileBean - L202 - User: Anonymous | IP: Unknown | Email: user@example.com | Value: INVALID - Invalid usualWorkplace value received.
+14/07/2025-05:27:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L53 - User: Anonymous | IP: Unknown | Email: unknown - Attempted to update photograph for null user. Operation aborted.
+14/07/2025-05:27:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L72 - User: Anonymous | IP: Unknown - Attempted to convert a null ProfileEntity to DTO. Operation aborted.
+14/07/2025-05:27:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L59 - User: Anonymous | IP: Unknown | Email: user@example.com - Successfully updated profile photograph.
+14/07/2025-05:27:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L172 - User: Anonymous | IP: Unknown | Email: unknown@example.com - Could not find user to update.
+14/07/2025-05:27:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L233 - User: Anonymous | IP: Unknown | Email: null - No profile entity found for user.
+14/07/2025-05:27:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L228 - User: Anonymous | IP: Unknown | Email: unknown - Attempted to update photo for null user.
+14/07/2025-05:27:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L147 - User: Anonymous | IP: Unknown | Filters -> Employee Name: name, Workplace: COIMBRA, Manager Email: manager@example.com | Page: 1 - Searching paginated profiles with filters.
+14/07/2025-05:27:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L128 - User: Anonymous | IP: Unknown | Filters -> Employee Name: name, Workplace: COIMBRA, Manager Email: manager@example.com - Searching profiles with filters.
+14/07/2025-05:27:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L238 - User: Anonymous | IP: Unknown | Email: user@example.com - Profile photo updated to 'photo.png'.
+14/07/2025-05:27:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L181 - User: Anonymous | IP: Unknown | Email: user@example.com - Created new profile for user.
+14/07/2025-05:27:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L207 - User: Anonymous | IP: Unknown | Email: user@example.com - Missing required usualWorkplace field.
+14/07/2025-05:27:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L181 - User: Anonymous | IP: Unknown | Email: user@example.com - Created new profile for user.
+14/07/2025-05:27:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L202 - User: Anonymous | IP: Unknown | Email: user@example.com | Value: INVALID - Invalid usualWorkplace value received.
