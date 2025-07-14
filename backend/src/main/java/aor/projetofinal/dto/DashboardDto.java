@@ -1,5 +1,6 @@
+package aor.projetofinal.dto;
+
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * DTO for aggregating and transporting dashboard summary data for the frontend.
