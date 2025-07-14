@@ -124,7 +124,7 @@ class UserBeanTest {
         assertFalse(confirmed);
     }
 
-   
+
     @Test
     void findUserByEmail_returnsNullIfNotFound() {
         when(userDao.findByEmail("email@example.com")).thenReturn(null);

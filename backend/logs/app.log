@@ -373,3 +373,19 @@ java.lang.RuntimeException: DB error
 14/07/2025-05:36:49 [main] WARN  aor.projetofinal.bean.UserBean - L78 - User: Anonymous | IP: Unknown - User or manager not found. Assignment skipped.
 14/07/2025-05:36:49 [main] INFO  aor.projetofinal.bean.UserBean - L229 - User: Anonymous | IP: Unknown - Authorization request received.
 14/07/2025-05:36:49 [main] INFO  aor.projetofinal.bean.UserBean - L265 - User: Anonymous | IP: Unknown - Authorization granted for user: null.
+14/07/2025-05:39:44 [main] INFO  aor.projetofinal.bean.UserBean - L312 - User: Anonymous | IP: Unknown - Account confirmation attempt received.
+14/07/2025-05:39:44 [main] WARN  aor.projetofinal.bean.UserBean - L321 - User: Anonymous | IP: Unknown - Account confirmation failed. Token invalid or account already confirmed.
+14/07/2025-05:39:44 [main] INFO  aor.projetofinal.bean.UserBean - L372 - User: Anonymous | IP: Unknown - Attempting to find user by email: email@example.com.
+14/07/2025-05:39:44 [main] WARN  aor.projetofinal.bean.UserBean - L381 - User: Anonymous | IP: Unknown - No user found for email: email@example.com.
+14/07/2025-05:39:44 [main] INFO  aor.projetofinal.bean.UserBean - L229 - User: Anonymous | IP: Unknown - Authorization request received.
+14/07/2025-05:39:44 [main] WARN  aor.projetofinal.bean.UserBean - L246 - User: Anonymous | IP: Unknown - Authorization denied: session token has expired.
+14/07/2025-05:39:44 [main] INFO  aor.projetofinal.bean.UserBean - L1216 - User: Anonymous | IP: Unknown - Password reset attempt using recovery token: token.
+14/07/2025-05:39:44 [main] WARN  aor.projetofinal.bean.UserBean - L1238 - User: Anonymous | IP: Unknown - Password reset failed: token expired for user: null.
+14/07/2025-05:39:44 [main] INFO  aor.projetofinal.bean.UserBean - L312 - User: Anonymous | IP: Unknown - Account confirmation attempt received.
+14/07/2025-05:39:44 [main] INFO  aor.projetofinal.bean.UserBean - L354 - User: Anonymous | IP: Unknown - Account successfully confirmed for user: user@example.com.
+14/07/2025-05:39:44 [main] INFO  aor.projetofinal.bean.UserBean - L1216 - User: Anonymous | IP: Unknown - Password reset attempt using recovery token: token.
+14/07/2025-05:39:44 [main] INFO  aor.projetofinal.bean.UserBean - L642 - User: Anonymous | IP: Unknown - Hashing password.
+14/07/2025-05:39:45 [main] INFO  aor.projetofinal.bean.UserBean - L1254 - User: Anonymous | IP: Unknown - Password successfully reset for user: email@example.com.
+14/07/2025-05:39:45 [main] WARN  aor.projetofinal.bean.UserBean - L78 - User: Anonymous | IP: Unknown - User or manager not found. Assignment skipped.
+14/07/2025-05:39:45 [main] INFO  aor.projetofinal.bean.UserBean - L229 - User: Anonymous | IP: Unknown - Authorization request received.
+14/07/2025-05:39:45 [main] INFO  aor.projetofinal.bean.UserBean - L265 - User: Anonymous | IP: Unknown - Authorization granted for user: null.
