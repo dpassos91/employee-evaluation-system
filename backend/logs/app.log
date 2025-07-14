@@ -33,3 +33,14 @@
 14/07/2025-05:17:25 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L315 - User: Anonymous | IP: Unknown - Admins and managers notified by email about the opening of a new evaluation cycle.
 14/07/2025-05:17:25 [main] INFO  aor.projetofinal.bean.EvaluationCycleBean - L58 - User: Anonymous | IP: Unknown - Active evaluation cycle found with ID 1.
 14/07/2025-05:17:25 [main] WARN  aor.projetofinal.bean.EvaluationCycleBean - L53 - User: Anonymous | IP: Unknown - No active evaluation cycle found.
+14/07/2025-05:19:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L175 - User: Anonymous | IP: Unknown - 5 messages marked as read (SenderId: 1, ReceiverId: 2).
+14/07/2025-05:19:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L203 - User: Anonymous | IP: Unknown - Invalid sender (1) or receiver (2). Message not saved.
+14/07/2025-05:19:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L165 - User: Anonymous | IP: Unknown - Invalid sender (1) or receiver (2). Cannot mark as read.
+14/07/2025-05:19:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L69 - User: Anonymous | IP: Unknown - Fetching conversations for userId 1.
+14/07/2025-05:19:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L119 - User: Anonymous | IP: Unknown - Added conversation with userId 2 (unread: 0, role: null, online: false).
+14/07/2025-05:19:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L119 - User: Anonymous | IP: Unknown - Added conversation with userId 3 (unread: 0, role: null, online: false).
+14/07/2025-05:19:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L130 - User: Anonymous | IP: Unknown - Total conversations found for userId 1: 2.
+14/07/2025-05:19:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L192 - User: Anonymous | IP: Unknown - Attempted to save null MessageDto. Operation aborted.
+14/07/2025-05:19:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L219 - User: Anonymous | IP: Unknown - Message persisted. SenderId: 1, ReceiverId: 2
+14/07/2025-05:19:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L236 - User: Anonymous | IP: Unknown - Attempted to convert null MessageEntity to DTO.
+14/07/2025-05:19:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L45 - User: Anonymous | IP: Unknown - Invalid users in getConversation(). Operation aborted.
