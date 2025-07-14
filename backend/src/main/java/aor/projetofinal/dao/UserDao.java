@@ -445,11 +445,49 @@ public class UserDao {
         return results;
     }
 
-
-
-
     public void save(UserEntity user) {
         em.merge(user);
     }
+
+    /**
+ * Counts the number of users who have the specified manager.
+ *
+ * @param managerId The unique identifier of the manager.
+ * @return The number of users managed by the given manager.
+ */
+public int countUsersManagedBy(int managerId) {
+    Long count = em.createQuery(
+        "SELECT COUNT(u) FROM UserEntity u WHERE u.manager.id = :managerId", Long.class)
+        .setParameter("managerId", managerId)
+        .getSingleResult();
+    return count.intValue();
+}
+
+/**
+ * Counts the total number of users in the system.
+ *
+ * @return The total number of users.
+ */
+public int countAllUsers() {
+    Long count = em.createQuery(
+        "SELECT COUNT(u) FROM UserEntity u", Long.class)
+        .getSingleResult();
+    return count.intValue();
+}
+
+/**
+ * Retrieves a list of users who have the specified manager.
+ *
+ * @param managerId The unique identifier of the manager.
+ * @return A list of UserEntity managed by the given manager.
+ */
+public List<UserEntity> findUsersManagedBy(int managerId) {
+    return em.createQuery(
+        "SELECT u FROM UserEntity u WHERE u.manager.id = :managerId", UserEntity.class)
+        .setParameter("managerId", managerId)
+        .getResultList();
+}
+
+
 
 }

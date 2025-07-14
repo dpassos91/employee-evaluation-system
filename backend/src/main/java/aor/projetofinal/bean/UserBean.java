@@ -35,7 +35,6 @@ public class UserBean implements Serializable {
     @Inject
     JavaConversionUtil javaConversionUtil;
 
-
     private static final Logger logger = LogManager.getLogger(UserBean.class);
 
     @Inject
@@ -1441,6 +1440,37 @@ public List<UserEntity> listManagers() {
     return userDao.findUsersByRole("MANAGER");
 }
 
+/**
+ * Counts the number of users managed by the given manager.
+ *
+ * @param managerId The unique identifier of the manager.
+ * @return The number of users directly managed by the manager.
+ */
+public int countUsersManagedBy(int managerId) {
+    return userDao.countUsersManagedBy(managerId);
+}
+
+/**
+ * Counts the total number of users in the system.
+ *
+ * @return The total number of users.
+ */
+public int countAllUsers() {
+    return userDao.countAllUsers();
+}
+
+/**
+ * Retrieves the list of users managed by the given manager.
+ *
+ * @param managerId The unique identifier of the manager.
+ * @return List of UserDto representing users managed by the manager.
+ */
+public List<UserDto> listUsersManagedBy(int managerId) {
+    List<UserEntity> users = userDao.findUsersManagedBy(managerId);
+    return users.stream()
+        .map(JavaConversionUtil::convertUserEntityToUserDto)
+        .toList();
+}
 
 }
 
