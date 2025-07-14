@@ -81,3 +81,26 @@
 14/07/2025-05:27:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L207 - User: Anonymous | IP: Unknown | Email: user@example.com - Missing required usualWorkplace field.
 14/07/2025-05:27:51 [main] INFO  aor.projetofinal.bean.ProfileBean - L181 - User: Anonymous | IP: Unknown | Email: user@example.com - Created new profile for user.
 14/07/2025-05:27:51 [main] WARN  aor.projetofinal.bean.ProfileBean - L202 - User: Anonymous | IP: Unknown | Email: user@example.com | Value: INVALID - Invalid usualWorkplace value received.
+14/07/2025-05:29:45 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L43 - System | IP: Unknown - Running session token cleanup at 2025-07-14T05:29:45.191828700
+14/07/2025-05:29:45 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L52 - System | IP: Unknown - Cleaned up 2 expired session tokens.
+14/07/2025-05:29:45 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L43 - System | IP: Unknown - Running session token cleanup at 2025-07-14T05:29:45.308643700
+14/07/2025-05:29:45 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L55 - System | IP: Unknown - No expired session tokens found.
+14/07/2025-05:29:45 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L43 - System | IP: Unknown - Running session token cleanup at 2025-07-14T05:29:45.321544800
+14/07/2025-05:29:45 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L55 - System | IP: Unknown - No expired session tokens found.
+14/07/2025-05:30:06 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L43 - System | IP: Unknown - Running session token cleanup at 2025-07-14T05:30:06.385530100
+14/07/2025-05:30:06 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L55 - System | IP: Unknown - No expired session tokens found.
+14/07/2025-05:30:06 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L43 - System | IP: Unknown - Running session token cleanup at 2025-07-14T05:30:06.502609700
+14/07/2025-05:30:06 [main] INFO  aor.projetofinal.bean.SessionTokenCleanupTimerBean - L55 - System | IP: Unknown - No expired session tokens found.
+14/07/2025-05:31:09 [main] WARN  aor.projetofinal.bean.ProfileBean - L53 - User: Anonymous | IP: Unknown | Email: unknown - Attempted to update photograph for null user. Operation aborted.
+14/07/2025-05:31:09 [main] WARN  aor.projetofinal.bean.ProfileBean - L72 - User: Anonymous | IP: Unknown - Attempted to convert a null ProfileEntity to DTO. Operation aborted.
+14/07/2025-05:31:09 [main] INFO  aor.projetofinal.bean.ProfileBean - L59 - User: Anonymous | IP: Unknown | Email: user@example.com - Successfully updated profile photograph.
+14/07/2025-05:31:09 [main] WARN  aor.projetofinal.bean.ProfileBean - L172 - User: Anonymous | IP: Unknown | Email: unknown@example.com - Could not find user to update.
+14/07/2025-05:31:09 [main] WARN  aor.projetofinal.bean.ProfileBean - L233 - User: Anonymous | IP: Unknown | Email: null - No profile entity found for user.
+14/07/2025-05:31:09 [main] WARN  aor.projetofinal.bean.ProfileBean - L228 - User: Anonymous | IP: Unknown | Email: unknown - Attempted to update photo for null user.
+14/07/2025-05:31:09 [main] INFO  aor.projetofinal.bean.ProfileBean - L147 - User: Anonymous | IP: Unknown | Filters -> Employee Name: name, Workplace: COIMBRA, Manager Email: manager@example.com | Page: 1 - Searching paginated profiles with filters.
+14/07/2025-05:31:09 [main] INFO  aor.projetofinal.bean.ProfileBean - L128 - User: Anonymous | IP: Unknown | Filters -> Employee Name: name, Workplace: COIMBRA, Manager Email: manager@example.com - Searching profiles with filters.
+14/07/2025-05:31:09 [main] INFO  aor.projetofinal.bean.ProfileBean - L238 - User: Anonymous | IP: Unknown | Email: user@example.com - Profile photo updated to 'photo.png'.
+14/07/2025-05:31:09 [main] INFO  aor.projetofinal.bean.ProfileBean - L181 - User: Anonymous | IP: Unknown | Email: user@example.com - Created new profile for user.
+14/07/2025-05:31:09 [main] WARN  aor.projetofinal.bean.ProfileBean - L207 - User: Anonymous | IP: Unknown | Email: user@example.com - Missing required usualWorkplace field.
+14/07/2025-05:31:09 [main] INFO  aor.projetofinal.bean.ProfileBean - L181 - User: Anonymous | IP: Unknown | Email: user@example.com - Created new profile for user.
+14/07/2025-05:31:09 [main] WARN  aor.projetofinal.bean.ProfileBean - L202 - User: Anonymous | IP: Unknown | Email: user@example.com | Value: INVALID - Invalid usualWorkplace value received.

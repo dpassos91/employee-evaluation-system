@@ -135,7 +135,7 @@ class ProfileBeanTest {
         assertFalse(result);
     }
 
-   
+
     @Test
     void updateProfilePhoto_success() {
         UserEntity user = new UserEntity();
