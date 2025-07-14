@@ -15,6 +15,9 @@ import { FiSettings } from "react-icons/fi";
 import Modal from "../components/Modal"; // Certifica-te que o teu Modal está importado
 import { authAPI } from "../api/authAPI";
 import { useEffect } from "react";
+import { useIntl } from "react-intl";
+import { AppTableFilters } from "../components/AppTableFilters";
+
 
 export default function UsersPage() {
   // Filtros e página
@@ -36,6 +39,8 @@ export default function UsersPage() {
     () => ({ name, office, manager, page }),
     [name, office, manager, page]
   );
+
+  const intl = useIntl();
 
   // Buscar utilizadores com filtros e paginação
   const { users, totalPages, loading, error, refetch } = useUsersList(filters);
@@ -188,48 +193,37 @@ useEffect(() => {
     .catch(() => setManagers([]));
 }, []);
 
+const tableFilters = [
+  {
+    type: "input",
+    value: name,
+    onChange: handleFilterName,
+    placeholder: intl.formatMessage({ id: "users.filter.name", defaultMessage: "Nome" }),
+  },
+  {
+    type: "select",
+    value: office,
+    onChange: handleFilterOffice,
+    options: offices,
+  },
+  {
+    type: "input",
+    value: manager,
+    onChange: handleFilterManager,
+    placeholder: intl.formatMessage({ id: "users.filter.manager", defaultMessage: "Gestor" }),
+  },
+];
+
+const actions = (
+  <AppButton variant="excel" onClick={handleExportCSV}>
+    <FormattedMessage id="users.button.excel" defaultMessage="Excel" />
+  </AppButton>
+);
+
   return (
     <PageLayout title={<FormattedMessage id="users.list.title" defaultMessage="Listagem de Utilizadores" />}>
       {/* Filtros */}
-      <div className="flex gap-4 mb-4">
-        <FormattedMessage id="users.filter.name" defaultMessage="Nome">
-          {(msg) => (
-            <input
-              placeholder={msg}
-              className="border px-2 py-1 rounded"
-              value={name}
-              onChange={handleFilterName}
-            />
-          )}
-        </FormattedMessage>
-        <select
-          className="border px-2 py-1 rounded"
-          value={office}
-          onChange={handleFilterOffice}
-        >
-          {offices.map((officeOption) => (
-            <option key={officeOption} value={officeOption}>
-              {officeOption}
-            </option>
-          ))}
-        </select>
-        <FormattedMessage id="users.filter.manager" defaultMessage="Gestor">
-          {(msg) => (
-            <input
-              placeholder={msg}
-              className="border px-2 py-1 rounded"
-              value={manager}
-              onChange={handleFilterManager}
-            />
-          )}
-        </FormattedMessage>
-        <AppButton
-          variant="excel"
-          onClick={handleExportCSV}
-        >
-          <FormattedMessage id="users.button.excel" defaultMessage="Excel" />
-        </AppButton>
-      </div>
+      <AppTableFilters filters={tableFilters} actions={actions} />
 
       {/* Modal de edição */}
       {editingUser && (

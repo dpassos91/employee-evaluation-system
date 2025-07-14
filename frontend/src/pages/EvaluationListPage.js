@@ -5,15 +5,16 @@
 
 import { useState, useMemo } from "react";
 import PageLayout from "../components/PageLayout";
-import { FormattedMessage } from "react-intl";
 import { useUsersEvaluationList } from "../hooks/useUsersEvaluationList"; 
 import { userStore } from "../stores/userStore";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useIntl } from "react-intl";
 import { evaluationAPI } from "../api/evaluationAPI";
-
+import { AppTable } from "../components/AppTable";
+import { AppTableFilters } from "../components/AppTableFilters";
+import { useIntl, FormattedMessage } from "react-intl";
+import AppButton from "../components/AppButton";
 
 
 
@@ -183,87 +184,160 @@ const handleExportCSV = async () => {
   }
 };
 
+const columns = [
+  {
+    header: <FormattedMessage id="evaluations.table.photo" defaultMessage="Fotografia" />,
+    accessor: "avatar",
+    width: "100px",
+    render: (row) => (
+      <img
+        src={row.avatar || "/default_avatar.png"}
+        alt={row.evaluated}
+        className="w-10 h-10 rounded-full object-cover"
+      />
+    ),
+  },
+  {
+    header: <FormattedMessage id="evaluations.table.evaluated" defaultMessage="Avaliado" />,
+    accessor: "evaluated",
+    className: "font-medium",
+  },
+  {
+    header: <FormattedMessage id="evaluations.table.state" defaultMessage="Estado" />,
+    accessor: "state",
+    render: (row) => (
+      <FormattedMessage
+        id={`evaluation.state.${row.state}`}
+        defaultMessage={row.state}
+      />
+    ),
+  },
+  {
+    header: "", // Ações
+    accessor: "actions",
+    render: (row) => (
+      <div className="flex flex-row gap-2 justify-center">
+        {row.state === "IN_EVALUATION" ? (
+          <button
+            onClick={() => handleFillEvaluation(row.userId)}
+            className="bg-[#D41C1C] text-white px-3 py-1 rounded"
+          >
+            <FormattedMessage id="evaluation.button.fill" defaultMessage="Preencher" />
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={() => navigate(`/evaluationform/${row.userId}`)}
+              className="bg-[#D41C1C] text-white px-3 py-1 rounded"
+            >
+              <FormattedMessage id="evaluation.button.view" defaultMessage="Ver" /> <span>&gt;</span>
+            </button>
+            {/* Fechar e Reverter apenas se EVALUATED */}
+            {row.state === "EVALUATED" && (
+              <>
+                <button
+                  onClick={() => handleCloseEvaluation(row.id)}
+                  className="bg-[#D41C1C] text-white px-3 py-1 rounded"
+                >
+                  <FormattedMessage id="evaluation.button.close" defaultMessage="Fechar" />
+                </button>
+                <button
+                  onClick={() => handleReopenEvaluation(row.id)}
+                  className="bg-[#D41C1C] text-white px-3 py-1 rounded"
+                >
+                  <FormattedMessage id="evaluation.button.revert" defaultMessage="Reverter" />
+                </button>
+              </>
+            )}
+          </>
+        )}
+      </div>
+    ),
+    className: "text-center",
+  },
+];
 
+const filtersTable = [
+  // Filtro por nome
+  {
+    type: "input",
+    value: name,
+    onChange: handleFilterName,
+    placeholder: intl.formatMessage({ id: "evaluations.filter.name", defaultMessage: "Nome" }),
+  },
+  // Filtro por estado
+  {
+    type: "select",
+    value: evaluationState,
+    onChange: handleFilterEvaluationState,
+    options: [
+      { value: "", label: intl.formatMessage({ id: "evaluations.filter.state.state", defaultMessage: "Estado" }) },
+      { value: "IN_EVALUATION", label: intl.formatMessage({ id: "evaluation.state.IN_EVALUATION", defaultMessage: "Em Avaliação" }) },
+      { value: "EVALUATED", label: intl.formatMessage({ id: "evaluation.state.EVALUATED", defaultMessage: "Concluído" }) },
+      { value: "CLOSED", label: intl.formatMessage({ id: "evaluation.state.CLOSED", defaultMessage: "Fechado" }) },
+    ]
+  },
+  // Filtro por avaliação (estrelas)
+  {
+    type: "custom",
+    render: () => (
+      <div className="flex flex-col items-start">
+        <label className="text-sm mb-1 font-medium text-gray-700">
+          <FormattedMessage id="evaluations.filter.grade" defaultMessage="Avaliação" />
+        </label>
+        <div className="flex items-center gap-1">
+          {[1, 2, 3, 4].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => {
+                setGrade(grade === String(star) ? "" : String(star));
+                setPage(1);
+              }}
+              onMouseEnter={() => setHover(star)}
+              onMouseLeave={() => setHover(null)}
+              className="text-yellow-500 text-xl focus:outline-none"
+              aria-label={`Nota ${star}`}
+            >
+              {star <= ((hover ?? Number(grade)) || 0) ? "★" : "☆"}
+            </button>
+          ))}
+        </div>
+      </div>
+    )
+  },
+  // Filtro por data fim de ciclo
+  {
+    type: "custom",
+    render: () => (
+      <div className="flex flex-col">
+        <label className="text-sm font-bold text-gray-700 mb-1">
+          <FormattedMessage id="evaluations.filter.cycleEnd" defaultMessage="Data fim de ciclo" />
+        </label>
+        <input
+          type="date"
+          value={cycleEnd || ""}
+          onChange={handleFilterCycleEnd}
+          className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
+        />
+      </div>
+    )
+  }
+];
+
+const actions = (
+  <AppButton
+    variant="excel"
+    onClick={handleExportCSV}
+  >
+    <FormattedMessage id="users.button.excel" defaultMessage="Excel CSV" />
+  </AppButton>
+);
 
   return (
     <PageLayout title={<FormattedMessage id="evaluations.list.title" defaultMessage="Listagem de Avaliações" />}>
       {/* Filters */}
-<div className="flex gap-4 mb-4">
-        <FormattedMessage id="evaluations.filter.name" defaultMessage="Nome">
-          {(msg) => (
-            <input
-              placeholder={msg}
-              className="border px-2 py-1 rounded"
-              value={name}
-              onChange={handleFilterName}
-            />
-          )}
-        </FormattedMessage>
-        <select
-  className="border px-2 py-1 rounded"
-  value={evaluationState}
-  onChange={handleFilterEvaluationState}
->
-  <option value="">
-    <FormattedMessage id="evaluations.filter.state.state" defaultMessage="Estado" />
-  </option>
-  <option value="IN_EVALUATION">
-    <FormattedMessage id="evaluation.state.IN_EVALUATION" defaultMessage="Em Avaliação" />
-  </option>
-  <option value="EVALUATED">
-    <FormattedMessage id="evaluation.state.EVALUATED" defaultMessage="Concluído" />
-  </option>
-  <option value="CLOSED">
-    <FormattedMessage id="evaluation.state.CLOSED" defaultMessage="Fechado" />
-  </option>
-</select>
-       <div className="flex flex-col items-start">
-  <label className="text-sm mb-1 font-medium text-gray-700">
-    <FormattedMessage id="evaluations.filter.grade" defaultMessage="Avaliação" />
-  </label>
-  <div className="flex items-center gap-1">
-    {[1, 2, 3, 4].map((star) => (
-  <button
-    key={star}
-    type="button"
-    onClick={() => {
-      setGrade(grade === String(star) ? "" : String(star));
-      setPage(1);
-    }}
-    onMouseEnter={() => setHover(star)}
-    onMouseLeave={() => setHover(null)}
-    className="text-yellow-500 text-xl focus:outline-none"
-    aria-label={`Nota ${star}`}
-  >
-    {star <= ((hover ?? Number(grade)) || 0) ? "★" : "☆"}
-  </button>
-))}
-  </div>
-</div>
-<div className="flex flex-col">
-  <label className="text-sm font-bold text-gray-700 mb-1">
-    <FormattedMessage id="evaluations.filter.cycleEnd" defaultMessage="Data fim de ciclo" />
-  </label>
-  <input
-    type="date"
-    value={cycleEnd || ""}
-    onChange={handleFilterCycleEnd}
-    className="border border-gray-300 focus:border-[#D41C1C] rounded px-2 py-1.5 text-sm"
-  />
-</div>
-
-
-
-        <button className="bg-green-600 text-white px-3 rounded" 
-        onClick={handleExportCSV}
-        >
-          <FormattedMessage id="users.button.excel" defaultMessage="Excel CSV" />
-        </button>
-      </div>
-
-
-
-
+<AppTableFilters filters={filtersTable} actions={actions} />
       {/* Loading/Error */}
       {loading && (
   <div className="py-8 text-center text-gray-500">
@@ -276,88 +350,12 @@ const handleExportCSV = async () => {
       {/* Evaluation Table */}
 {!loading && evaluations.length > 0 && (
         <div className="overflow-x-auto w-full">
-        <table className="min-w-full text-left border-collapse table-auto">
-          <thead>
-  <tr className="bg-gray-200 text-sm">
-    <th className="p-2 w-[100px]">
-      <FormattedMessage id="evaluations.table.photo" defaultMessage="Fotografia" />
-    </th>
-    <th className="p-2">
-      <FormattedMessage id="evaluations.table.evaluated" defaultMessage="Avaliado" />
-    </th>
-    <th className="p-2">
-      <FormattedMessage id="evaluations.table.state" defaultMessage="Estado" />
-    </th>
-  </tr>
-</thead>
-
-          <tbody>
-  {evaluations.map((evaluation) => (
-    <tr key={evaluation.id} className="border-b hover:bg-gray-50">
-      <td className="p-2">
-        <img
-          src={evaluation.avatar || "/default_avatar.png"}
-          alt={evaluation.evaluated}
-          className="w-10 h-10 rounded-full object-cover"
-        />
-      </td>
-      <td className="p-2 font-medium">{evaluation.evaluated}</td>
-      <td className="p-2">
-        <FormattedMessage
-          id={`evaluation.state.${evaluation.state}`}
-          defaultMessage={evaluation.state}
-        />
-      </td>
-
-      {/* Actions */}
-      <td className="p-2 text-center">
-        <div className="flex flex-row gap-2 justify-center">
-  {/* Show "Fill" only if at IN_EVALUATION */}
-  {evaluation.state === "IN_EVALUATION" ? (
-    <button
-      onClick={() => handleFillEvaluation(evaluation.userId)}
-      className="bg-[#D41C1C] text-white px-3 py-1 rounded"
-    >
-      <FormattedMessage id="evaluation.button.fill" defaultMessage="Preencher" />
-    </button>
-  ) : (
-    <>
-      {/* Show only if it's not at IN_EVALUATION */}
-      <button
-        onClick={() => navigate(`/evaluationform/${evaluation.userId}`)}
-        className="bg-[#D41C1C] text-white px-3 py-1 rounded"
-      >
-        <FormattedMessage id="evaluation.button.view" defaultMessage="Ver" /> <span>&gt;</span>
-      </button>
-
-      {/* Close if at EVALUATED */}
-      {evaluation.state === "EVALUATED" && (
-        <button
-          onClick={() => handleCloseEvaluation(evaluation.id)}
-          className="bg-[#D41C1C] text-white px-3 py-1 rounded"
-        >
-          <FormattedMessage id="evaluation.button.close" defaultMessage="Fechar" />
-        </button>
-      )}
-
-      {/* Revert if in EVALUATED */}
-      {evaluation.state === "EVALUATED" && (
-        <button
-          onClick={() => handleReopenEvaluation(evaluation.id)}
-          className="bg-[#D41C1C] text-white px-3 py-1 rounded"
-        >
-          <FormattedMessage id="evaluation.button.revert" defaultMessage="Reverter" />
-        </button>
-      )}
-    </>
-  )}
-</div>
-      </td>
-    </tr>
-  ))}
-</tbody>
-
-</table>      
+        <AppTable
+  columns={columns}
+  data={evaluations}
+  loading={loading}
+  emptyMessage={<FormattedMessage id="evaluations.table.empty" defaultMessage="Sem avaliações" />}
+/>      
         
         </div>
       )}

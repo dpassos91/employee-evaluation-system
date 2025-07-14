@@ -22,7 +22,7 @@ export default function Sidebar() {
   // Responsividade: sidebar aberta só em desktop por defeito
   const [isOpen, setIsOpen] = useState(window.innerWidth >= 1024);
   const isAdmin = user?.role === "ADMIN";
-  const isManager = user?.role === "manager";
+  const isManager = user?.role === "MANAGER";
 
   useEffect(() => {
     const handleResize = () => {
