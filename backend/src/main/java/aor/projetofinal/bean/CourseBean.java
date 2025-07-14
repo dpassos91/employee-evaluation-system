@@ -136,4 +136,37 @@ public class CourseBean {
         dto.setActive(course.isActive());
         return dto;
     }
+
+    /**
+ * Counts the number of active courses assigned to the given user.
+ *
+ * @param userId The unique identifier of the user.
+ * @return The number of active courses assigned to the user.
+ */
+public int countActiveCoursesForUser(int userId) {
+    return courseDao.countActiveCoursesForUser(userId);
+}
+
+/**
+ * Calculates the total duration (in hours) of all completed courses by the given user.
+ *
+ * @param userId The unique identifier of the user.
+ * @return The sum of course durations completed by the user (in hours).
+ */
+public int getTotalTrainingHoursForUser(int userId) {
+    return courseDao.sumTrainingHoursForUser(userId);
+}
+
+/**
+ * Lists all active courses currently assigned to the given user.
+ *
+ * @param userId The unique identifier of the user.
+ * @return List of CourseDto representing active courses for the user.
+ */
+public List<CourseDto> listActiveCoursesForUser(int userId) {
+    // Delegate to DAO to fetch all active courses for the user
+    return courseDao.findActiveCoursesForUser(userId)
+                    .stream().map(this::toDto)
+                    .collect(Collectors.toList());
+}
 }

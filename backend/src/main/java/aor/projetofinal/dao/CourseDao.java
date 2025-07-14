@@ -183,5 +183,51 @@ public class CourseDao {
     public CourseEntity update(CourseEntity course) {
         return em.merge(course);
     }
+
+    /**
+ * Counts the number of active courses currently assigned to a given user.
+ *
+ * @param userId The unique identifier of the user.
+ * @return The number of active courses assigned to the user.
+ */
+public int countActiveCoursesForUser(int userId) {
+    // Example with JPQL (adjust entity/class names to your model)
+    Long count = em.createQuery(
+        "SELECT COUNT(uc) FROM UserCourseEntity uc " +
+        "WHERE uc.user.id = :userId AND uc.course.active = true", Long.class)
+        .setParameter("userId", userId)
+        .getSingleResult();
+    return count.intValue();
+}
+
+/**
+ * Sums the duration (in hours) of all completed courses by a given user.
+ *
+ * @param userId The unique identifier of the user.
+ * @return The total hours of completed training.
+ */
+public int sumTrainingHoursForUser(int userId) {
+    // Example with JPQL (change logic if you track completion differently)
+    Integer sum = em.createQuery(
+        "SELECT SUM(uc.course.timeSpan) FROM UserCourseEntity uc " +
+        "WHERE uc.user.id = :userId AND uc.course.active = true", Integer.class)
+        .setParameter("userId", userId)
+        .getSingleResult();
+    return sum != null ? sum : 0;
+}
+
+/**
+ * Retrieves all active courses assigned to a given user.
+ *
+ * @param userId The unique identifier of the user.
+ * @return List of CourseEntity representing active courses for the user.
+ */
+public List<CourseEntity> findActiveCoursesForUser(int userId) {
+    return em.createQuery(
+        "SELECT uc.course FROM UserCourseEntity uc " +
+        "WHERE uc.user.id = :userId AND uc.course.active = true", CourseEntity.class)
+        .setParameter("userId", userId)
+        .getResultList();
+}
 }
 

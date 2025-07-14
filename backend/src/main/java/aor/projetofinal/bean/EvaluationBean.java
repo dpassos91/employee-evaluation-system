@@ -432,6 +432,44 @@ public class EvaluationBean implements Serializable {
         return evaluationDao.alreadyEvaluatedAtCurrentCycle(cycle, evaluated);
     }
 
+/**
+ * Counts the number of pending evaluations that the given user still needs to complete as evaluated.
+ *
+ * @param userId The unique identifier of the evaluated user.
+ * @return The number of pending evaluations.
+ */
+public int countPendingEvaluationsForUser(int userId) {
+    // Use DAO method for aggregation.
+    return evaluationDao.countPendingEvaluationsForUser(userId);
+}
 
+/**
+ * Counts the number of evaluations assigned to the given manager that are still pending completion.
+ *
+ * @param managerId The unique identifier of the manager (evaluator).
+ * @return The number of pending evaluations to be filled by this manager.
+ */
+public int countPendingEvaluationsToFillByManager(int managerId) {
+    return evaluationDao.countPendingEvaluationsToFillByManager(managerId);
+}
+
+/**
+ * Retrieves the date of the most recent evaluation completed for the given user.
+ *
+ * @param userId The unique identifier of the evaluated user.
+ * @return The date of the last completed evaluation, or null if none exist.
+ */
+public LocalDateTime getLastEvaluationDate(int userId) {
+    return evaluationDao.findLastCompletedEvaluationDateForUser(userId);
+}
+
+/**
+ * Counts the total number of evaluations in the system that are currently pending (not completed or closed).
+ *
+ * @return The number of pending evaluations in the system.
+ */
+public int countAllPendingEvaluations() {
+    return evaluationDao.countAllPendingEvaluations();
+}
 
 }

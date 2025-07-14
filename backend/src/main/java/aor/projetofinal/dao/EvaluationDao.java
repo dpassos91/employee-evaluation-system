@@ -12,6 +12,8 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import aor.projetofinal.util.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -583,6 +585,69 @@ public class EvaluationDao {
     }
 
 
+/**
+ * Counts the number of evaluations where the given user is being evaluated and the evaluation is still pending.
+ *
+ * @param userId The unique identifier of the evaluated user.
+ * @return The number of pending evaluations for the user.
+ */
+public int countPendingEvaluationsForUser(int userId) {
+    Long count = em.createQuery(
+        "SELECT COUNT(e) FROM EvaluationEntity e " +
+        "WHERE e.evaluated.id = :userId AND e.state = :pendingState", Long.class)
+        .setParameter("userId", userId)
+        .setParameter("pendingState", EvaluationStateEnum.IN_EVALUATION)
+        .getSingleResult();
+    return count.intValue();
+}
 
+/**
+ * Counts the number of evaluations assigned to the given manager that are still pending completion.
+ *
+ * @param managerId The unique identifier of the manager (evaluator).
+ * @return The number of pending evaluations to be filled by this manager.
+ */
+public int countPendingEvaluationsToFillByManager(int managerId) {
+    Long count = em.createQuery(
+        "SELECT COUNT(e) FROM EvaluationEntity e " +
+        "WHERE e.evaluator.id = :managerId AND e.state = :pendingState", Long.class)
+        .setParameter("managerId", managerId)
+        .setParameter("pendingState", EvaluationStateEnum.IN_EVALUATION)
+        .getSingleResult();
+    return count.intValue();
+}
+
+/**
+ * Retrieves the date of the most recent completed evaluation for the given user.
+ *
+ * @param userId The unique identifier of the evaluated user.
+ * @return The date of the last completed evaluation, or null if none exist.
+ */
+public LocalDateTime findLastCompletedEvaluationDateForUser(int userId) {
+    List<LocalDateTime> results = em.createQuery(
+        "SELECT e.date FROM EvaluationEntity e " +
+        "WHERE e.evaluated.id = :userId AND e.state = :evaluatedState " +
+        "ORDER BY e.date DESC", LocalDateTime.class)
+        .setParameter("userId", userId)
+        .setParameter("evaluatedState", EvaluationStateEnum.EVALUATED)
+        .setMaxResults(1)
+        .getResultList();
+
+    return results.isEmpty() ? null : results.get(0);
+}
+
+/**
+ * Counts the total number of evaluations in the system that are currently pending (not completed or closed).
+ *
+ * @return The number of pending evaluations in the system.
+ */
+public int countAllPendingEvaluations() {
+    Long count = em.createQuery(
+        "SELECT COUNT(e) FROM EvaluationEntity e " +
+        "WHERE e.state = :pendingState", Long.class)
+        .setParameter("pendingState", EvaluationStateEnum.IN_EVALUATION)
+        .getSingleResult();
+    return count.intValue();
+}
 
 }
