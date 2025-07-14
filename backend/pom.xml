@@ -16,9 +16,32 @@
         <wildfly.plugin.version>5.1.2.Final</wildfly.plugin.version>
         <maven-war.plugin.version>3.4.0</maven-war.plugin.version>
         <junit.version>5.11.4</junit.version>
+        <selenium.version>4.29.0</selenium.version>
     </properties>
 
     <dependencies>
+
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>5.4.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-grid</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+
 
         <dependency>
             <groupId>com.sun.mail</groupId>
