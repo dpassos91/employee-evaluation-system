@@ -65,6 +65,25 @@ export default function ProfilePage() {
   // True if current user is viewing own profile or is admin (can edit)
   const canEdit = user?.role === "ADMIN" || String(user?.id) === String(userId);
 
+const canViewManager = () => {
+  if (!user || !profile) {
+    console.log("❌ canViewHistories: user or profile not available.");
+    return false;
+  }
+
+  
+  const isManager = profile.managerId === user.id; //userId
+  
+
+  console.log("🔍 Checking canViewHistories:");
+  
+  console.log("Profile Manager ID:", profile.managerId);
+  
+  console.log("✅ isManager?", isManager);
+  
+
+  return isManager ;
+};
 
 
 
@@ -348,6 +367,76 @@ const handlePhotoUpload = async () => {
 };
 
 
+const renderActions = () => {
+  if (canEdit) {
+    return (
+      <>
+        {/* Hidden file input */}
+        <input
+          id="profile-photo-input"
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handlePhotoChange}
+        />
+        <AppButton
+          variant="secondary"
+          className="w-full px-3 py-1.5 text-sm justify-center text-center"
+          onClick={() => document.getElementById("profile-photo-input").click()}
+          disabled={isUploading}
+        >
+          <FormattedMessage id="profile.changePhoto" defaultMessage="Change Photo" />
+        </AppButton>
+        <AppButton
+          variant="secondary"
+          className="w-full px-3 py-1.5 text-sm justify-center text-center"
+          onClick={() => navigate(`/profile/${userId}/courseshistory`)}
+        >
+          <FormattedMessage id="profile.trainingHistory" defaultMessage="Training History" />
+        </AppButton>
+        <AppButton
+          variant="secondary"
+          className="w-full px-3 py-1.5 text-sm justify-center text-center"
+          onClick={() => navigate(`/profile/${userId}/evaluationhistory`)}
+        >
+          <FormattedMessage id="profile.evaluationHistory" defaultMessage="Evaluation History" />
+        </AppButton>
+      </>
+    );
+  } else if (canViewManager()) {
+    return (
+      <>
+        <AppButton
+          variant="secondary"
+          className="w-full px-3 py-1.5 text-sm justify-center text-center"
+          onClick={() => navigate(`/profile/${userId}/courseshistory`)}
+        >
+          <FormattedMessage id="profile.trainingHistory" defaultMessage="Training History" />
+        </AppButton>
+        <AppButton
+          variant="secondary"
+          className="w-full px-3 py-1.5 text-sm justify-center text-center"
+          onClick={() => navigate(`/profile/${userId}/evaluationhistory`)}
+        >
+          <FormattedMessage id="profile.evaluationHistory" defaultMessage="Evaluation History" />
+        </AppButton>
+      </>
+    );
+  } else {
+    return (
+      <AppButton
+        variant="primary"
+        className="w-full px-3 py-1.5 text-sm justify-center text-center"
+        onClick={handleSendMessage}
+      >
+        <ChatBubbleBottomCenterTextIcon className="w-5 h-5 mr-2" />
+        <FormattedMessage id="profile.message" defaultMessage="Send Message" />
+      </AppButton>
+    );
+  }
+};
+
+
   return (
     <PageLayout>
       <section className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
@@ -375,52 +464,7 @@ const handlePhotoUpload = async () => {
 
           {/* Actions */}
 <div className="flex flex-col gap-3 w-full mt-14">
-  {canEdit ? (
-    <>
-      {/* Hidden file input */}
-      <input
-        id="profile-photo-input"
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handlePhotoChange}
-      />
-      {/* Change Photo Button */}
-      <AppButton
-        variant="secondary"
-        className="w-full px-3 py-1.5 text-sm justify-center text-center"
-        onClick={() => document.getElementById("profile-photo-input").click()}
-        disabled={isUploading}
-      >
-        <FormattedMessage id="profile.changePhoto" defaultMessage="Change Photo" />
-      </AppButton>
-
-      <AppButton variant="secondary" className="w-full px-3 py-1.5 text-sm justify-center text-center"
-       onClick={() => navigate(`/profile/${userId}/courseshistory`)}>
-  
-   <FormattedMessage id="profile.trainingHistory" defaultMessage="Training History" />
-      </AppButton>
-
-      
-      <AppButton
-  variant="secondary"
-  className="w-full px-3 py-1.5 text-sm justify-center text-center"
-  onClick={() => navigate(`/profile/${userId}/evaluationhistory`)}
->
-  <FormattedMessage id="profile.evaluationHistory" defaultMessage="Evaluation History" />
-</AppButton>
-    </>
-  ) : (
-    // If not edit, show "Send Message" only
-    <AppButton
-      variant="primary"
-      className="w-full px-3 py-1.5 text-sm justify-center text-center"
-      onClick={handleSendMessage}
-    >
-      <ChatBubbleBottomCenterTextIcon className="w-5 h-5 mr-2" />
-      <FormattedMessage id="profile.message" defaultMessage="Send Message" />
-    </AppButton>
-  )}
+  {renderActions()}
 </div>
 </div>
 
