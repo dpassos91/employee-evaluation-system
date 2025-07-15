@@ -38,6 +38,7 @@ import EvaluationIntermediaryPage from "./pages/EvaluationIntermediaryPage";
 import SettingsPage from "./pages/SettingsPage";
 import CoursesPage from "./pages/CoursesPage";
 import LogoutAndRedirect from "./components/LogoutAndRedirect";
+import CoursesHistoryPage from "./pages/CoursesHistoryPage";
 
 /**
  * Main App component.
@@ -217,6 +218,19 @@ const handleWebSocketMessage = useCallback((data) => {
               </RoleRoute>
             }
           />
+
+
+<Route
+  path="/profile/:userId/courseshistory"
+  element={
+    <PrivateRoute>
+      <CoursesHistoryPage />
+    </PrivateRoute>
+  }
+/>
+
+
+
 
 
 <Route
