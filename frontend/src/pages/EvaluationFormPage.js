@@ -54,6 +54,7 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
   const [dropdownUsers, setDropdownUsers] = useState([]);
   const [selectedManager, setSelectedManager] = useState("");
   const [evaluatedEmail, setEvaluatedEmail] = useState("");
+  const [evaluationState, setEvaluationState] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [updatingManager, setUpdatingManager] = useState(false);
@@ -79,6 +80,7 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
         setName(evaluation.evaluatedName || "");
         setGrade(evaluation.grade ? String(evaluation.grade) : "");
         setFeedback(evaluation.feedback || "");
+        setEvaluationState(evaluation.state || "");
         setPhoto(evaluation.photograph);
         setManagerName(evaluation.evaluatorName || "");
         setManagerEmail(evaluation.evaluatorEmail || "");
@@ -93,7 +95,7 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
     fetchEvaluation();
   }, [userId]);
 
-
+const isReadOnlyEvaluation = evaluationState === "EVALUATED" || evaluationState === "CLOSED";
    /**
    * Loads available managers for the dropdown if user is admin.
    */
@@ -255,6 +257,7 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
               onChange={(e) => setGrade(e.target.value)}
               className="w-full border rounded px-2 py-1"
               required
+              disabled={isReadOnlyEvaluation}
             >
               <option value="">
     <FormattedMessage id="evaluations.selectGrade" defaultMessage="-- Selecionar --" />
@@ -284,26 +287,30 @@ const showToast = (id, defaultMessage, type = "error", options = {}) => {
               onChange={(e) => setFeedback(e.target.value)}
               rows={4}
               className="w-full border rounded px-2 py-1"
+              disabled={isReadOnlyEvaluation}
             />
           </div>
 
           {/* Buttons alligned */}
-          <div className="flex justify-center gap-4 pt-4">
-            <button
-              type="button"
-              onClick={() => navigate("/evaluationlist")}
-              className="bg-gray-300 text-black px-4 py-2 rounded"
-            >
-              <FormattedMessage id="button.cancel" defaultMessage="Cancelar" />
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="bg-red-600 text-white px-4 py-2 rounded"
-            >
-              <FormattedMessage id="button.save" defaultMessage="Salvar" />
-            </button>
-          </div>
+         {!isReadOnlyEvaluation && (
+  <div className="flex justify-center gap-4 pt-4">
+    <button
+      type="button"
+      onClick={() => navigate("/evaluationlist")}
+      className="bg-gray-300 text-black px-4 py-2 rounded"
+    >
+      <FormattedMessage id="button.cancel" defaultMessage="Cancelar" />
+    </button>
+    <button
+      type="button"
+      onClick={handleSubmit}
+      className="bg-red-600 text-white px-4 py-2 rounded"
+    >
+      <FormattedMessage id="button.save" defaultMessage="Salvar" />
+    </button>
+  </div>
+)}
+
         </div>
       </div>
 

@@ -1,12 +1,16 @@
 package aor.projetofinal.dto;
 
 
+import aor.projetofinal.entity.enums.EvaluationStateEnum;
+
 /**
  * DTO used to update an evaluation with grade and feedback information.
  * Includes details about both the evaluated user and the evaluator.
  */
 public class UpdateEvaluationDto {
     private int evaluatedId;
+
+    private String state;
 
     private int grade;                // the frontend should send a number between 1 and 4
     private String feedback;         // manager's feedback on the evaluation
@@ -27,6 +31,14 @@ public class UpdateEvaluationDto {
         this.evaluatedId = evaluatedId;
     }
 
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
 
     public int getGrade() { return grade; }
     public void setGrade(int grade) { this.grade = grade; }

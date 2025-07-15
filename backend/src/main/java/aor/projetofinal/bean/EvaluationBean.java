@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static aor.projetofinal.entity.enums.EvaluationStateEnum.transformToString;
+
 @Stateless
 public class EvaluationBean implements Serializable {
 
@@ -85,6 +87,10 @@ public class EvaluationBean implements Serializable {
         // Evaluation content
         if (evaluation.getGrade() != null) {
             dto.setGrade(evaluation.getGrade().getGrade());
+        }
+
+        if (evaluation.getState() != null){
+            dto.setState(transformToString(evaluation.getState()));
         }
 
         if (evaluation.getFeedback() != null) {
