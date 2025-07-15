@@ -123,6 +123,43 @@ const exportUserCourseHistoryByYearCsv = async (userId, year) => {
   return apiCall(API_ENDPOINTS.courses.userHistoryYearExport(userId, year), { method: 'GET' });
 };
 
+
+/**
+ * Gets a user's training summary by year (total hours per year).
+ * @param {number} userId - The user ID.
+ * @returns {Promise<Array>} List of UserCourseYearSummaryDto.
+ */
+const getUserCourseSummaryByYear = async (userId) => {
+  return apiCall(API_ENDPOINTS.courses.summaryByYear, {
+    method: 'POST',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId }),
+  });
+};
+
+/**
+ * Gets all distinct years in which a user has participated in training.
+ * @param {number} userId - The user ID.
+ * @returns {Promise<Array<number>>} List of years.
+ */
+const getUserCourseYears = async (userId) => {
+  return apiCall(API_ENDPOINTS.courses.userYears(userId), { method: 'GET' });
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const courseAPI = {
   listCourses,
   getCourse,
@@ -135,4 +172,6 @@ export const courseAPI = {
   exportUserCourseHistoryCsv,
   getUserCourseHistoryByYear,
   exportUserCourseHistoryByYearCsv,
+  getUserCourseSummaryByYear,
+  getUserCourseYears,
 };
