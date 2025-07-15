@@ -286,7 +286,7 @@
 
   "auth.session.expired": "Token de sessão expirado. A redirecionar para login.",
 
-
+"button.back": "Return",
   
   "redefinepassword.password.short": "A password deve ter pelo menos 6 caracteres.",
   "redefinepassword.password.mismatch": "As passwords não coincidem.",
