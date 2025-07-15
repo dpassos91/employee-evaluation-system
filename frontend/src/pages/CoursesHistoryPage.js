@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { courseAPI } from "../api/courseAPI";
+import { profileAPI } from "../api/profileAPI";
 import Modal from "../components/Modal";
 import { useParams } from "react-router-dom";
 
@@ -19,34 +20,38 @@ export default function CoursesHistoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
-  const [formData, setFormData] = useState({ courseId: '', participationDate: '' });
+  const [formData, setFormData] = useState({ courseId: "", participationDate: "" });
   const [availableCourses, setAvailableCourses] = useState([]);
+  const [targetUser, setTargetUser] = useState(null);
 
   const { userId: paramUserId } = useParams();
-const userId = Number(paramUserId);
+  const userId = Number(paramUserId);
+
+  const fetchHistory = async () => {
+    try {
+      setLoading(true);
+      const [history, availableYears, summary] = await Promise.all([
+        courseAPI.getUserCourseHistory(userId),
+        courseAPI.getUserCourseYears(userId),
+        courseAPI.getUserCourseSummaryByYear(userId),
+      ]);
+      setCourses(history);
+      setYears(availableYears);
+      setYearlySummary(summary);
+      setSelectedYear(availableYears[availableYears.length - 1] || null);
+      setError(null);
+    } catch {
+      setError(intl.formatMessage({ id: "courses.history.loadError", defaultMessage: "Erro ao carregar o histórico de formações." }));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        setLoading(true);
-        const [history, availableYears, summary] = await Promise.all([
-          courseAPI.getUserCourseHistory(userId),
-          courseAPI.getUserCourseYears(userId),
-          courseAPI.getUserCourseSummaryByYear(userId),
-        ]);
-        setCourses(history);
-        setYears(availableYears);
-        setYearlySummary(summary);
-        setSelectedYear(availableYears[availableYears.length - 1] || null);
-        setError(null);
-      } catch (err) {
-        setError("Erro ao carregar o histórico de formações.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (userId) fetchHistory();
+    if (userId) {
+      fetchHistory();
+      profileAPI.getProfileById(userId).then(setTargetUser);
+    }
   }, [userId]);
 
   useEffect(() => {
@@ -54,13 +59,19 @@ const userId = Number(paramUserId);
       try {
         const activeCourses = await courseAPI.listCourses({ active: true });
         setAvailableCourses(activeCourses);
-      } catch (err) {
-        console.error("Erro ao carregar cursos ativos:", err);
+      } catch {
+        console.error("Erro ao carregar cursos ativos");
       }
     };
-
     fetchCourses();
   }, []);
+
+  const canAssignTraining = () => {
+    if (!user || !targetUser) return false;
+    const isAdmin = user.role === "ADMIN";
+    const isManager = targetUser.managerId === user.id;
+    return isAdmin || isManager;
+  };
 
   const getHoursForSelectedYear = () => {
     const found = yearlySummary.find((item) => item.year === selectedYear);
@@ -69,92 +80,70 @@ const userId = Number(paramUserId);
 
   const handleAssignCourse = async (e) => {
     e.preventDefault();
+    if (!formData.courseId || !formData.participationDate) {
+      toast.error(intl.formatMessage({ id: "toast.course.assign.missingFields" }), { closeButton: false });
+      return;
+    }
     try {
       await courseAPI.assignCourseToUser({
         userId,
         courseId: formData.courseId,
         participationDate: formData.participationDate,
       });
-      toast.success("Formação atribuída com sucesso!");
+      toast.success(intl.formatMessage({ id: "toast.course.assign.success" }), { closeButton: false });
       setShowAssignModal(false);
+      await fetchHistory();
     } catch (err) {
-      toast.error("Erro ao atribuir formação.");
+      console.error("Erro:", err);
+      toast.error(intl.formatMessage({ id: "toast.course.assign.error" }), { closeButton: false });
     }
   };
 
   const columns = [
-    {
-      header: <FormattedMessage id="courses.table.name" defaultMessage="Formação" />, 
-      accessor: "courseName",
-    },
-    {
-      header: <FormattedMessage id="courses.table.hours" defaultMessage="Duração" />, 
-      accessor: "timeSpan",
-      render: (row) => `${row.timeSpan} h`,
-    },
-    {
-      header: <FormattedMessage id="courses.table.language" defaultMessage="Idioma" />, 
-      accessor: "language",
-    },
-    {
-      header: <FormattedMessage id="courses.table.category" defaultMessage="Área" />, 
-      accessor: "courseCategory",
-    },
-    {
-      header: <FormattedMessage id="courses.table.date" defaultMessage="Data" />, 
-      accessor: "participationDate",
-      render: (row) => new Date(row.participationDate).toLocaleDateString(),
-    },
+    { header: <FormattedMessage id="courses.table.name" defaultMessage="Formação" />, accessor: "courseName" },
+    { header: <FormattedMessage id="courses.table.hours" defaultMessage="Duração" />, accessor: "timeSpan", render: (row) => `${row.timeSpan} h` },
+    { header: <FormattedMessage id="courses.table.language" defaultMessage="Idioma" />, accessor: "language" },
+    { header: <FormattedMessage id="courses.table.category" defaultMessage="Área" />, accessor: "courseCategory" },
+    { header: <FormattedMessage id="courses.table.date" defaultMessage="Data" />, accessor: "participationDate", render: (row) => new Date(row.participationDate).toLocaleDateString() },
   ];
 
   const formatDecimalHours = (decimalHours) => {
     const hours = Math.floor(decimalHours);
     const minutes = Math.round((decimalHours - hours) * 60);
-
-    let result = '';
+    let result = "";
     if (hours > 0) result += `${hours} h`;
     if (minutes > 0) result += ` ${minutes} mins`;
-
-    return result.trim() || '0 mins';
+    return result.trim() || "0 mins";
   };
 
   return (
     <PageLayout title={<FormattedMessage id="courses.history.title" defaultMessage="Histórico de Formações" />}>
-
       <div className="flex justify-between items-center mb-6">
         <div className="text-lg font-semibold text-gray-800 flex items-center">
           <span className="mr-2">
-            <FormattedMessage
-              id="courses.summary.totalHours.label"
-              defaultMessage="Tempo de formação em:"
-            />
+            <FormattedMessage id="courses.summary.totalHours.label" defaultMessage="Tempo de formação em:" />
           </span>
-
           <select
             id="yearSelect"
-            value={selectedYear || ''}
+            value={selectedYear || ""}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
             className="border border-gray-300 rounded px-2 py-1 text-sm mr-4"
           >
-            <>
-              <option value="">
-                <FormattedMessage id="courses.dropdown.selectYear" defaultMessage="Selecione ano" />
-              </option>
-              {years.map((year) => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </>
+            <option value="">
+              <FormattedMessage id="courses.dropdown.selectYear" defaultMessage="Selecione ano" />
+            </option>
+            {years.map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
           </select>
-
           <span>{formatDecimalHours(getHoursForSelectedYear())}</span>
         </div>
 
-        <button
-          onClick={() => setShowAssignModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          <FormattedMessage id="courses.assignCourse" defaultMessage="Atribuir Formação" />
-        </button>
+        {canAssignTraining() && (
+          <button onClick={() => setShowAssignModal(true)} className="bg-red-600 text-white px-4 py-2 rounded">
+            <FormattedMessage id="courses.assignCourse" defaultMessage="Atribuir Formação" />
+          </button>
+        )}
       </div>
 
       {showAssignModal && (
@@ -184,6 +173,7 @@ const userId = Number(paramUserId);
                 ))}
               </select>
             </div>
+
             <div className="mb-4">
               <label className="block mb-1 text-sm font-medium">
                 <FormattedMessage id="courses.field.date" defaultMessage="Data de Participação" />
@@ -196,11 +186,12 @@ const userId = Number(paramUserId);
                 className="border px-2 py-1 rounded w-full"
               />
             </div>
+
             <div className="flex gap-2 justify-end">
               <button type="button" onClick={() => setShowAssignModal(false)} className="bg-gray-300 px-4 py-2 rounded">
                 <FormattedMessage id="modal.cancel" defaultMessage="Cancelar" />
               </button>
-              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+              <button type="submit" className="bg-red-600 text-white px-4 py-2 rounded">
                 <FormattedMessage id="modal.save" defaultMessage="Guardar" />
               </button>
             </div>
@@ -213,6 +204,7 @@ const userId = Number(paramUserId);
           <FormattedMessage id="table.loading" defaultMessage="A carregar..." />
         </div>
       )}
+
       {error && (
         <div className="py-8 text-center text-red-600">{error}</div>
       )}

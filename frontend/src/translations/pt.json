@@ -248,6 +248,27 @@
   "courses.field.language": "Idioma",
   "courses.field.category": "Área",
   "courses.field.active": "Ativo",
+  "toast.course.assign.success": "Formação atribuída com sucesso!",
+  "toast.course.assign.error": "Erro ao atribuir formação.",
+  "toast.course.assign.missingFields": "Preencha todos os campos obrigatórios.",
+  
+  "courses.history.title": "Histórico de Formações",
+  "courses.summary.totalHours.label": "Tempo de formação em:",
+  "courses.dropdown.selectYear": "Selecione ano",
+  "courses.assignCourse": "Atribuir Formação",
+  "courses.modal.title": "Atribuir Formação",
+  "courses.field.courseId": "Formação",
+  "courses.field.date": "Data de Participação",
+  "courses.assign.select": "Selecione uma formação",
+  
+  "courses.table.hours": "Duração",
+  
+  "courses.table.date": "Data",
+  
+
+
+
+
     
   "profile.manager.update.success": "Gestor atualizado com sucesso!",
   "profile.currentPassword": "Password atual",

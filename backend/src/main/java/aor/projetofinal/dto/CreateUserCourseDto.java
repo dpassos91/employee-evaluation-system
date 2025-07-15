@@ -1,5 +1,6 @@
 package aor.projetofinal.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -15,7 +16,7 @@ public class CreateUserCourseDto {
     private int courseId;
 
     /** Date and time when the user participated in the course. */
-    private LocalDateTime participationDate;
+    private LocalDate participationDate;
 
     /** Default constructor. */
     public CreateUserCourseDto() {}
@@ -38,11 +39,11 @@ public class CreateUserCourseDto {
         this.courseId = courseId;
     }
 
-    public LocalDateTime getParticipationDate() {
+    public LocalDate getParticipationDate() {
         return participationDate;
     }
 
-    public void setParticipationDate(LocalDateTime participationDate) {
+    public void setParticipationDate(LocalDate participationDate) {
         this.participationDate = participationDate;
     }
 }

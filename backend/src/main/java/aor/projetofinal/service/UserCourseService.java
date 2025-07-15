@@ -45,16 +45,83 @@ public class UserCourseService {
 
 
 
+    /**
+     * Registers a user's participation in a specific course.
+     *
+     * Accessible by:
+     * - The user themselves
+     * - Their direct manager
+     * - An administrator
+     *
+     * @param dto   Data containing user ID, course ID, and participation date
+     * @param token Session token for authentication and authorization
+     * @return      HTTP Response indicating success or failure of registration
+     */
     @POST
-    public Response addUserCourse(CreateUserCourseDto dto) {
+    public Response addUserCourse(CreateUserCourseDto dto, @HeaderParam("sessionToken") String token) {
         UserEntity currentUser = RequestContext.getCurrentUser();
 
-        logger.info("User: {} | IP: {} - Registered participation in course {} for user {}.",
-                currentUser.getEmail(), RequestContext.getIp(), dto.getCourseId(), dto.getUserId());
+        logger.info("User: {} | IP: {} - Attempting to register course {} for user {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), dto.getCourseId(), dto.getUserId());
 
-        userCourseBean.addUserCourse(dto);
-        return Response.status(Response.Status.CREATED).build();
+        // 1. Validate session token
+        SessionStatusDto sessionStatus = userBean.validateAndRefreshSessionToken(token);
+        if (sessionStatus == null) {
+            logger.warn("User: {} | IP: {} - Session expired while registering course for user {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), dto.getUserId());
+
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"message\": \"Session expired. Please, log in again.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // 2. Check if target user exists
+        UserEntity targetUser = userDao.findById(dto.getUserId());
+        if (targetUser == null) {
+            logger.warn("User: {} | IP: {} - Attempted to register course for non-existent user ID {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), dto.getUserId());
+
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"message\": \"Target user not found.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // 3. Authorization check: Admin, self, or user's manager
+        boolean isAdmin = currentUser.getRole().getName().equalsIgnoreCase("admin");
+        boolean isSelf = currentUser.getId() == targetUser.getId();
+        boolean isManager = targetUser.getManager() != null &&
+                targetUser.getManager().getId() == currentUser.getId();
+
+        if (!isAdmin && !isSelf && !isManager) {
+            logger.warn("User: {} | IP: {} - Unauthorized attempt to assign course to user ID {}.",
+                    RequestContext.getAuthor(), RequestContext.getIp(), dto.getUserId());
+
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("{\"message\": \"Access denied. Only admins, the user, or their manager may register courses.\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
+        // 4. Authorized - proceed with registration
+        logger.info("User: {} | IP: {} - Authorized to assign course {} to user {}.",
+                RequestContext.getAuthor(), RequestContext.getIp(), dto.getCourseId(), dto.getUserId());
+
+        try {
+            userCourseBean.addUserCourse(dto);
+            return Response.status(Response.Status.CREATED).build();
+        } catch (IllegalArgumentException e) {
+            logger.warn("User: {} | IP: {} - Failed to assign course: {}",
+                    RequestContext.getAuthor(), RequestContext.getIp(), e.getMessage());
+
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"message\": \"" + e.getMessage() + "\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
     }
+
 
     @GET
     @Path("/user/{userId}")

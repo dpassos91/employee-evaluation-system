@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ class UserCourseBeanTest {
         CreateUserCourseDto dto = new CreateUserCourseDto();
         dto.setUserId(1);
         dto.setCourseId(10);
-        dto.setParticipationDate(LocalDateTime.now());
+        dto.setParticipationDate(LocalDate.now());
 
         CourseEntity course = new CourseEntity();
         course.setId(10);
