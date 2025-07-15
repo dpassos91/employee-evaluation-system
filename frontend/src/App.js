@@ -76,6 +76,12 @@ const handleWebSocketMessage = useCallback((data) => {
         useNotificationStore.getState().incrementCount("MESSAGE");
       });
     }
+    if (data.type === "status_update") {
+  import("./stores/chatStore").then(({ useChatStore }) => {
+    useChatStore.getState().updateContactStatus(data.userId, data.online);
+  });
+}
+
   }
 
   // (Se para além do chat_message tiveres outros tipos, mete-os aqui)

@@ -6,6 +6,8 @@ import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.MessageDto;
 import aor.projetofinal.entity.MessageEntity;
 import aor.projetofinal.entity.UserEntity;
+import aor.projetofinal.util.OnlineUserTracker;
+import aor.projetofinal.websocket.ChatEndpoint;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -111,8 +113,8 @@ if (lastMessage != null) {
                 : null
         );
 
-        // --- Set online status (all false for now, unless you implement tracking) ---
-        dto.setOnline(false);
+        //Set online status
+        dto.setOnline(OnlineUserTracker.isOnline(contact.getId()));
 
         conversations.add(dto);
 

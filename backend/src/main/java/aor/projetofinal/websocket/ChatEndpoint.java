@@ -51,25 +51,27 @@ public class ChatEndpoint {
      *
      * @param session the WebSocket session that was closed
      */
-    @OnClose
-    public void onClose(Session session) {
-        logger.info("[ONCLOSE] Antes de remover, sessions.keySet: {}", sessions.keySet());
-        try {
-            sessions.entrySet().removeIf(entry -> entry.getValue().equals(session));
-            Integer userId = (Integer) session.getUserProperties().get("userId");
-            if (userId != null) {
-                OnlineUserTracker.markOffline(userId);
-            }
-            String author = (String) session.getUserProperties().getOrDefault("author", "Anonymous");
-            String ip = (String) session.getUserProperties().getOrDefault("ip", "Unknown");
-            RequestContext.setAuthor(author);
-            RequestContext.setIp(ip);
-
-            logger.info("User: {} | IP: {} - WebSocket connection closed.", RequestContext.getAuthor(), RequestContext.getIp());
-        } finally {
-            RequestContext.clear();
+@OnClose
+public void onClose(Session session) {
+    logger.info("[ONCLOSE] Antes de remover, sessions.keySet: {}", sessions.keySet());
+    try {
+        Integer userId = (Integer) session.getUserProperties().get("userId");
+        if (userId != null) {
+            sessions.remove(userId);                // Limpa do mapa!
+            OnlineUserTracker.markOffline(userId);  // Marca offline no tracker
+            broadcastOnlineStatus(userId, false);   // Notifica todos os clientes!
         }
+        String author = (String) session.getUserProperties().getOrDefault("author", "Anonymous");
+        String ip = (String) session.getUserProperties().getOrDefault("ip", "Unknown");
+        RequestContext.setAuthor(author);
+        RequestContext.setIp(ip);
+
+        logger.info("User: {} | IP: {} - WebSocket connection closed.", RequestContext.getAuthor(), RequestContext.getIp());
+    } finally {
+        RequestContext.clear();
     }
+}
+
 
     /**
  * Called when a WebSocket error occurs.
@@ -84,7 +86,9 @@ public void onError(Session session, Throwable throwable) {
     try {
         Integer userId = (Integer) session.getUserProperties().get("userId");
         if (userId != null) {
-            OnlineUserTracker.markOffline(userId);
+                sessions.remove(userId);
+                 OnlineUserTracker.markOffline(userId);
+                broadcastOnlineStatus(userId, false);
         }
         String author = (String) session.getUserProperties().getOrDefault("author", "Anonymous");
         String ip = (String) session.getUserProperties().getOrDefault("ip", "Unknown");
@@ -212,6 +216,19 @@ public void onMessage(Session session, String messageText) {
 }
 
 
+public static void broadcastOnlineStatus(int userId, boolean isOnline) {
+    String msg = String.format("{\"type\":\"status_update\",\"userId\":%d,\"online\":%s}", userId, isOnline);
+    for (Session s : sessions.values()) {
+        if (s.isOpen()) {
+            try {
+                s.getBasicRemote().sendText(msg);
+            } catch (Exception e) {
+                // Logging opcional
+            }
+        }
+    }
+}
+
     /**
      * Called when a new WebSocket connection is established.
      * Authenticates the user and associates their userId with the session.
@@ -249,6 +266,7 @@ public void onOpen(Session session, EndpointConfig config) {
         logger.info("Sessões WebSocket ativas: " + sessions.keySet());
         logger.info("[ONOPEN] sessions.keySet depois: {}", sessions.keySet());
         logger.info("User: {} | IP: {} - WebSocket connection established.", RequestContext.getAuthor(), RequestContext.getIp());
+        broadcastOnlineStatus(userId, true);
     } finally {
         RequestContext.clear();
     }
