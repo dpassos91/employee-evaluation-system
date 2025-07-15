@@ -295,7 +295,23 @@
   "redefinepassword.error": "Erro ao redefinir password.",
   "redefinepassword.newPasswordLabel": "Password",
   "redefinepassword.confirmPasswordLabel": "Confirme a password",
-  "redefinepassword.submit": "Redefinir"
+  "redefinepassword.submit": "Redefinir",
+
+  "login.error.invalidCredentials": "Email ou password inválidos.",
+  "register.form.alreadyAccount": "Já tem conta?",
+  "register.error.emailInUse": "Este email já está registado. Esqueceu-se da sua password?",
+  "register.forgotPassword": "Recuperar password",
+  "forgotPassword.title": "Recuperar Password",
+  "forgotPassword.form.submit": "Enviar instruções",
+  "forgotPassword.success": "Instruções enviadas para o seu email.",
+
+  "register.error.password_mismatch": "As passwords não coincidem.",
+  "register.error.generic": "Ocorreu um erro ao registar. Por favor, tente novamente.",
+  "register.confirmation_required": "Registo pendente. Por favor, confirme a sua conta através do email que enviámos.",
+
+    "confirm.success": "Conta confirmada com sucesso! Já pode fazer login.",
+  "confirm.error.noToken": "Token de confirmação em falta.",
+  "confirm.error.generic": "Não foi possível confirmar a sua conta. O link pode ter expirado."
 
 
 

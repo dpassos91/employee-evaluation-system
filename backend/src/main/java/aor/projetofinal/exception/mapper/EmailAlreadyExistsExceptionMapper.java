@@ -32,11 +32,11 @@ public class EmailAlreadyExistsExceptionMapper implements ExceptionMapper<EmailA
 
         ErrorResponseDto errorResponse = new ErrorResponseDto(
                 Response.Status.CONFLICT.getStatusCode(),
-                "Conflict",
-                exception.getMessage(),
-                uriInfo.getPath(),
-                ip,
-                author
+    "EMAIL_ALREADY_EXISTS",  
+    "Email already in use.",  
+    uriInfo != null ? uriInfo.getPath() : "unknown",
+    ip,
+    author
         );
 
         return Response.status(Response.Status.CONFLICT)

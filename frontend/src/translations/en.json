@@ -284,7 +284,25 @@
   "redefinepassword.error": "Error resetting password.",
   "redefinepassword.newPasswordLabel": "Password",
   "redefinepassword.confirmPasswordLabel": "Confirm Password",
-  "redefinepassword.submit": "Redefine"
+  "redefinepassword.submit": "Redefine",
+
+
+  "login.error.invalidCredentials": "Invalid email or password.",
+  "register.form.alreadyAccount": "Already have an account?",
+  "register.error.emailInUse": "This email is already registered. Forgot your password?",
+  "register.forgotPassword": "Recover password",
+  "forgotPassword.title": "Recover Password",
+  "forgotPassword.form.submit": "Send instructions",
+  "forgotPassword.success": "Instructions sent to your email.",
+  
+  "register.error.password_mismatch": "Passwords do not match.",
+  "register.error.generic": "An error occurred during registration. Please try again.",
+  "register.confirmation_required": "Registration not complete. Please confirm your account through the email we sent you.",
+
+    "confirm.success": "Account confirmed successfully! You can now log in.",
+  "confirm.error.noToken": "Confirmation token is missing.",
+  "confirm.error.generic": "Could not confirm your account. The link may have expired."
+ 
 
   
 }

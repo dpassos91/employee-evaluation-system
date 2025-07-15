@@ -41,6 +41,7 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
 
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(errorResponse)
+                .type("application/json")
                 .build();
     }
 

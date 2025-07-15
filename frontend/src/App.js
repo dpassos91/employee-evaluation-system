@@ -40,6 +40,7 @@ import CoursesPage from "./pages/CoursesPage";
 import LogoutAndRedirect from "./components/LogoutAndRedirect";
 import CoursesHistoryPage from "./pages/CoursesHistoryPage";
 import TeamCoursesPage from "./pages/TeamCoursesPage";
+import ConfirmAccountPage from "./pages/ConfirmAccountPage";
 
 /**
  * Main App component.
@@ -132,6 +133,7 @@ const handleWebSocketMessage = useCallback((data) => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
           <Route path="/redefinepassword" element={<RedefinePasswordPage />} />
+          <Route path="/confirmAccount" element={<ConfirmAccountPage />} />
           <Route
             path="/dashboard"
             element={

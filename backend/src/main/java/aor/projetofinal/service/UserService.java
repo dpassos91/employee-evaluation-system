@@ -329,7 +329,7 @@ public Response createUser(LoginUserDto loginUserDto) {
     String confirmToken = userBean.getConfirmToken(createdUser.getEmail());
 
     // 3. Build the confirmation link containing the token
-    String confirmationLink = "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=" + confirmToken;
+    String confirmationLink = "https://localhost:3000/confirmAccount?confirmToken=" + confirmToken;
 
     // 4. Send the confirmation email with the link
     EmailUtil.sendEmail(
@@ -526,7 +526,7 @@ public Response loginUser(LoginUserDto userLog) {
 
     if (!userBean.isAccountConfirmed(userLog.getEmail())) {
         String confirmToken = userBean.getConfirmToken(userLog.getEmail());
-        String confirmationLink = "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=" + confirmToken;
+        String confirmationLink = "https://localhost:3000/confirmAccount?confirmToken=" + confirmToken;
 
         EmailUtil.sendEmail(
                 userEntity.getEmail(),

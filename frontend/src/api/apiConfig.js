@@ -25,7 +25,7 @@ const API_ENDPOINTS = {
     /** @function Change user password by email */
     changePassword: (email) => `${API_BASE_URL}/users/update/${email}/password`,
     /** @function Confirm user registration with token */
-    confirm: (token) => `${API_BASE_URL}/users/confirm?token=${token}`,
+    confirm: (token) => `${API_BASE_URL}/users/confirmAccount?confirmToken=${token}`,
     /** @function Get all managers (users with the MANAGER role, active and confirmed) */
     managers: `${API_BASE_URL}/users/managers`,
     /** @type {string} User login endpoint */
