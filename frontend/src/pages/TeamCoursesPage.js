@@ -15,20 +15,25 @@ export default function TeamCoursesPage() {
   const [teamCourses, setTeamCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [years, setYears] = useState([]);
+  const [selectedYear, setSelectedYear] = useState(null);
+
   // Modal state
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [assignTarget, setAssignTarget] = useState(null);
   const [formData, setFormData] = useState({ courseId: "", participationDate: "" });
   const [availableCourses, setAvailableCourses] = useState([]);
 
-  // Fetch team courses (per manager)
-  const fetchTeamCourses = async () => {
+  // Fetch team courses (by year, or all if year is null)
+  const fetchTeamCourses = async (year) => {
     setLoading(true);
     try {
-      const result = await courseAPI.getTeamCourses();
-      setTeamCourses(result);
+      const params = year ? { year } : {};
+      const result = await courseAPI.getTeamCourses(params);
+      setTeamCourses(Array.isArray(result) ? result : []);
     } catch (err) {
       toast.error(intl.formatMessage({ id: "courses.team.loadError", defaultMessage: "Erro ao carregar equipa." }));
+      setTeamCourses([]);
     } finally {
       setLoading(false);
     }
@@ -38,16 +43,35 @@ export default function TeamCoursesPage() {
   const fetchAvailableCourses = async () => {
     try {
       const courses = await courseAPI.listCourses({ active: true });
-      setAvailableCourses(courses);
+      setAvailableCourses(Array.isArray(courses) ? courses : []);
     } catch (err) {
       setAvailableCourses([]);
     }
   };
 
+  // Fetch years for dropdown
+const fetchTeamCourseYears = async () => {
+  try {
+    const response = await courseAPI.getTeamParticipationYears();
+    console.log("DEBUG: years API response →", response);
+    setYears(Array.isArray(response) ? response : []);
+  } catch (e) {
+    setYears([]);
+    console.log("DEBUG: erro ao buscar anos", e);
+  }
+};
+
+  // Carrega tudo no início
   useEffect(() => {
-    fetchTeamCourses();
     fetchAvailableCourses();
+    fetchTeamCourseYears();
+    fetchTeamCourses(null); 
   }, []);
+
+  // Atualiza cursos sempre que muda o ano (ou todos)
+  useEffect(() => {
+    fetchTeamCourses(selectedYear);
+  }, [selectedYear]);
 
   // Modal open handler
   const openAssignModal = (user) => {
@@ -71,68 +95,87 @@ export default function TeamCoursesPage() {
       });
       toast.success(intl.formatMessage({ id: "toast.course.assign.success" }), { closeButton: false });
       setShowAssignModal(false);
-      fetchTeamCourses(); // Refresh the table!
+      fetchTeamCourses(selectedYear); // Atualiza para o ano filtrado
     } catch {
       toast.error(intl.formatMessage({ id: "toast.course.assign.error" }), { closeButton: false });
     }
   };
 
   // Define columns
-const columns = [
-  {
-    header: <FormattedMessage id="users.table.name" defaultMessage="Nome" />,
-    accessor: (row) => (
-      <span className="font-medium">{row.user.firstName} {row.user.lastName}</span>
-    ),
-    className: "text-left w-[140px] pr-2",
-  },
-  {
-    header: "",
-    accessor: (row) => (
-      <div className="justify-left pr-24">
-        <AvatarCell
-          avatar={row.user.photograph}
-          name={`${row.user.firstName} ${row.user.lastName}`}
-        />
-      </div>
-    ),
-    className: "text-center w-[54px]",
-  },
-  {
-    header: <FormattedMessage id="courses.table.assigned" defaultMessage="Formações Atribuídas" />,
-    accessor: (row) =>
-      row.courses && row.courses.length
-        ? row.courses.map((c) => c.courseName).join(", ")
-        : <span className="text-gray-400"><FormattedMessage id="courses.table.none" defaultMessage="Nenhuma" /></span>,
-    className: "text-left w-[260px]",
-  },
-  {
-    header: <FormattedMessage id="courses.table.hours" defaultMessage="Duração" />,
-    accessor: (row) =>
-      row.courses && row.courses.length
-        ? row.courses.reduce((sum, c) => sum + (c.timeSpan || 0), 0) + " h"
-        : "0 h",
-    className: "text-left w-[100px]",
-  },
-  {
-    header: <FormattedMessage id="users.table.actions" defaultMessage="Ações" />,
-    accessor: null,
-    render: (row) => (
-      <button
-        className="bg-red-600 text-white px-3 py-1 rounded"
-        onClick={() => openAssignModal(row.user)}
-      >
-        <FormattedMessage id="courses.assignCourse" defaultMessage="Atribuir Formação" />
-      </button>
-    ),
-    className: "text-left w-[180px] pl-2",
-  },
-];
-
-
+  const columns = [
+    {
+      header: <FormattedMessage id="users.table.name" defaultMessage="Nome" />,
+      accessor: (row) => (
+        <span className="font-medium">{row.user.firstName} {row.user.lastName}</span>
+      ),
+      className: "text-left w-[140px] pr-2",
+    },
+    {
+      header: "",
+      accessor: (row) => (
+        <div className="justify-left pr-24">
+          <AvatarCell
+            avatar={row.user.photograph}
+            name={`${row.user.firstName} ${row.user.lastName}`}
+          />
+        </div>
+      ),
+      className: "text-center w-[54px]",
+    },
+    {
+      header: <FormattedMessage id="courses.table.assigned" defaultMessage="Formações Atribuídas" />,
+      accessor: (row) =>
+        row.courses && row.courses.length
+          ? row.courses.map((c) => c.courseName).join(", ")
+          : <span className="text-gray-400"><FormattedMessage id="courses.table.none" defaultMessage="Nenhuma" /></span>,
+      className: "text-left w-[260px]",
+    },
+    {
+      header: <FormattedMessage id="courses.table.hours" defaultMessage="Duração" />,
+      accessor: (row) =>
+        row.courses && row.courses.length
+          ? row.courses.reduce((sum, c) => sum + (c.timeSpan || 0), 0) + " h"
+          : "0 h",
+      className: "text-left w-[100px]",
+    },
+    {
+      header: <FormattedMessage id="users.table.actions" defaultMessage="Ações" />,
+      accessor: null,
+      render: (row) => (
+        <button
+          className="bg-red-600 text-white px-3 py-1 rounded"
+          onClick={() => openAssignModal(row.user)}
+        >
+          <FormattedMessage id="courses.assignCourse" defaultMessage="Atribuir Formação" />
+        </button>
+      ),
+      className: "text-left w-[180px] pl-2",
+    },
+  ];
 
   return (
-    <PageLayout title={<FormattedMessage id="courses.team.title" defaultMessage="Formações de Equipa" />}>
+<PageLayout title={<FormattedMessage id="courses.team.title" defaultMessage="Formações de Equipa" />}>
+  <div className="flex justify-between items-center mb-6">
+    <div className="text-lg font-semibold text-gray-800 flex items-center">
+      <span className="mr-2">
+        <FormattedMessage id="courses.summary.totalHours.label" defaultMessage="Tempo de formação em:" />
+      </span>
+      <select
+        id="yearSelect"
+        value={selectedYear || ""}
+        onChange={e => setSelectedYear(e.target.value ? Number(e.target.value) : null)}
+        className="border border-gray-300 rounded px-2 py-1 text-sm mr-4"
+      >
+        <option value="">
+          <FormattedMessage id="courses.dropdown.selectYear" defaultMessage="Selecione o ano" />
+        </option>
+        {years.map((year) => (
+          <option key={year} value={year}>{year}</option>
+        ))}
+      </select>
+    </div>
+  </div>
+
       {/* Modal de atribuição */}
       {showAssignModal && assignTarget && (
         <Modal
@@ -185,13 +228,11 @@ const columns = [
         </Modal>
       )}
 
-      {loading && (
+      {loading ? (
         <div className="py-8 text-center text-gray-500">
           <FormattedMessage id="table.loading" defaultMessage="A carregar..." />
         </div>
-      )}
-
-      {!loading && (
+      ) : (
         <AppTable
           columns={columns}
           data={teamCourses}

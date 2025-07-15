@@ -113,6 +113,7 @@ public class UserCourseDao {
                 .setParameter("userId", userId)
                 .setParameter("start", start)
                 .setParameter("end", end)
+                .setParameter("year", year)
                 .getResultList();
     }
 

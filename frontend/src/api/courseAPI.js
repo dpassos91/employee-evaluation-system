@@ -42,9 +42,17 @@ const createCourse = async (data) => {
  * @returns {Promise<Array<UserTeamCoursesDto>>} List of UserTeamCoursesDto (user + courses).
  */
 const getTeamCourses = async () => {
-  // Aqui assumimos que o apiCall já trata do header do token via interceptors,
-  // caso contrário, podes adicionar manualmente nas options.
   return apiCall(API_ENDPOINTS.courses.teamCourses, { method: 'GET' });
+};
+
+/**
+ * Gets all distinct years with course participation for the manager's team (for filtering).
+ * @returns {Promise<Array<number>>} List of years.
+ */
+const getTeamParticipationYears = async () => {
+  return apiCall(API_ENDPOINTS.courses.teamParticipationYears, {
+    method: 'GET',
+  });
 };
 
 /**
@@ -161,6 +169,7 @@ export const courseAPI = {
   listCourses,
   getCourse,
   getTeamCourses,
+  getTeamParticipationYears,
   createCourse,
   updateCourse,
   deactivateCourse,

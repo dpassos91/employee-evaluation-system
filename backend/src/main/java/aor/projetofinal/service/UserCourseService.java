@@ -360,17 +360,19 @@ public class UserCourseService {
 @Path("/manager/team-courses")
 @Produces(MediaType.APPLICATION_JSON)
 /**
- * Returns the flat profile and assigned courses for all users managed by the current manager.
- * Used for team dashboards where a manager can view/assign trainings.
+ * Returns the flat profile and assigned courses for all users managed by the current manager,
+ * optionally filtered by participation year.
  *
  * @param token The manager's session token (for authentication).
+ * @param year (optional) Filter courses by year of participation.
  * @return 200 OK with List<UserTeamCoursesDto> if authorized, 403 if forbidden.
  */
-public Response getTeamCourses(@HeaderParam("sessionToken") String token) {
+public Response getTeamCourses(
+        @HeaderParam("sessionToken") String token,
+        @QueryParam("year") Integer year) {
     // 1. Authenticate manager using session token
     UserEntity manager = userBean.findUserBySessionToken(token);
     if (manager == null || !manager.getRole().getName().equalsIgnoreCase("MANAGER")) {
-        // If not authenticated or not a manager, deny access
         return Response.status(Response.Status.FORBIDDEN)
             .entity("{\"message\": \"Access denied. Only managers can access this resource.\"}")
             .type(MediaType.APPLICATION_JSON)
@@ -381,10 +383,15 @@ public Response getTeamCourses(@HeaderParam("sessionToken") String token) {
     List<UserEntity> subordinates = userDao.findUsersManagedBy(manager.getId());
     List<UserTeamCoursesDto> team = new ArrayList<>();
 
-    // 3. For each user, get their flat profile and assigned courses
+    // 3. For each user, get their flat profile and assigned courses (filter by year if needed)
     for (UserEntity user : subordinates) {
         FlatProfileDto profile = JavaConversionUtil.convertProfileEntityToFlatProfileDto(user.getProfile());
-        List<UserCourseDto> courses = userCourseBean.listUserCourses(user.getId());
+        List<UserCourseDto> courses;
+        if (year != null) {
+            courses = userCourseBean.listUserCoursesByYear(user.getId(), year);
+        } else {
+            courses = userCourseBean.listUserCourses(user.getId());
+        }
         team.add(new UserTeamCoursesDto(profile, courses));
     }
 
@@ -393,5 +400,28 @@ public Response getTeamCourses(@HeaderParam("sessionToken") String token) {
 }
 
 
+/**
+ * Returns the distinct years in which any member of the manager's team participated in courses.
+ * Only accessible by users with MANAGER role.
+ *
+ * Example: [2022, 2023, 2024]
+ */
+@GET
+@Path("/manager/team-years")
+@Produces(MediaType.APPLICATION_JSON)
+public Response getTeamParticipationYears(@HeaderParam("sessionToken") String token) {
+    // Authenticate and check manager role
+    UserEntity manager = userBean.findUserBySessionToken(token);
+    if (manager == null || !manager.getRole().getName().equalsIgnoreCase("MANAGER")) {
+        return Response.status(Response.Status.FORBIDDEN)
+            .entity("{\"message\": \"Access denied. Only managers can access this resource.\"}")
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+    }
+
+    // Fetch all years for team (delegates to bean)
+    List<Integer> years = userCourseBean.listTeamParticipationYears(manager.getId());
+    return Response.ok(years).build();
+}
 }
 

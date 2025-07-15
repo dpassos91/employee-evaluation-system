@@ -76,6 +76,8 @@ validateSessionStatus: `${API_BASE_URL}/users/session-status`,
     assignToUser: `${API_BASE_URL}/user-courses`,
     /** @function Get profiles + courses for all users managed by current manager */
     teamCourses: `${API_BASE_URL}/user-courses/manager/team-courses`,
+      /** @function Get all distinct years with training for team managed by current manager */
+  teamParticipationYears: `${API_BASE_URL}/user-courses/manager/team-years`,
     /** @function Get a user's training history */
     userHistory: (userId) => `${API_BASE_URL}/user-courses/user/${userId}`,
     /** @function Export a user's training history to CSV */

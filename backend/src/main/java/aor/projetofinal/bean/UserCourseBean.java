@@ -5,11 +5,13 @@ import aor.projetofinal.dao.CourseDao;
 import aor.projetofinal.dao.UserCourseDao;
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.CreateUserCourseDto;
+import aor.projetofinal.dto.FlatProfileDto;
 import aor.projetofinal.dto.UserCourseDto;
 import aor.projetofinal.dto.UserCourseYearSummaryDto;
 import aor.projetofinal.entity.CourseEntity;
 import aor.projetofinal.entity.UserCourseEntity;
 import aor.projetofinal.entity.UserCourseIdEntity;
+import aor.projetofinal.bean.UserBean;
 
 import aor.projetofinal.entity.UserEntity;
 import aor.projetofinal.util.JavaConversionUtil;
@@ -22,8 +24,12 @@ import org.apache.logging.log4j.Logger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Business logic bean for managing user-course participation.
@@ -38,14 +44,13 @@ public class UserCourseBean {
     @Inject
     private UserCourseDao userCourseDao;
 
-
     @Inject
     private UserDao userDao;
 
-
+    @Inject
+    private UserBean userBean;
 
     private static final Logger logger = LogManager.getLogger(UserCourseBean.class);
-
 
     /**
      * Registers a new training participation for a user in a specific course.
@@ -161,10 +166,11 @@ public class UserCourseBean {
      * @param year   The year.
      * @return List of UserCourseDto.
      */
-    public List<UserCourseDto> listUserCoursesByYear(int userId, int year) {
-        return userCourseDao.findByUserIdAndYear(userId, year).stream()
-                .map(this::toDto).collect(Collectors.toList());
-    }
+public List<UserCourseDto> listUserCoursesByYear(int userId, int year) {
+    return userCourseDao.findByUserIdAndYear(userId, year).stream()
+        .map(JavaConversionUtil::convertEntityToUserCourseDto)
+        .collect(Collectors.toList());
+}
 
     /**
      * Generates a yearly summary of training hours for a specific user.
@@ -185,10 +191,29 @@ public class UserCourseBean {
         return JavaConversionUtil.convertUserCourseEntityToUserCourseYearSummaryDto(participations);
     }
 
+/**
+ * Returns a sorted list of all unique years in which any subordinate of the manager participated in a course.
+ * @param managerId The ID of the manager.
+ * @return Sorted list of unique participation years across the manager's team.
+ */
+public List<Integer> listTeamParticipationYears(int managerId) {
+    // Get the profiles (FlatProfileDto) of all subordinates
+    List<FlatProfileDto> teamProfiles = userBean.listFlatProfilesManagedBy(managerId);
+    if (teamProfiles.isEmpty()) return List.of();
 
-
-
-
+    Set<Integer> years = new HashSet<>();
+    for (FlatProfileDto profile : teamProfiles) {
+        Long userId = profile.getUserId();
+        if (userId == null) continue;
+        List<UserCourseEntity> courses = userCourseDao.findByUserId(userId.intValue());
+        for (UserCourseEntity uc : courses) {
+            years.add(uc.getParticipationDate().getYear());
+        }
+    }
+    List<Integer> result = new ArrayList<>(years);
+    Collections.sort(result);
+    return result;
+}
 
 
 }

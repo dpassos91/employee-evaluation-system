@@ -4,9 +4,7 @@ import aor.projetofinal.context.RequestContext;
 import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.*;
 import aor.projetofinal.entity.*;
-import aor.projetofinal.entity.enums.UsualWorkPlaceEnum;
 
-import aor.projetofinal.service.UserService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Utility class for converting JPA entities to DTOs (Data Transfer Objects).
@@ -363,6 +362,49 @@ public static ProfileDto convertProfileEntityToProfileDto(ProfileEntity p) {
         userDto.setRecoveryTokenExpiry(userEntity.getRecoveryTokenExpiry());
         return userDto;
     }
+
+/**
+ * Converts a UserCourseEntity instance to a UserCourseDto for API output.
+ * Extracts relevant fields such as user ID, course ID, course name,
+ * time span, language, course category, and participation date.
+ * Handles possible null fields safely.
+ *
+ * @param uc The UserCourseEntity to convert (may be null).
+ * @return A UserCourseDto populated with flat fields, or null if input is null.
+ */
+public static UserCourseDto convertEntityToUserCourseDto(UserCourseEntity uc) {
+    if (uc == null) return null;
+    UserCourseDto dto = new UserCourseDto();
+
+    // User ID (guarda como int)
+    if (uc.getUser() != null) {
+        dto.setUserId(uc.getUser().getId());
+    }
+
+    // Course info
+    if (uc.getCourse() != null) {
+        dto.setCourseId(uc.getCourse().getId());
+        dto.setCourseName(uc.getCourse().getName());
+        dto.setTimeSpan(uc.getCourse().getTimeSpan());
+
+        if (uc.getCourse().getLanguage() != null) {
+            dto.setLanguage(uc.getCourse().getLanguage());
+        } else {
+            dto.setLanguage(null);
+        }
+
+        if (uc.getCourse().getCourseCategory() != null) {
+            dto.setCourseCategory(uc.getCourse().getCourseCategory());
+        } else {
+            dto.setCourseCategory(null);
+        }
+    }
+
+    dto.setParticipationDate(uc.getParticipationDate());
+
+    return dto;
+}
+
 }
 
 
