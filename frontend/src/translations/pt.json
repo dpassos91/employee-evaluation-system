@@ -284,7 +284,18 @@
   "profile.uploading": "A fazer upload...",
   "profile.loading": "A carregar perfil...",
 
-  "auth.session.expired": "Token de sessão expirado. A redirecionar para login."
+  "auth.session.expired": "Token de sessão expirado. A redirecionar para login.",
+
+
+  
+  "redefinepassword.password.short": "A password deve ter pelo menos 6 caracteres.",
+  "redefinepassword.password.mismatch": "As passwords não coincidem.",
+  "redefinepassword.token.missing": "Token de recuperação em falta.",
+  "redefinepassword.success": "Password redefinida com sucesso!",
+  "redefinepassword.error": "Erro ao redefinir password.",
+  "redefinepassword.newPasswordLabel": "Password",
+  "redefinepassword.confirmPasswordLabel": "Confirme a password",
+  "redefinepassword.submit": "Redefinir"
 
 
 

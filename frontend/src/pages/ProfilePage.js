@@ -290,29 +290,28 @@ const handleSubmit = async (e) => {
    * Handler for changing the user's password via modal.
    */
   const handleChangePassword = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (newPassword.length < 6) {
-      toast.error(formatMessage({ id: "profile.password.short", defaultMessage: "Password must have at least 6 characters." }));
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      toast.error(formatMessage({ id: "profile.password.mismatch", defaultMessage: "Passwords do not match." }));
-      return;
-    }
-    try {
-      const sessionToken = sessionStorage.getItem("authToken");
-      // Always use the profile owner's email
-      const emailToUpdate = profileOwnerEmail || user.email;
-      await authAPI.changePassword(emailToUpdate, currentPassword, newPassword, sessionToken);
-      toast.success(formatMessage({ id: "profile.password.success", defaultMessage: "Password updated successfully!" }));
-      setPasswordModalOpen(false);
-      setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
-    } catch (err) {
-      console.log(err)
-      toast.error(formatMessage({ id: "profile.password.error", defaultMessage: "Error updating password!" }));
-    }
-  };
+  if (newPassword.length < 6) {
+    toast.error(formatMessage({ id: "profile.password.short", defaultMessage: "Password must have at least 6 characters." }));
+    return;
+  }
+  if (newPassword !== confirmPassword) {
+    toast.error(formatMessage({ id: "profile.password.mismatch", defaultMessage: "Passwords do not match." }));
+    return;
+  }
+  try {
+    const sessionToken = sessionStorage.getItem("authToken");
+    const emailToUpdate = profileOwnerEmail || user.email;
+    await authAPI.changePassword(emailToUpdate, currentPassword, newPassword, sessionToken);
+    toast.success(formatMessage({ id: "profile.password.success", defaultMessage: "Password updated successfully!" }));
+    setPasswordModalOpen(false);
+    setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
+  } catch (err) {
+    toast.error(formatMessage({ id: "profile.password.error", defaultMessage: "Error updating password!" }));
+  }
+};
+
 
   /**
    * Handler to start a chat with this user.
@@ -676,24 +675,27 @@ const renderActions = () => {
             )}
           </form>
           {/* Password Modal */}
-          <Modal
+        <Modal
   isOpen={isPasswordModalOpen}
   onClose={() => setPasswordModalOpen(false)}
   title={formatMessage({ id: "profile.changePassword", defaultMessage: "Alterar password" })}
-  actions={[
-    {
-      label: <FormattedMessage id="modal.cancel" defaultMessage="Cancelar" />,
-      variant: "secondary",
-      onClick: () => setPasswordModalOpen(false)
-    },
-    {
-      label: <FormattedMessage id="modal.save" defaultMessage="Guardar" />,
-      variant: "primary",
-      type: "submit",
-    }
-  ]}
 >
-  <AppForm onSubmit={handleChangePassword}>
+  <AppForm
+    onSubmit={handleChangePassword}
+    actions={[
+      {
+        label: <FormattedMessage id="modal.cancel" defaultMessage="Cancelar" />,
+        variant: "secondary",
+        onClick: () => setPasswordModalOpen(false),
+        type: "button",
+      },
+      {
+        label: <FormattedMessage id="modal.save" defaultMessage="Guardar" />,
+        variant: "primary",
+        type: "submit",
+      },
+    ]}
+  >
     <div className="mb-3">
       <label className="block text-sm font-medium mb-1">
         <FormattedMessage id="profile.currentPassword" defaultMessage="Password atual" />
@@ -732,6 +734,7 @@ const renderActions = () => {
     </div>
   </AppForm>
 </Modal>
+
 
         </div>
       </section>
