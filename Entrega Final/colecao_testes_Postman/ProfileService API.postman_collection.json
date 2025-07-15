@@ -1,0 +1,292 @@
+{
+	"info": {
+		"_postman_id": "ebe0a494-ab51-4920-89b8-ce5e2587d5a2",
+		"name": "ProfileService API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41790208",
+		"_collection_link": "https://jorge-nuno-diogo-proj3.postman.co/workspace/643a78bb-cf01-4c04-8c03-ca48377b883f/collection/41790208-ebe0a494-ab51-4920-89b8-ce5e2587d5a2?action=share&source=collection_link&creator=41790208"
+	},
+	"item": [
+		{
+			"name": "Export Users to CSV",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/profiles/export-users-csv",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"profiles",
+						"export-users-csv"
+					],
+					"query": [
+						{
+							"key": "profile-name",
+							"value": "John",
+							"disabled": true
+						},
+						{
+							"key": "usual-work-place",
+							"value": "REMOTE",
+							"disabled": true
+						},
+						{
+							"key": "manager-email",
+							"value": "manager@example.com",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Profile by Email",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/profiles/amourinho.grupo7@gmail.com",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"profiles",
+						"amourinho.grupo7@gmail.com"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Profile by ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/profiles/by-id/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"profiles",
+						"by-id",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Users Paginated",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/profiles/list-users-by-filters?page=1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"profiles",
+						"list-users-by-filters"
+					],
+					"query": [
+						{
+							"key": "profile-name",
+							"value": "Jane",
+							"disabled": true
+						},
+						{
+							"key": "usual-work-place",
+							"value": "HYBRID",
+							"disabled": true
+						},
+						{
+							"key": "manager-email",
+							"value": "manager@example.com",
+							"disabled": true
+						},
+						{
+							"key": "page",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update User Photograph",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "your_token_here"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"photograph\": \"http://example.com/photo.jpg\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/profiles/update/{email}/password",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"profiles",
+						"update",
+						"{email}",
+						"password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update User Profile",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"phone\": \"123-456-7890\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/profiles/update/amourinho.grupo7@gmail.com",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"profiles",
+						"update",
+						"amourinho.grupo7@gmail.com"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Usual Workplace Options",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/profiles/usualworkplaces",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"profiles",
+						"usualworkplaces"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Profile Photo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/profiles/photo/{fileName}",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"profiles",
+						"photo",
+						"{fileName}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

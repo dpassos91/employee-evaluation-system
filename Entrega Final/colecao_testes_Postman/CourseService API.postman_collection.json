@@ -1,0 +1,233 @@
+{
+	"info": {
+		"_postman_id": "f74cf754-096e-4350-a338-8261628d2899",
+		"name": "CourseService API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41790208",
+		"_collection_link": "https://jorge-nuno-diogo-proj3.postman.co/workspace/643a78bb-cf01-4c04-8c03-ca48377b883f/collection/41790208-f74cf754-096e-4350-a338-8261628d2899?action=share&source=collection_link&creator=41790208"
+	},
+	"item": [
+		{
+			"name": "Get All Courses (with filters)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/courses?active=true",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"courses"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "Leadership",
+							"disabled": true
+						},
+						{
+							"key": "minTimeSpan",
+							"value": "1.5",
+							"disabled": true
+						},
+						{
+							"key": "maxTimeSpan",
+							"value": "8",
+							"disabled": true
+						},
+						{
+							"key": "language",
+							"value": "ENGLISH",
+							"disabled": true
+						},
+						{
+							"key": "category",
+							"value": "SOFT_SKILLS",
+							"disabled": true
+						},
+						{
+							"key": "active",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Export Courses CSV",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/courses/export/csv?active=true",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"courses",
+						"export",
+						"csv"
+					],
+					"query": [
+						{
+							"key": "active",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Course By ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/courses/2",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"courses",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Course",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"New Communication Course\",\n  \"timeSpan\": 4,\n  \"language\": \"EN\",\n  \"description\": \"aaa\",\n  \"link\": \"http\",\n  \"courseCategory\": \"BACKEND\",\n  \"active\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/courses",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"courses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Course",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"name\": \"New Communication Coursera\",\n  \"timeSpan\": 4,\n  \"language\": \"EN\",\n  \"description\": \"aaa\",\n  \"link\": \"http\",\n  \"courseCategory\": \"BACKEND\",\n  \"active\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/courses/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"courses",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deactivate Course",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/courses/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"courses",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

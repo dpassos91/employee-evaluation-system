@@ -1,0 +1,1045 @@
+{
+	"info": {
+		"_postman_id": "d6130440-5a87-4f8e-a50e-376573aedcea",
+		"name": "grupo 7_projeto Final",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41790208",
+		"_collection_link": "https://jorge-nuno-diogo-proj3.postman.co/workspace/643a78bb-cf01-4c04-8c03-ca48377b883f/collection/41790208-d6130440-5a87-4f8e-a50e-376573aedcea?action=share&source=collection_link&creator=41790208"
+	},
+	"item": [
+		{
+			"name": "create User",
+			"item": [
+				{
+					"name": "create User Diogo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"email\": \"anapassos93@gmail.com\",\r\n\"password\": \"senha123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/createUser",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"createUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create User David",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"email\": \"diogopassos91@gmail.com\",\r\n    \"password\": \"senha123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/createUser",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"createUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create User David own email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"email\": \"diogopassos91@gmail.com\",\r\n    \"password\": \"senha123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/createUser",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"createUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create davidjcaetanocoelho@gmail.com",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"email\": \"diogopassos91@gmail.com\",\r\n    \"password\": \"senha123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/createUser",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"createUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create Mail ua",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"email\": \"davidjccoelho@ua.pt\",\r\n    \"password\": \"senha123?\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/createUser",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"createUser"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "login",
+			"item": [
+				{
+					"name": "login Diogo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"diogopassos91@gmail.com\",\r\n    \"password\": \"teste123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/login",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login David",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"grupo7.exemplo.receiver@gmail.com\",\r\n    \"password\": \"senha123?\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/login",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"amourinho.grupo7@gmail.com\",\r\n    \"password\": \"senha123?\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/login",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login David own email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"diogopassos91@gmail.com\",\r\n    \"password\": \"senha123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/login",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login davidjcaetanocoelho@gmail.com",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"diogopassos91@gmail.com\",\r\n    \"password\": \"senha123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/login",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login mail ua",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"email\": \"davidjccoelho@ua.pt\",\r\n    \"password\": \"senha123?\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/login",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Confirming Account",
+			"item": [
+				{
+					"name": "Confirm account",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base-url}}/users/confirmAccount?confirmToken=67b60a90-cb7f-4562-9cca-4d5799ef1e5a",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"confirmAccount"
+							],
+							"query": [
+								{
+									"key": "confirmToken",
+									"value": "67b60a90-cb7f-4562-9cca-4d5799ef1e5a"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "logout",
+			"item": [
+				{
+					"name": "logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base-url}}/users/logout",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "forgot and reset Password",
+			"item": [
+				{
+					"name": "Introducing Email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"grupo7.exemplo.receiver@gmail.com\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base-url}}/users/request-reset",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"request-reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"password\": \"Senha123!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/reset-password?recoveryToken=ad6895cb-2b01-498c-9506-6824ebbf95ad",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"reset-password"
+							],
+							"query": [
+								{
+									"key": "recoveryToken",
+									"value": "ad6895cb-2b01-498c-9506-6824ebbf95ad"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "update profile",
+			"item": [
+				{
+					"name": "update own profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "553faab0-90be-46e7-8548-120bfe5a0dd4",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"David\",\r\n  \"phone\": \"123456789\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/profiles/update/grupo7.exemplo.receiver@gmail.com",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"profiles",
+								"update",
+								"grupo7.exemplo.receiver@gmail.com"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "update photograph",
+			"item": [
+				{
+					"name": "check if photo is avaiable",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "email",
+								"value": "amourinho.grupo7@gmail.com",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "/C:/Users/Diogo Passos/Pictures/Camera Roll/WIN_20200903_13_32_58_Pro.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/profiles/photo/profile_2_1751840841318.jpg",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"profiles",
+								"photo",
+								"profile_2_1751840841318.jpg"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload photo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "18a9fc9c-e76f-4fe1-877b-b70b7d728993",
+								"type": "text"
+							},
+							{
+								"key": "email",
+								"value": "amourinho.grupo7@gmail.com",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "/C:/Users/Diogo Passos/Pictures/Camera Roll/WIN_20200903_13_32_58_Pro.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/profiles/diogopassos91@gmail.com/upload-photo",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"profiles",
+								"diogopassos91@gmail.com",
+								"upload-photo"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "messages David",
+			"item": [
+				{
+					"name": "sendMessage David",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "4abca74c-b8a7-40a5-98fa-b97ff10da728",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"receiverId\": 1,\r\n  \"content\": \"Hi !\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/messages",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getMessages David",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "assign manager to user",
+			"item": [
+				{
+					"name": "assign manager",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "3bd86b2a-a812-4d36-9d35-90e00417d334",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userEmail\": \"davidjccoelho@gmail.com\",\r\n  \"managerEmail\": \"grupo7.exemplo.receiver@gmail.com\"   \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/assign-manager",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"assign-manager"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "assign manager Copy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "3bd86b2a-a812-4d36-9d35-90e00417d334",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userEmail\": \"davidjccoelho@gmail.com\",\r\n  \"managerEmail\": \"grupo7.exemplo.receiver@gmail.com\"   \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/users/assign-manager",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"users",
+								"assign-manager"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "evaluations",
+			"item": [
+				{
+					"name": "close evaluation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "cfa35cfd-52e2-447a-affb-124db724e5db",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{base-url}}/evaluations/close/2",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"evaluations",
+								"close",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users without managers filtered",
+			"item": [
+				{
+					"name": "users without managers filtered",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "sessionToken",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"email\": \"davidjccoelho@ua.pt\",\r\n    \"password\": \"senha123?\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base-url}}users/users-without-manager-paginated?page=1&pageSize=10\n",
+							"host": [
+								"{{base-url}}users"
+							],
+							"path": [
+								"users-without-manager-paginated"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10\n"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "sendMessage",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"receiverId\": 1,\r\n  \"content\": \"Olá! Esta mensagem vai do utilizador autenticado para o user 8.\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base-url}}/messages",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"messages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get messages",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "GET /messages/with/{otherUserId}\r\n(com header token do utilizador autenticado)",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base-url}}/messages/with/1",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"messages",
+						"with",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "messages read",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base-url}}/messages/read-from/1",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"messages",
+						"read-from",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "count unread notifications by type",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base-url}}/notifications/unread/count-by-type",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"notifications",
+						"unread",
+						"count-by-type"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "teste manager",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"role\": \"USER\",\r\n  \"managerId\": null\r\n}"
+				},
+				"url": {
+					"raw": "{{base-url}}/users/3/role-manager",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"users",
+						"3",
+						"role-manager"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base-url}}/dashboard/summary",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"dashboard",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base-url",
+			"value": "https://localhost:8443/grupo7/rest",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "0a72e3da-6a76-4c82-bdb6-1d419ccca62b",
+			"type": "string"
+		}
+	]
+}
