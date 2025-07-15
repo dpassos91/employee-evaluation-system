@@ -63,7 +63,16 @@ export default function ProfilePage() {
   const photoUrl = profileAPI.getPhoto(profile?.photograph);
 
   // True if current user is viewing own profile or is admin (can edit)
-  const canEdit = user?.role === "ADMIN" || String(user?.id) === String(userId);
+  //const canEdit = user?.role === "ADMIN" || String(user?.id) === String(userId);
+
+const isOwnProfile = String(user?.id) === String(userId);
+const isAdmin = user?.role === "ADMIN";
+const isManagerOfProfile = profile?.managerId === user?.id;
+const isManager = user?.role === "MANAGER"; // se tiveres este role
+const canEdit = isAdmin || isOwnProfile;
+
+const canSendMessage =
+  !isOwnProfile && (isAdmin || isManagerOfProfile);
 
 const canViewManager = () => {
   if (!user || !profile) {
@@ -369,6 +378,7 @@ const handlePhotoUpload = async () => {
 
 const renderActions = () => {
   if (canEdit) {
+    // Admin ou o próprio user: pode editar e vê tudo
     return (
       <>
         {/* Hidden file input */}
@@ -403,9 +413,18 @@ const renderActions = () => {
         </AppButton>
       </>
     );
-  } else if (canViewManager()) {
+  } else if (isManagerOfProfile) {
+    // Manager deste utilizador: vê históricos + botão de mensagem
     return (
       <>
+              <AppButton
+          variant="primary"
+          className="w-full px-3 py-1.5 text-sm justify-center text-center mt-2"
+          onClick={handleSendMessage}
+        >
+          <ChatBubbleBottomCenterTextIcon className="w-5 h-5 mr-2" />
+          <FormattedMessage id="profile.message" defaultMessage="Enviar mensagem" />
+        </AppButton>
         <AppButton
           variant="secondary"
           className="w-full px-3 py-1.5 text-sm justify-center text-center"
@@ -420,9 +439,11 @@ const renderActions = () => {
         >
           <FormattedMessage id="profile.evaluationHistory" defaultMessage="Evaluation History" />
         </AppButton>
+
       </>
     );
   } else {
+    // Qualquer outro user ou manager: só pode enviar mensagem
     return (
       <AppButton
         variant="primary"
@@ -430,11 +451,13 @@ const renderActions = () => {
         onClick={handleSendMessage}
       >
         <ChatBubbleBottomCenterTextIcon className="w-5 h-5 mr-2" />
-        <FormattedMessage id="profile.message" defaultMessage="Send Message" />
+        <FormattedMessage id="profile.message" defaultMessage="Enviar mensagem" />
       </AppButton>
     );
   }
 };
+
+
 
 
   return (
