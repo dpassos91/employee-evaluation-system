@@ -51,7 +51,7 @@ public class UserService {
      * @param passwordAtualizado The new password in the ResetPasswordDto object.
      * @return HTTP 200 if updated, or error if not authorized or invalid input.
      */
-    @PATCH
+    @PUT
 @Path("/update/{email}/password")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -812,24 +812,24 @@ public Response updateUserRoleAndManager(
         if (user == null) {
             logger.info("Password reset requested for non-existent email '{}'. IP: {}", email, RequestContext.getIp());
             // Do not reveal user existence for security
-            return Response.ok("{\"message\": \"Se o email existir, o link de recuperação será enviado.\"}")
+            return Response.ok("{\"message\": \"If the email is registered in our servers, the recovery link will be sent.\"}")
                     .build();
         }
 
         String recoveryToken = userBean.generateRecoveryToken(user.getEmail());
 
-        String recoveryLink = "https://127.0.0.1:8443/grupo7/rest/users/reset-password?recoveryToken=" + recoveryToken;
+        String recoveryLink = "https://localhost:3000/redefinepassword?recoveryToken=" + recoveryToken;
 
         EmailUtil.sendEmail(
                 user.getEmail(),
-                "Pedido de recuperação de password",
-                "Clique neste link para escolher nova password: " + recoveryLink
+                "Request for password reset",
+                "Please, click on this link to select your new password: " + recoveryLink
         );
 
         logger.info("Password reset link sent to email '{}'. IP: {}", user.getEmail(), RequestContext.getIp());
 
         return Response.ok()
-                .entity("{\"message\": \"Se o email existir, o link de recuperação será enviado.\"}")
+                .entity("{\"message\": \"If the email is registered in our servers, the recovery link will be sent.\"}")
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }
@@ -856,7 +856,7 @@ public Response updateUserRoleAndManager(
             logger.warn("User: {} | IP: {} - Invalid or expired recovery token used for password reset.",
                     RequestContext.getAuthor(), RequestContext.getIp());
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"message\": \"Token expirado ou inválido.\", \"error\": true}")
+                    .entity("{\"message\": \"Invalid or expired token.\", \"error\": true}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }

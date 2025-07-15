@@ -25,7 +25,7 @@ const { apiCall, API_ENDPOINTS } = apiConfig;
  */
 const changePassword = async (email, currentPassword, newPassword, sessionToken) => {
   return apiCall(`${API_ENDPOINTS.auth.changePassword(email)}`, {
-    method: 'PATCH',
+    method: 'PUT',
     headers: {
       "Content-Type": "application/json",
       sessionToken,

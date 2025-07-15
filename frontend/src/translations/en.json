@@ -273,7 +273,18 @@
   "profile.uploading": "Uploading...",
   "profile.loading": "Loading profile...",
 
-  "auth.session.expired": "Session token expired. Redirecting to login page."
+  "auth.session.expired": "Session token expired. Redirecting to login page.",
+
+
+  
+  "redefinepassword.password.short": "Password must be at least 6 characters long.",
+  "redefinepassword.password.mismatch": "Passwords do not match.",
+  "redefinepassword.token.missing": "Recovery token is missing.",
+  "redefinepassword.success": "Password successfully reset!",
+  "redefinepassword.error": "Error resetting password.",
+  "redefinepassword.newPasswordLabel": "Password",
+  "redefinepassword.confirmPasswordLabel": "Confirm Password",
+  "redefinepassword.submit": "Redefine"
 
   
 }
