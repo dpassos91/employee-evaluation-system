@@ -34,20 +34,28 @@ export const useChatStore = create((set, get) => ({
       }
     })),
 
-  addMessage: (msg) => {
-    const myId = userStore.getState().user.id;
-    // Determina qual o outro user na conversa (sender ou receiver)
-    const otherId = msg.senderId === myId ? msg.receiverId : msg.senderId;
-    set((state) => {
-      const msgs = state.messagesByConversation[otherId] || [];
-      return {
-        messagesByConversation: {
-          ...state.messagesByConversation,
-          [otherId]: [...msgs, msg]
-        }
-      };
-    });
-  },
+addMessage: (msg) => {
+  const myId = userStore.getState().user.id;
+  const otherId = msg.senderId === myId ? msg.receiverId : msg.senderId;
+  set((state) => {
+    const msgs = state.messagesByConversation[otherId] || [];
+    // Verifica duplicado por: senderId, receiverId, content, timestamp (ou outro campo que tenhas)
+    const exists = msgs.some(m =>
+      m.content === msg.content &&
+      m.senderId === msg.senderId &&
+      m.receiverId === msg.receiverId &&
+      (m.timestamp === msg.timestamp || m.createdAt === msg.createdAt)
+    );
+    if (exists) return {}; // não adiciona
+    return {
+      messagesByConversation: {
+        ...state.messagesByConversation,
+        [otherId]: [...msgs, msg]
+      }
+    };
+  });
+},
+
 
   /**
    * Envia uma mensagem via WebSocket global (se estiver disponível).
