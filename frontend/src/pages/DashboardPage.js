@@ -177,14 +177,14 @@ useEffect(() => {
       {/* Bottom Buttons */}
 <div className="flex flex-wrap gap-6 justify-center mt-16">
   {/* Todos os utilizadores vêem */}
-  <AppButton variant="primary">
+  <AppButton variant="secondary">
     <FaSearch className="mr-2" />
     <FormattedMessage id="dashboard.buttons.setTrainings" defaultMessage="Ver formações" />
   </AppButton>
 
   {/* Só managers e admins */}
   {(isManager || isAdmin) && (
-    <AppButton variant="secondary"   onClick={() => {
+    <AppButton variant="primary"   onClick={() => {
     if (isAdmin) {
       navigate("/evaluations");
     } else if (isManager) {

@@ -19,6 +19,7 @@ import profileIcon from "../images/profile_icon.png";
 import { useIntl } from "react-intl";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import AvatarCell from "../components/AvatarCell";
 
 export default function EvaluationFormPage() {
   /** @type {{ userId: string }} */

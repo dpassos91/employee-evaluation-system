@@ -17,6 +17,7 @@ import { authAPI } from "../api/authAPI";
 import { useEffect } from "react";
 import { useIntl } from "react-intl";
 import { AppTableFilters } from "../components/AppTableFilters";
+import AvatarCell from "../components/AvatarCell";
 
 
 export default function UsersPage() {
@@ -44,22 +45,6 @@ export default function UsersPage() {
 
   // Buscar utilizadores com filtros e paginação
   const { users, totalPages, loading, error, refetch } = useUsersList(filters);
-
-  function AvatarCell({ avatar, name }) {
-    const [src, setSrc] = useState(
-      avatar && avatar.trim() !== ""
-        ? profileAPI.getPhoto(avatar)
-        : profileIcon
-    );
-    return (
-      <img
-        src={src}
-        alt={name}
-        className="w-8 h-8 rounded-full object-cover ml-12"
-        onError={() => setSrc("/default_avatar.png")}
-      />
-    );
-  }
 
   // Modal handler
   const openEditModal = (userRow) => {

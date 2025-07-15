@@ -202,7 +202,7 @@ const handleWebSocketMessage = useCallback((data) => {
 <Route
   path="/evaluations"
   element={
-   <RoleRoute allowedRoles={["MANAGER"]}>
+   <RoleRoute allowedRoles={["ADMIN"]}>
       <EvaluationIntermediaryPage />
     </RoleRoute>
   }

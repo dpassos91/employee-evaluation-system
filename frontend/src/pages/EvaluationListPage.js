@@ -15,6 +15,7 @@ import { AppTable } from "../components/AppTable";
 import { AppTableFilters } from "../components/AppTableFilters";
 import { useIntl, FormattedMessage } from "react-intl";
 import AppButton from "../components/AppButton";
+import AvatarCell from "../components/AvatarCell";
 
 
 
@@ -185,23 +186,18 @@ const handleExportCSV = async () => {
 };
 
 const columns = [
-  {
-    header: <FormattedMessage id="evaluations.table.photo" defaultMessage="Fotografia" />,
-    accessor: "avatar",
-    width: "100px",
-    render: (row) => (
-      <img
-        src={row.avatar || "/default_avatar.png"}
-        alt={row.evaluated}
-        className="w-10 h-10 rounded-full object-cover"
-      />
-    ),
-  },
-  {
+
+    {
     header: <FormattedMessage id="evaluations.table.evaluated" defaultMessage="Avaliado" />,
     accessor: "evaluated",
     className: "font-medium",
   },
+  {
+    header: "",
+    accessor: (u) => <AvatarCell avatar={u.avatar} name={u.name} />,
+    className: "w-[100px] flex items-center",
+  },
+
   {
     header: <FormattedMessage id="evaluations.table.state" defaultMessage="Estado" />,
     accessor: "state",
