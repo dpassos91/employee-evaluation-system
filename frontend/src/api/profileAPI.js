@@ -85,6 +85,23 @@ const listUsersByFilters = async (filters, sessionToken) => {
 };
 
 /**
+ * Search user profiles by partial/full name.
+ * @param {string} query - The search string (name or part of name).
+ * @param {string} sessionToken - The session token (for authorization).
+ * @returns {Promise<Array<FlatProfileDto>>}
+ */
+const searchProfiles = async (query, sessionToken) => {
+  const params = new URLSearchParams();
+  if (query) params.append("q", query);
+
+  const url = API_ENDPOINTS.profiles.searchProfiles(query);
+  return apiCall(url, {
+    method: "GET",
+    headers: { sessionToken },
+  });
+};
+
+/**
  * Uploads a profile photo for the user.
  * @param {string} email - The user's email.
  * @param {File} file - The selected photo file.
@@ -143,6 +160,7 @@ export const profileAPI = {
   getProfileById,
   getUsualWorkplaces,
   listUsersByFilters,
+  searchProfiles,
   updateProfile,
   uploadPhoto,
 };

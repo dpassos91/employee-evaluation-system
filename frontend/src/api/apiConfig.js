@@ -189,6 +189,8 @@ profiles: {
   getProfileById: (userId) => `${API_BASE_URL}/profiles/by-id/${userId}`,
   /** @function List users by filters */
   listUsersByFilters: `${API_BASE_URL}/profiles/list-users-by-filters`,
+  /** @function Search user profiles by name (for chat search, etc.) */
+  searchProfiles: (query) => `${API_BASE_URL}/profiles/search?q=${encodeURIComponent(query)}`,
   /** @function Upload user profile photo */
   uploadPhoto: (email) => `${API_BASE_URL}/profiles/${email}/upload-photo`,
   /** @function Update user profile by email */

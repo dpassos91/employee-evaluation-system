@@ -581,5 +581,26 @@ public Response getProfilePhoto(
     }
 }
 
+/**
+ * REST endpoint to search for user profiles by (partial) employee name.
+ * Useful for features such as chat user search or selecting users for actions.
+ *
+ * Example: GET /api/profiles/search?q=ana
+ *
+ * @param query Partial or full name of the employee to search for.
+ * @return 200 OK with a list of FlatProfileDto objects matching the query.
+ */
+@GET
+@Path("/search")
+@Produces(MediaType.APPLICATION_JSON)
+public Response searchProfiles(@QueryParam("q") String query) {
+    // Calls the business logic to find profiles matching the name filter only.
+    // Workplace and managerEmail filters are ignored here.
+    List<FlatProfileDto> results = profileBean.findProfilesWithFilters(query, null, null);
+
+    // Returns the matching profiles as JSON in the response body.
+    return Response.ok(results).build();
+}
+
 
 }
