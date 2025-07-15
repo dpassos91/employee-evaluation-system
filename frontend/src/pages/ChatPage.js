@@ -367,8 +367,11 @@ return (
             onClick={handleSend}
             disabled={!input.trim()}
           >
-            <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
-              className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M3 10l9-6 9 6M4 10v10a1 1 0 001 1h2a1 1 0 001-1V14a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 001 1h2a1 1 0 001-1V10" /></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+  strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+  <path d="M22 2L11 13"/>
+  <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+</svg>
           </button>
         </div>
       </section>
