@@ -419,7 +419,7 @@ const renderActions = () => {
       <>
               <AppButton
           variant="primary"
-          className="w-full px-3 py-1.5 text-sm justify-center text-center mt-2"
+          className="w-full px-3 py-1.5 text-sm justify-center text-center"
           onClick={handleSendMessage}
         >
           <ChatBubbleBottomCenterTextIcon className="w-5 h-5 mr-2" />

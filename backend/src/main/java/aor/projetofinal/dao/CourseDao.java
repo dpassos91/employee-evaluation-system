@@ -207,13 +207,12 @@ public int countActiveCoursesForUser(int userId) {
  * @return The total hours of completed training.
  */
 public int sumTrainingHoursForUser(int userId) {
-    // Example with JPQL (change logic if you track completion differently)
-    Integer sum = em.createQuery(
+    Double sum = em.createQuery(
         "SELECT SUM(uc.course.timeSpan) FROM UserCourseEntity uc " +
-        "WHERE uc.user.id = :userId AND uc.course.active = true", Integer.class)
+        "WHERE uc.user.id = :userId AND uc.course.active = true", Double.class)
         .setParameter("userId", userId)
         .getSingleResult();
-    return sum != null ? sum : 0;
+    return sum != null ? sum.intValue() : 0;
 }
 
 /**

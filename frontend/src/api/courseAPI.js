@@ -146,20 +146,6 @@ const getUserCourseYears = async (userId) => {
   return apiCall(API_ENDPOINTS.courses.userYears(userId), { method: 'GET' });
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const courseAPI = {
   listCourses,
   getCourse,

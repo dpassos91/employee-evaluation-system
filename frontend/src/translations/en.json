@@ -41,9 +41,9 @@
   "dashboard.agenda.currentEvaluationEnds": "Current evaluation ends on 05/29",
   "dashboard.agenda.trainingSession": "Training session ",
   "dashboard.agenda.trainingSessionDate": " on 06/01",
-  "dashboard.buttons.setTrainings": "Courses          ",
+  "dashboard.buttons.teamTrainings": "Team Courses",
   "dashboard.buttons.settings": "Settings",
-  "dashboard.buttons.setEvaluations": "Evaluations",
+  "dashboard.buttons.teamEvaluations": "Team Evaluations",
   "dashboard.cards.teamSize": "Team size",
   "dashboard.cards.teamPendingEvaluations": "Team pending evaluations",
 

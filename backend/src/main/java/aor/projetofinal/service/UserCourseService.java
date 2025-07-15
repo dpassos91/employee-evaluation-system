@@ -42,9 +42,6 @@ public class UserCourseService {
     @Inject
     private UserDao userDao;
 
-
-
-
     /**
      * Registers a user's participation in a specific course.
      *
@@ -275,10 +272,6 @@ public class UserCourseService {
         return Response.ok(years).build();
     }
 
-
-
-
-
     /**
      * REST endpoint to retrieve the yearly training summary (total hours per year)
      * for a specific user. Accessible by:
@@ -360,11 +353,6 @@ public class UserCourseService {
         List<UserCourseYearSummaryDto> summary = userCourseBean.summarizeUserCoursesByYear(dto.getUserId());
         return Response.ok(summary).build();
     }
-
-
-
-
-
 
 }
 
