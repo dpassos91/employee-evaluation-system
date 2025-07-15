@@ -1,0 +1,3019 @@
+{
+	"info": {
+		"_postman_id": "9c50dbcc-121e-40e0-a0e9-151d5f10166d",
+		"name": "UserService Full API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41790208",
+		"_collection_link": "https://jorge-nuno-diogo-proj3.postman.co/workspace/643a78bb-cf01-4c04-8c03-ca48377b883f/collection/41790208-9c50dbcc-121e-40e0-a0e9-151d5f10166d?action=share&source=collection_link&creator=41790208"
+	},
+	"item": [
+		{
+			"name": "Login User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.not.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Your test name\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.value).to.eql(100);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"amourinho.grupo7@gmail.com\",\n  \"password\": \"senha123?\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"examplePassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/login",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"login"
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "400 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"examplePassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/login",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"login"
+							]
+						}
+					},
+					"status": "400",
+					"code": 400,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 400 error.\"}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"examplePassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/login",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"login"
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"examplePassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/login",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"login"
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				},
+				{
+					"name": "409 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"examplePassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/login",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"login"
+							]
+						}
+					},
+					"status": "409",
+					"code": 409,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 409 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Create User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"examplePassword\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/createUser",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"createUser"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"examplePassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/createUser",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"createUser"
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "400 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"examplePassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/createUser",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"createUser"
+							]
+						}
+					},
+					"status": "400",
+					"code": 400,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 400 error.\"}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"examplePassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/createUser",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"createUser"
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"examplePassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/createUser",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"createUser"
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				},
+				{
+					"name": "409 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"examplePassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/createUser",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"createUser"
+							]
+						}
+					},
+					"status": "409",
+					"code": 409,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 409 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Assign Manager",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"userEmail\": \"grupo7.exemplo.receiver@gmail.com\",\n  \"managerEmail\": \"amourinho.grupo7@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/assign-manager",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"assign-manager"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userEmail\": \"user@example.com\",\n  \"managerEmail\": \"manager@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/assign-manager",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"assign-manager"
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "400 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userEmail\": \"user@example.com\",\n  \"managerEmail\": \"manager@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/assign-manager",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"assign-manager"
+							]
+						}
+					},
+					"status": "400",
+					"code": 400,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 400 error.\"}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userEmail\": \"user@example.com\",\n  \"managerEmail\": \"manager@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/assign-manager",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"assign-manager"
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userEmail\": \"user@example.com\",\n  \"managerEmail\": \"manager@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/assign-manager",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"assign-manager"
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				},
+				{
+					"name": "409 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userEmail\": \"user@example.com\",\n  \"managerEmail\": \"manager@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/assign-manager",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"assign-manager"
+							]
+						}
+					},
+					"status": "409",
+					"code": 409,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 409 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Session Status",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/session-status",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"session-status"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/session-status",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"session-status"
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/session-status",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"session-status"
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/session-status",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"session-status"
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				},
+				{
+					"name": "404 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/session-status",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"session-status"
+							]
+						}
+					},
+					"status": "404",
+					"code": 404,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 404 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Confirm Account",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=06bc8ab9-3e20-4854-bcd2-99972faca0d9",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"confirmAccount"
+					],
+					"query": [
+						{
+							"key": "confirmToken",
+							"value": "06bc8ab9-3e20-4854-bcd2-99972faca0d9"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=testToken",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"confirmAccount"
+							],
+							"query": [
+								{
+									"key": "confirmToken",
+									"value": "testToken"
+								}
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=testToken",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"confirmAccount"
+							],
+							"query": [
+								{
+									"key": "confirmToken",
+									"value": "testToken"
+								}
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=testToken",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"confirmAccount"
+							],
+							"query": [
+								{
+									"key": "confirmToken",
+									"value": "testToken"
+								}
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				},
+				{
+					"name": "404 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/confirmAccount?confirmToken=testToken",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"confirmAccount"
+							],
+							"query": [
+								{
+									"key": "confirmToken",
+									"value": "testToken"
+								}
+							]
+						}
+					},
+					"status": "404",
+					"code": 404,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 404 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Get Users for Manager Dropdown",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/manager-dropdown",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"manager-dropdown"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/manager-dropdown",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"manager-dropdown"
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/manager-dropdown",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"manager-dropdown"
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/manager-dropdown",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"manager-dropdown"
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				},
+				{
+					"name": "404 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/manager-dropdown",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"manager-dropdown"
+							]
+						}
+					},
+					"status": "404",
+					"code": 404,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 404 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Get Users Without Manager Paginated",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/users-without-manager-paginated?page=1&pageSize=10",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"users-without-manager-paginated"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "Joana",
+							"disabled": true
+						},
+						{
+							"key": "office",
+							"value": "LISBOA",
+							"disabled": true
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/users-without-manager-paginated?name=&office=&page=1&pageSize=10",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"users-without-manager-paginated"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": ""
+								},
+								{
+									"key": "office",
+									"value": ""
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/users-without-manager-paginated?name=&office=&page=1&pageSize=10",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"users-without-manager-paginated"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": ""
+								},
+								{
+									"key": "office",
+									"value": ""
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/users-without-manager-paginated?name=&office=&page=1&pageSize=10",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"users-without-manager-paginated"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": ""
+								},
+								{
+									"key": "office",
+									"value": ""
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				},
+				{
+					"name": "404 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/users-without-manager-paginated?name=&office=&page=1&pageSize=10",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"users-without-manager-paginated"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": ""
+								},
+								{
+									"key": "office",
+									"value": ""
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"status": "404",
+					"code": 404,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 404 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Logout User",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/logout",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"logout"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/logout",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"logout"
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "400 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/logout",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"logout"
+							]
+						}
+					},
+					"status": "400",
+					"code": 400,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 400 error.\"}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/logout",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"logout"
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/logout",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"logout"
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				},
+				{
+					"name": "409 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/logout",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"logout"
+							]
+						}
+					},
+					"status": "409",
+					"code": 409,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 409 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Promote to Admin",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/promote-to-admin?test@example.com",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"promote-to-admin"
+					],
+					"query": [
+						{
+							"key": "test@example.com",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/promote-to-admin?email=user@example.com",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"promote-to-admin"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "user@example.com"
+								}
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "400 Response",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/promote-to-admin?email=user@example.com",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"promote-to-admin"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "user@example.com"
+								}
+							]
+						}
+					},
+					"status": "400",
+					"code": 400,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 400 error.\"}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/promote-to-admin?email=user@example.com",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"promote-to-admin"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "user@example.com"
+								}
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/promote-to-admin?email=user@example.com",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"promote-to-admin"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "user@example.com"
+								}
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Update Role and Manager",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"role\": \"MANAGER\",\n  \"managerId\": 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/2/role-manager",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"2",
+						"role-manager"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role\": \"MANAGER\",\n  \"managerId\": 456\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/123/role-manager",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"123",
+								"role-manager"
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "400 Response",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role\": \"MANAGER\",\n  \"managerId\": 456\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/123/role-manager",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"123",
+								"role-manager"
+							]
+						}
+					},
+					"status": "400",
+					"code": 400,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 400 error.\"}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role\": \"MANAGER\",\n  \"managerId\": 456\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/123/role-manager",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"123",
+								"role-manager"
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role\": \"MANAGER\",\n  \"managerId\": 456\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/123/role-manager",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"123",
+								"role-manager"
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Request Password Reset",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"user@example.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/request-reset",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"request-reset"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/request-reset",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"request-reset"
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "400 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/request-reset",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"request-reset"
+							]
+						}
+					},
+					"status": "400",
+					"code": 400,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 400 error.\"}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/request-reset",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"request-reset"
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/request-reset",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"request-reset"
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				},
+				{
+					"name": "409 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/request-reset",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"request-reset"
+							]
+						}
+					},
+					"status": "409",
+					"code": 409,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 409 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Reset Password",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"password\": \"newPassword123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/reset-password",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"reset-password"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"password\": \"newPassword123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/reset-password?recoveryToken=testToken",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"reset-password"
+							],
+							"query": [
+								{
+									"key": "recoveryToken",
+									"value": "testToken"
+								}
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "400 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"password\": \"newPassword123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/reset-password?recoveryToken=testToken",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"reset-password"
+							],
+							"query": [
+								{
+									"key": "recoveryToken",
+									"value": "testToken"
+								}
+							]
+						}
+					},
+					"status": "400",
+					"code": 400,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 400 error.\"}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"password\": \"newPassword123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/reset-password?recoveryToken=testToken",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"reset-password"
+							],
+							"query": [
+								{
+									"key": "recoveryToken",
+									"value": "testToken"
+								}
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"password\": \"newPassword123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/reset-password?recoveryToken=testToken",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"reset-password"
+							],
+							"query": [
+								{
+									"key": "recoveryToken",
+									"value": "testToken"
+								}
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				},
+				{
+					"name": "409 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"password\": \"newPassword123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/reset-password?recoveryToken=testToken",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"reset-password"
+							],
+							"query": [
+								{
+									"key": "recoveryToken",
+									"value": "testToken"
+								}
+							]
+						}
+					},
+					"status": "409",
+					"code": 409,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 409 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Validate Session",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/validate-session",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"validate-session"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/validate-session",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"validate-session"
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "400 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/validate-session",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"validate-session"
+							]
+						}
+					},
+					"status": "400",
+					"code": 400,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 400 error.\"}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/validate-session",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"validate-session"
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/validate-session",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"validate-session"
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				},
+				{
+					"name": "409 Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/validate-session",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"validate-session"
+							]
+						}
+					},
+					"status": "409",
+					"code": 409,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 409 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Get Managers",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/managers",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"managers"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/managers",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"managers"
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/managers",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"managers"
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/managers",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"managers"
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				},
+				{
+					"name": "404 Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/managers",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"managers"
+							]
+						}
+					},
+					"status": "404",
+					"code": 404,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 404 error.\"}"
+				}
+			]
+		},
+		{
+			"name": "Update User Password",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"currentPassword\": \"senha123?\",\n  \"newPassword\": \"senha123?\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/grupo7/rest/users/update/amourinho.grupo7@gmail.com/password",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"grupo7",
+						"rest",
+						"users",
+						"update",
+						"amourinho.grupo7@gmail.com",
+						"password"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Response",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"oldPass123\",\n  \"newPassword\": \"newPass456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/update/user@example.com/password",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"update",
+								"user@example.com",
+								"password"
+							]
+						}
+					},
+					"status": "200",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{}"
+				},
+				{
+					"name": "400 Response",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"oldPass123\",\n  \"newPassword\": \"newPass456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/update/user@example.com/password",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"update",
+								"user@example.com",
+								"password"
+							]
+						}
+					},
+					"status": "400",
+					"code": 400,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 400 error.\"}"
+				},
+				{
+					"name": "401 Response",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"oldPass123\",\n  \"newPassword\": \"newPass456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/update/user@example.com/password",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"update",
+								"user@example.com",
+								"password"
+							]
+						}
+					},
+					"status": "401",
+					"code": 401,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 401 error.\"}"
+				},
+				{
+					"name": "403 Response",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "sessionToken",
+								"value": "testToken"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"oldPass123\",\n  \"newPassword\": \"newPass456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/grupo7/rest/users/update/user@example.com/password",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"grupo7",
+								"rest",
+								"users",
+								"update",
+								"user@example.com",
+								"password"
+							]
+						}
+					},
+					"status": "403",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": "{\"message\": \"Simulated 403 error.\"}"
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": "793b3060-a643-4b8d-a2f9-fd2834333b98",
+			"type": "default"
+		}
+	]
+}

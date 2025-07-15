@@ -275,7 +275,7 @@
 
   "auth.session.expired": "Session token expired. Redirecting to login page.",
 
-
+"button.back": "Go Back",
   
   "redefinepassword.password.short": "Password must be at least 6 characters long.",
   "redefinepassword.password.mismatch": "Passwords do not match.",

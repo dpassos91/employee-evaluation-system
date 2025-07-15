@@ -26,10 +26,10 @@ const { apiCall, API_ENDPOINTS } = apiConfig;
  */
 const listEvaluationsByFilters = async (filters, sessionToken) => {
   const params = new URLSearchParams();
-  if (filters.name) params.append('evaluated-name', filters.name);
-  if (filters.evaluationState) params.append('evaluation-state', filters.evaluationState);
+  if (filters.name) params.append('name', filters.name);
+  if (filters.evaluationState) params.append('state', filters.evaluationState);
   if (filters.grade) params.append('grade', filters.grade);
-  if (filters.cycleEndDate) params.append('cycle-end-date', filters.cycleEndDate);
+  if (filters.cycleEndDate) params.append('cycleEnd', filters.cycleEndDate);
   if (filters.page) params.append('page', filters.page);
 
   const url = `${API_ENDPOINTS.evaluations.listByFilters}?${params.toString()}`;

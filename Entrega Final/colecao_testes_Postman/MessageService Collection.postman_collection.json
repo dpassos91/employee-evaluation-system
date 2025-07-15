@@ -1,0 +1,129 @@
+{
+	"info": {
+		"_postman_id": "9053b5da-7da2-4e73-baf1-2dc466038b78",
+		"name": "MessageService Collection",
+		"description": "Collection of endpoints from the MessageService class",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41790208",
+		"_collection_link": "https://jorge-nuno-diogo-proj3.postman.co/workspace/643a78bb-cf01-4c04-8c03-ca48377b883f/collection/41790208-9053b5da-7da2-4e73-baf1-2dc466038b78?action=share&source=collection_link&creator=41790208"
+	},
+	"item": [
+		{
+			"name": "Get Conversations",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/messages/conversations",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages",
+						"conversations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Conversation With User",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/messages/with/:otherUserId",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages",
+						"with",
+						":otherUserId"
+					],
+					"variable": [
+						{
+							"key": "otherUserId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send Message",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"receiverId\": 2,\n  \"content\": \"Olá!\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/messages",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mark Messages as Read",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "sessionToken",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/messages/read-from/:otherUserId",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages",
+						"read-from",
+						":otherUserId"
+					],
+					"variable": [
+						{
+							"key": "otherUserId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

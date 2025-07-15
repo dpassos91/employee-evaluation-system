@@ -311,6 +311,18 @@ const isReadOnlyEvaluation = evaluationState === "EVALUATED" || evaluationState 
   </div>
 )}
 
+{isReadOnlyEvaluation && (
+  <div className="flex justify-start pt-2">
+    <button
+      type="button"
+      onClick={() => navigate("/evaluationlist")}
+      className="bg-gray-200 text-black px-3 py-1 rounded hover:bg-gray-300"
+    >
+      <FormattedMessage id="button.back" defaultMessage="Voltar" />
+    </button>
+  </div>
+)}
+
         </div>
       </div>
 

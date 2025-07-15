@@ -1,0 +1,175 @@
+{
+	"info": {
+		"_postman_id": "18adedef-4954-4787-8e31-abf04f53dcca",
+		"name": "NotificationService - Grupo 7",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41790208",
+		"_collection_link": "https://jorge-nuno-diogo-proj3.postman.co/workspace/643a78bb-cf01-4c04-8c03-ca48377b883f/collection/41790208-18adedef-4954-4787-8e31-abf04f53dcca?action=share&source=collection_link&creator=41790208"
+	},
+	"item": [
+		{
+			"name": "Get All Notifications",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/notifications",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"notifications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Unread Notifications",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/notifications/unread",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"notifications",
+						"unread"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Unread Non-Message Notifications",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/notifications/unread/non-message",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"notifications",
+						"unread",
+						"non-message"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Unread Counts By Type",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/notifications/unread/count-by-type",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"notifications",
+						"unread",
+						"count-by-type"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mark All As Read",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/notifications/read",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"notifications",
+						"read"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mark All Message Notifications As Read",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "sessionToken",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/notifications/read/message",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"notifications",
+						"read",
+						"message"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
