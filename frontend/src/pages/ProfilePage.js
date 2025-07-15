@@ -596,7 +596,7 @@ const handlePhotoUpload = async () => {
                   onClick={() => setPasswordModalOpen(true)}
                 >
                   <LockClosedIcon className="w-5 h-5" />
-                  <FormattedMessage id="profile.changePassword" defaultMessage="Altear password" />
+                  <FormattedMessage id="profile.changePassword" defaultMessage="Alterar password" />
                 </AppButton>
                 <AppButton
                   type="submit"
@@ -622,8 +622,7 @@ const handlePhotoUpload = async () => {
     {
       label: <FormattedMessage id="modal.save" defaultMessage="Guardar" />,
       variant: "primary",
-      type: "submit", // garante submit se for <button> no AppForm
-      // não precisas de onClick aqui se o submit do form já faz handleChangePassword
+      type: "submit",
     }
   ]}
 >

@@ -148,9 +148,6 @@ const handleWebSocketMessage = useCallback((data) => {
               </PrivateRoute>
             }
           />
-           
-
-
 <Route
             path="/evaluationlist"
             element={
@@ -159,8 +156,6 @@ const handleWebSocketMessage = useCallback((data) => {
               </RoleRoute>
             }
           />
-
-
 <Route
   path="/evaluationform/:userId"
   element={
@@ -170,8 +165,6 @@ const handleWebSocketMessage = useCallback((data) => {
     </RoleRoute>
   }
 />
-
-
 <Route
   path="/profile/:userId/evaluationhistory"
   element={
@@ -180,7 +173,6 @@ const handleWebSocketMessage = useCallback((data) => {
     </PrivateRoute>
   }
 />
-
 <Route
   path="/newevaluationcycle"
   element={
@@ -189,8 +181,6 @@ const handleWebSocketMessage = useCallback((data) => {
     </RoleRoute>
   }
 />
-
-
 <Route
   path="/newevaluationcycle/userswithoutmanager"
   element={
@@ -199,7 +189,6 @@ const handleWebSocketMessage = useCallback((data) => {
     </RoleRoute>
   }
 />
-
 <Route
   path="/evaluations"
   element={
@@ -208,8 +197,6 @@ const handleWebSocketMessage = useCallback((data) => {
     </RoleRoute>
   }
 />
-
-
 <Route
             path="/courses"
             element={
@@ -218,8 +205,6 @@ const handleWebSocketMessage = useCallback((data) => {
               </RoleRoute>
             }
           />
-
-
 <Route
   path="/profile/:userId/courseshistory"
   element={
@@ -228,11 +213,6 @@ const handleWebSocketMessage = useCallback((data) => {
     </PrivateRoute>
   }
 />
-
-
-
-
-
 <Route
   path="/settings"
   element={
@@ -241,10 +221,6 @@ const handleWebSocketMessage = useCallback((data) => {
     </RoleRoute>
   }
 />
-
-
-
-
           {/* Redirect all unknown routes to login */}
           <Route path="*" element={<LogoutAndRedirect />} />
         </Routes>

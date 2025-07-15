@@ -18,7 +18,7 @@ import {
 import Spinner from "../components/Spinner"; // Assume que tens um spinner
 import { userStore } from "../stores/userStore";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function DashboardPage() {
   const { formatMessage } = useIntl();
@@ -28,6 +28,8 @@ export default function DashboardPage() {
 
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
+
+    const { userId } = useParams();
 
   // Para feedback elegante em caso de erro
   const [error, setError] = useState(null);
@@ -177,7 +179,7 @@ useEffect(() => {
       {/* Bottom Buttons */}
 <div className="flex flex-wrap gap-6 justify-center mt-16">
   {/* Todos os utilizadores vêem */}
-  <AppButton variant="secondary">
+  <AppButton variant="secondary" onClick={() => navigate(`/profile/${userId}/courseshistory`)}>
     <FaSearch className="mr-2" />
     <FormattedMessage id="dashboard.buttons.setTrainings" defaultMessage="Ver formações" />
   </AppButton>
