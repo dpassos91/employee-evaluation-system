@@ -342,8 +342,10 @@ public class EvaluationService {
         // 4. Validate permission: admin or self
         boolean isAdmin = requester.getRole().getName().equalsIgnoreCase("ADMIN");
         boolean isSelf = evaluation.getEvaluated().getEmail().equalsIgnoreCase(requester.getEmail());
+        boolean isManager = evaluation.getEvaluated().getManager() != null &&
+                evaluation.getEvaluated().getManager().getId() == requester.getId();
 
-        if (!isAdmin && !isSelf) {
+        if (!isSelf && !isManager && !isAdmin){
             logger.warn("User: {} | IP: {} - Unauthorized export attempt of evaluation ID {}.",
                     requester.getEmail(), RequestContext.getIp(), id);
             return Response.status(Response.Status.FORBIDDEN)
