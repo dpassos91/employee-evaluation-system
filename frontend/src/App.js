@@ -37,6 +37,7 @@ import UsersWithoutManagerPage from "./pages/UsersWithoutManagerPage";
 import EvaluationIntermediaryPage from "./pages/EvaluationIntermediaryPage";
 import SettingsPage from "./pages/SettingsPage";
 import CoursesPage from "./pages/CoursesPage";
+import LogoutAndRedirect from "./components/LogoutAndRedirect";
 
 /**
  * Main App component.
@@ -201,7 +202,7 @@ const handleWebSocketMessage = useCallback((data) => {
 <Route
   path="/evaluations"
   element={
-   <RoleRoute allowedRoles={["ADMIN", "MANAGER"]}>
+   <RoleRoute allowedRoles={["MANAGER"]}>
       <EvaluationIntermediaryPage />
     </RoleRoute>
   }
@@ -231,7 +232,7 @@ const handleWebSocketMessage = useCallback((data) => {
 
 
           {/* Redirect all unknown routes to login */}
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="*" element={<LogoutAndRedirect />} />
         </Routes>
         <ToastContainer position="top-center" />
       </Router>

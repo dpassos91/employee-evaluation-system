@@ -17,10 +17,14 @@ import {
 } from "react-icons/fa";
 import Spinner from "../components/Spinner"; // Assume que tens um spinner
 import { userStore } from "../stores/userStore";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function DashboardPage() {
   const { formatMessage } = useIntl();
   const user = userStore((state) => state.user); // Assume que o user tem role, nome, etc.
+
+  const navigate = useNavigate();
 
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -66,74 +70,81 @@ useEffect(() => {
       }
     >
       {/* Cards Section */}
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-  {/* Sempre visíveis para qualquer utilizador */}
-  <DashboardCard
-    icon={<FaBook className="text-blue-600 mr-2" size={26} />}
-    label={formatMessage({ id: "dashboard.cards.activeTrainings", defaultMessage: "Formações ativas" })}
-    value={dashboard.activeTrainings}
-    subLabel={formatMessage({ id: "dashboard.cards.trainingsOngoing", defaultMessage: "em curso" })}
-  />
+<div className="flex flex-col gap-4 w-full">
+  {/* Primeira linha: sempre 4 cards */}
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <DashboardCard
+      icon={<FaBook className="text-blue-600 mr-2" size={26} />}
+      label={formatMessage({ id: "dashboard.cards.activeTrainings", defaultMessage: "Formações ativas" })}
+      value={dashboard.activeTrainings}
+      subLabel={formatMessage({ id: "dashboard.cards.trainingsOngoing", defaultMessage: "em curso" })}
+    />
+    <DashboardCard
+      icon={<FaFileAlt className="text-red-600 mr-2" size={26} />}
+      label={formatMessage({ id: "dashboard.cards.pendingEvaluations", defaultMessage: "Avaliações em aberto" })}
+      value={dashboard.pendingEvaluations}
+      subLabel={formatMessage({ id: "dashboard.cards.evaluationsToFill", defaultMessage: "por preencher" })}
+    />
+    <DashboardCard
+      icon={<FaCalendarCheck className="text-green-600 mr-2" size={26} />}
+      label={formatMessage({ id: "dashboard.cards.lastEvaluation", defaultMessage: "Última avaliação" })}
+      value={
+        dashboard.lastEvaluationDate
+          ? new Date(dashboard.lastEvaluationDate).toLocaleDateString()
+          : formatMessage({ id: "dashboard.cards.noEvaluation", defaultMessage: "Sem registo" })
+      }
+      subLabel=""
+    />
+    <DashboardCard
+      icon={<FaClock className="text-yellow-600 mr-2" size={26} />}
+      label={formatMessage({ id: "dashboard.cards.totalTrainingHours", defaultMessage: "Total de horas de formação" })}
+      value={dashboard.totalTrainingHours + "h"}
+      subLabel={formatMessage({ id: "dashboard.cards.trainingHours", defaultMessage: "acumuladas este ano" })}
+    />
+  </div>
 
-  <DashboardCard
-    icon={<FaFileAlt className="text-red-600 mr-2" size={26} />}
-    label={formatMessage({ id: "dashboard.cards.pendingEvaluations", defaultMessage: "Avaliações em aberto" })}
-    value={dashboard.pendingEvaluations}
-    subLabel={formatMessage({ id: "dashboard.cards.evaluationsToFill", defaultMessage: "por preencher" })}
-  />
-
-  <DashboardCard
-    icon={<FaCalendarCheck className="text-green-600 mr-2" size={26} />}
-    label={formatMessage({ id: "dashboard.cards.lastEvaluation", defaultMessage: "Última avaliação" })}
-    value={
-      dashboard.lastEvaluationDate
-        ? new Date(dashboard.lastEvaluationDate).toLocaleDateString()
-        : formatMessage({ id: "dashboard.cards.noEvaluation", defaultMessage: "Sem registo" })
-    }
-    subLabel=""
-  />
-
-  <DashboardCard
-    icon={<FaClock className="text-yellow-600 mr-2" size={26} />}
-    label={formatMessage({ id: "dashboard.cards.totalTrainingHours", defaultMessage: "Total de horas de formação" })}
-    value={dashboard.totalTrainingHours + "h"}
-    subLabel={formatMessage({ id: "dashboard.cards.trainingHours", defaultMessage: "acumuladas este ano" })}
-  />
-
-  {/* Só para MANAGER */}
+  {/* Segunda linha: só para MANAGER, centrada */}
   {isManager && (
-    <>
-      <DashboardCard
-        icon={<FaUsers className="text-purple-600 mr-2" size={26} />}
-        label={formatMessage({ id: "dashboard.cards.teamSize", defaultMessage: "Colaboradores em equipa" })}
-        value={dashboard.teamSize}
-        subLabel=""
-      />
-      <DashboardCard
-        icon={<FaListAlt className="text-fuchsia-600 mr-2" size={26} />}
-        label={formatMessage({ id: "dashboard.cards.teamPendingEvaluations", defaultMessage: "Avaliações da equipa em aberto" })}
-        value={dashboard.teamPendingEvaluations}
-        subLabel=""
-      />
-    </>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="col-start-2 col-span-1">
+        <DashboardCard
+          icon={<FaUsers className="text-purple-600 mr-2" size={26} />}
+          label={formatMessage({ id: "dashboard.cards.teamSize", defaultMessage: "Colaboradores em equipa" })}
+          value={dashboard.teamSize}
+          subLabel=""
+        />
+      </div>
+      <div className="col-span-1">
+        <DashboardCard
+          icon={<FaListAlt className="text-fuchsia-600 mr-2" size={26} />}
+          label={formatMessage({ id: "dashboard.cards.teamPendingEvaluations", defaultMessage: "Avaliações da equipa em aberto" })}
+          value={dashboard.teamPendingEvaluations}
+          subLabel=""
+        />
+      </div>
+    </div>
   )}
 
-  {/* Só para ADMIN */}
+  {/* Segunda linha: só para ADMIN, centrada (caso se aplique) */}
   {isAdmin && (
-    <>
-      <DashboardCard
-        icon={<FaUserShield className="text-gray-700 mr-2" size={26} />}
-        label={formatMessage({ id: "dashboard.cards.totalUsers", defaultMessage: "Utilizadores totais" })}
-        value={dashboard.totalUsers}
-        subLabel=""
-      />
-      <DashboardCard
-        icon={<FaBell className="text-pink-600 mr-2" size={26} />}
-        label={formatMessage({ id: "dashboard.cards.totalPendingEvaluations", defaultMessage: "Avaliações pendentes (global)" })}
-        value={dashboard.totalPendingEvaluations}
-        subLabel=""
-      />
-    </>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="col-start-2 col-span-1">
+        <DashboardCard
+          icon={<FaUserShield className="text-gray-700 mr-2" size={26} />}
+          label={formatMessage({ id: "dashboard.cards.totalUsers", defaultMessage: "Utilizadores totais" })}
+          value={dashboard.totalUsers}
+          subLabel=""
+        />
+      </div>
+      <div className="col-span-1">
+        <DashboardCard
+          icon={<FaBell className="text-pink-600 mr-2" size={26} />}
+          label={formatMessage({ id: "dashboard.cards.totalPendingEvaluations", defaultMessage: "Avaliações pendentes (global)" })}
+          value={dashboard.totalPendingEvaluations}
+          subLabel=""
+        />
+      </div>
+    </div>
   )}
 </div>
 
@@ -164,33 +175,63 @@ useEffect(() => {
       )}
 
       {/* Bottom Buttons */}
-      <div className="flex flex-wrap gap-6 justify-center">
-        <AppButton variant="primary">
-          <FaSearch className="mr-2" />
-          <FormattedMessage id="dashboard.buttons.viewTrainings" defaultMessage="Ver formações" />
-        </AppButton>
-        <AppButton variant="secondary">
-          <FaFileAlt className="mr-2" />
-          <FormattedMessage id="dashboard.buttons.viewEvaluations" defaultMessage="Consultar avaliações" />
-        </AppButton>
-        <AppButton variant="secondary">
-          <FaCog className="mr-2" />
-          <FormattedMessage id="dashboard.buttons.settings" defaultMessage="Definições da aplicação" />
-        </AppButton>
-      </div>
+<div className="flex flex-wrap gap-6 justify-center mt-16">
+  {/* Todos os utilizadores vêem */}
+  <AppButton variant="primary">
+    <FaSearch className="mr-2" />
+    <FormattedMessage id="dashboard.buttons.viewTrainings" defaultMessage="Ver formações" />
+  </AppButton>
+
+  {/* Só managers e admins */}
+  {(isManager || isAdmin) && (
+    <AppButton variant="secondary"   onClick={() => {
+    if (isAdmin) {
+      navigate("/evaluations");
+    } else if (isManager) {
+      navigate("/evaluationlist");
+  }
+    }}>
+      <FaFileAlt className="mr-2" />
+      <FormattedMessage id="dashboard.buttons.viewEvaluations" defaultMessage="Consultar avaliações" />
+    </AppButton>
+  )}
+
+  {/* Só admins */}
+  {isAdmin && (
+    <AppButton variant="primary" onClick={() => navigate("/profile/:userId/evaluationhistory")}>
+      <FaCog className="mr-2" />
+      <FormattedMessage id="dashboard.buttons.settings" defaultMessage="Definições da aplicação" />
+    </AppButton>
+  )}
+</div>
+
     </PageLayout>
   );
 }
 
 function DashboardCard({ icon, label, value, subLabel }) {
+  // Limitar value a máximo de 12 caracteres para não rebentar layout
+  const displayedValue =
+    typeof value === "string" && value.length > 12
+      ? value.slice(0, 12) + "..."
+      : value;
+
   return (
-    <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-200 p-6 flex flex-col items-start gap-2 min-h-[110px]">
-      <div className="flex items-center text-lg">{icon}{label}</div>
-      <div className="text-3xl font-extrabold mt-2">{value}</div>
-      {subLabel && <div className="text-xs text-gray-400">{subLabel}</div>}
+    <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-200 p-6 flex flex-col justify-between items-center min-h-[160px] w-full text-center">
+      <div className="flex flex-col items-center mb-1">
+        <div className="mb-1">{React.cloneElement(icon, { size: 32 })}</div>
+        <span className="text-base font-semibold truncate max-w-[250px]">{label}</span>
+      </div>
+      <div className="text-3xl font-extrabold leading-tight min-h-[38px] flex items-center justify-center">
+        {displayedValue}
+      </div>
+      <div className="text-xs text-gray-500 mt-1" style={{ minHeight: "20px" }}>
+        {subLabel || <span className="invisible">-</span>}
+      </div>
     </div>
   );
 }
+
 
 
 

@@ -147,10 +147,10 @@ export function useAuth() {
       }
     } finally {
       // 4. Clear user-related state and all storage
-      userStore.setState({ username: "" });
-      sessionStorage.removeItem("authToken");
-      localStorage.removeItem("userData");
-      sessionStorage.removeItem("user-store");
+    userStore.getState().clearUser();
+    sessionStorage.removeItem("authToken");
+    localStorage.removeItem("locale");
+    sessionStorage.removeItem("user-store");
     }
   };
 

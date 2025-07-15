@@ -63,7 +63,7 @@ if (isManager) {
     {
       id: "sidebar.evaluations",
       icon: evaluationsIcon,
-      path: "/evaluations"
+      path: "/evaluationlist"
     }
   );
 }

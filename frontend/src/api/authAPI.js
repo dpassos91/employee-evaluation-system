@@ -98,7 +98,7 @@ const logoutUser = async () => {
 
   if (result && result.message && result.message === "Logout successful!") {
     sessionStorage.removeItem('authToken');
-    return true;
+    sessionStorage.removeItem('user-store');
   } else {
     throw new Error("Logout failed: " + (result?.message || result));
   }
