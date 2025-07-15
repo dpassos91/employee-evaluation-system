@@ -15,6 +15,7 @@ import { notificationAPI } from "../api/notificationAPI";
 import { useLocation, useNavigate } from "react-router-dom";
 import { profileAPI } from "../api/profileAPI";
 import profileIcon from "../images/profile_icon.png";
+import { useNotificationStore } from "../stores/notificationStore";
 
 export default function ChatPage() {
   // UI states
@@ -41,6 +42,8 @@ export default function ChatPage() {
 
   const messages = messagesByConversation[activeConversationId] || [];
   const sessionToken = sessionStorage.getItem("authToken");
+
+  const resetMessageCount = useNotificationStore((s) => s.resetCount);
 
   // Router state for deep linking to a conversation
   const location = useLocation();
@@ -75,7 +78,10 @@ export default function ChatPage() {
 
     // Mark messages as read
     messageAPI.markMessagesAsRead(activeConversationId)
-      .then(() => notificationAPI.markAllMessageNotificationsAsRead())
+      .then(() => {
+        notificationAPI.markAllMessageNotificationsAsRead();
+        resetMessageCount("MESSAGE");
+      })
       .catch(() => setError("Failed to update read state"));
 
     if (!messagesExist) {

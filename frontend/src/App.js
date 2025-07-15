@@ -60,9 +60,16 @@ export default function App() {
    * @param {Object} data - The message payload from the WebSocket server.
    */
 const handleWebSocketMessage = useCallback((data) => {
-  // Notificações não-message (ALERT, SYSTEM, WARNING)
+  // System notifications (ALERT, SYSTEM, WARNING)
   if (data?.type && ["ALERT", "SYSTEM", "WARNING"].includes(data.type)) {
     incrementNotificationCount(data.type);
+  }
+
+  // Status update: update contact online/offline
+  if (data.type === "status_update") {
+    import("./stores/chatStore").then(({ useChatStore }) => {
+      useChatStore.getState().updateContactStatus(data.userId, data.online);
+    });
   }
 
   // Chat message
@@ -70,22 +77,24 @@ const handleWebSocketMessage = useCallback((data) => {
     import("./stores/chatStore").then(({ useChatStore }) => {
       useChatStore.getState().addMessage(data);
     });
-    // Só incrementa badge se o chat não estiver aberto!
-    if (!window.location.pathname.startsWith("/chat")) {
-      import("./stores/notificationStore").then(({ useNotificationStore }) => {
-        useNotificationStore.getState().incrementCount("MESSAGE");
-      });
-    }
-    if (data.type === "status_update") {
-  import("./stores/chatStore").then(({ useChatStore }) => {
-    useChatStore.getState().updateContactStatus(data.userId, data.online);
-  });
-}
 
+    // Increment badge only if not in the correct chat!
+    import("./stores/chatStore").then(({ useChatStore }) => {
+      const activeConversationId = useChatStore.getState().activeConversationId;
+
+      if (
+        !window.location.pathname.startsWith("/chat") ||
+        activeConversationId !== data.senderId // or data.receiverId
+      ) {
+        import("./stores/notificationStore").then(({ useNotificationStore }) => {
+          useNotificationStore.getState().incrementCount("MESSAGE");
+        });
+      }
+    });
   }
-
-  // (Se para além do chat_message tiveres outros tipos, mete-os aqui)
 }, [incrementNotificationCount]);
+
+
 
   /**
    * Establishes the global WebSocket connection once user is authenticated.
