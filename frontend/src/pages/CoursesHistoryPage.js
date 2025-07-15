@@ -68,9 +68,13 @@ export default function CoursesHistoryPage() {
 
   const canAssignTraining = () => {
     if (!user || !targetUser) return false;
-    const isAdmin = user.role === "ADMIN";
-    const isManager = targetUser.managerId === user.id;
-    return isAdmin || isManager;
+    const isLoggedUserAdmin = user.role === "ADMIN";
+  const isTargetUserAdmin = targetUser.role === "ADMIN";
+  const isManagerOfTarget = targetUser.managerId === user.id;
+  if (isTargetUserAdmin) return false;
+
+
+    return isLoggedUserAdmin || isManagerOfTarget;
   };
 
   const getHoursForSelectedYear = () => {
