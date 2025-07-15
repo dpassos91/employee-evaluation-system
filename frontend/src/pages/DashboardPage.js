@@ -179,7 +179,7 @@ useEffect(() => {
   {/* Todos os utilizadores vêem */}
   <AppButton variant="primary">
     <FaSearch className="mr-2" />
-    <FormattedMessage id="dashboard.buttons.viewTrainings" defaultMessage="Ver formações" />
+    <FormattedMessage id="dashboard.buttons.setTrainings" defaultMessage="Ver formações" />
   </AppButton>
 
   {/* Só managers e admins */}
@@ -192,15 +192,15 @@ useEffect(() => {
   }
     }}>
       <FaFileAlt className="mr-2" />
-      <FormattedMessage id="dashboard.buttons.viewEvaluations" defaultMessage="Consultar avaliações" />
+      <FormattedMessage id="dashboard.buttons.setEvaluations" defaultMessage="Consultar avaliações" />
     </AppButton>
   )}
 
   {/* Só admins */}
   {isAdmin && (
-    <AppButton variant="primary" onClick={() => navigate("/profile/:userId/evaluationhistory")}>
+    <AppButton variant="primary" onClick={() => navigate("/settings")}>
       <FaCog className="mr-2" />
-      <FormattedMessage id="dashboard.buttons.settings" defaultMessage="Definições da aplicação" />
+      <FormattedMessage id="dashboard.buttons.settings" defaultMessage="Definições" />
     </AppButton>
   )}
 </div>
