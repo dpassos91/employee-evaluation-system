@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Stateless
 public class UserBean implements Serializable {
@@ -1471,6 +1473,24 @@ public List<UserDto> listUsersManagedBy(int managerId) {
         .map(JavaConversionUtil::convertUserEntityToUserDto)
         .toList();
 }
+
+/**
+ * Returns a list of FlatProfileDto for all users managed by the given manager.
+ *
+ * @param managerId The manager's user ID.
+ * @return List of FlatProfileDto representing the manager's subordinates.
+ */
+public List<FlatProfileDto> listFlatProfilesManagedBy(int managerId) {
+    UserEntity manager = userDao.findById(managerId);
+    if (manager == null) return List.of();
+
+    return manager.getSubordinates().stream()
+        .map(UserEntity::getProfile)
+        .filter(Objects::nonNull)
+        .map(JavaConversionUtil::convertProfileEntityToFlatProfileDto)
+        .collect(Collectors.toList());
+}
+
 
 }
 

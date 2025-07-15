@@ -39,6 +39,7 @@ import SettingsPage from "./pages/SettingsPage";
 import CoursesPage from "./pages/CoursesPage";
 import LogoutAndRedirect from "./components/LogoutAndRedirect";
 import CoursesHistoryPage from "./pages/CoursesHistoryPage";
+import TeamCoursesPage from "./pages/TeamCoursesPage";
 
 /**
  * Main App component.
@@ -218,6 +219,14 @@ const handleWebSocketMessage = useCallback((data) => {
   element={
     <RoleRoute allowedRoles={["ADMIN"]}>
       <SettingsPage />
+    </RoleRoute>
+  }
+/>
+<Route
+  path="/teamcourses"
+  element={
+    <RoleRoute allowedRoles={["MANAGER", "ADMIN"]}>
+      <TeamCoursesPage />
     </RoleRoute>
   }
 />

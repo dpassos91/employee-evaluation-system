@@ -55,12 +55,6 @@ public class JavaConversionUtil {
         return sb.toString();
     }
 
-
-
-
-
-
-
     /**
      * Builds a CSV string from a list of FlatProfileDto objects.
      * Each row will include the user's full name, workplace, manager name, and photograph URL.
@@ -139,11 +133,6 @@ public class JavaConversionUtil {
         return dto;
     }
 
-
-
-
-
-
     /**
      * Converts a list of ProfileEntity to a list of FlatProfileDto.
      *
@@ -213,8 +202,6 @@ public static FlatProfileDto convertProfileEntityToFlatProfileDto(ProfileEntity 
     return flat;
 }
 
-
-
     /**
      * Converts a list of UserCourseEntity objects into a list of
      * UserCourseYearSummaryDto, where each entry represents the total
@@ -257,10 +244,6 @@ public static FlatProfileDto convertProfileEntityToFlatProfileDto(ProfileEntity 
 
         return result;
     }
-
-
-
-
 
  /**
  * Converts a ProfileEntity to a ProfileDto for detailed profile view/edit.
@@ -325,7 +308,6 @@ public static ProfileDto convertProfileEntityToProfileDto(ProfileEntity p) {
     return profileDto;
 }
 
-
     /**
      * Converts a SessionTokenEntity to a SessionStatusDto.
      *
@@ -362,10 +344,6 @@ public static ProfileDto convertProfileEntityToProfileDto(ProfileEntity p) {
 
         return dto;
     }
-
-
-
-
 
     /**
      * Converts a UserEntity to a UserDto.

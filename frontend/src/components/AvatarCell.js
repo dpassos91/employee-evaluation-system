@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { profileAPI } from "../api/profileAPI"; // Ajusta o import conforme necessário
-import profileIcon from "../images/profile_icon.png"; // Ajusta o import conforme necessário
+import { profileAPI } from "../api/profileAPI"; 
+import profileIcon from "../images/profile_icon.png"; 
 
 /**
  * AvatarCell component.
@@ -28,7 +28,7 @@ function AvatarCell({ avatar, name }) {
     <img
       src={src}
       alt={name}
-      className="w-8 h-8 rounded-full object-cover ml-12"
+      className="w-8 h-8 rounded-full object-cover"
       onError={() => setSrc("/default_avatar.png")}
     />
   );

@@ -7,11 +7,13 @@ import aor.projetofinal.dao.UserDao;
 import aor.projetofinal.dto.*;
 import aor.projetofinal.entity.SessionTokenEntity;
 import aor.projetofinal.entity.UserEntity;
+import aor.projetofinal.util.JavaConversionUtil;
 import aor.projetofinal.context.RequestContext;
 
 import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.ArrayList;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -353,6 +355,43 @@ public class UserCourseService {
         List<UserCourseYearSummaryDto> summary = userCourseBean.summarizeUserCoursesByYear(dto.getUserId());
         return Response.ok(summary).build();
     }
+    
+@GET
+@Path("/manager/team-courses")
+@Produces(MediaType.APPLICATION_JSON)
+/**
+ * Returns the flat profile and assigned courses for all users managed by the current manager.
+ * Used for team dashboards where a manager can view/assign trainings.
+ *
+ * @param token The manager's session token (for authentication).
+ * @return 200 OK with List<UserTeamCoursesDto> if authorized, 403 if forbidden.
+ */
+public Response getTeamCourses(@HeaderParam("sessionToken") String token) {
+    // 1. Authenticate manager using session token
+    UserEntity manager = userBean.findUserBySessionToken(token);
+    if (manager == null || !manager.getRole().getName().equalsIgnoreCase("MANAGER")) {
+        // If not authenticated or not a manager, deny access
+        return Response.status(Response.Status.FORBIDDEN)
+            .entity("{\"message\": \"Access denied. Only managers can access this resource.\"}")
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+    }
+
+    // 2. Retrieve flat profiles for all users managed by this manager
+    List<UserEntity> subordinates = userDao.findUsersManagedBy(manager.getId());
+    List<UserTeamCoursesDto> team = new ArrayList<>();
+
+    // 3. For each user, get their flat profile and assigned courses
+    for (UserEntity user : subordinates) {
+        FlatProfileDto profile = JavaConversionUtil.convertProfileEntityToFlatProfileDto(user.getProfile());
+        List<UserCourseDto> courses = userCourseBean.listUserCourses(user.getId());
+        team.add(new UserTeamCoursesDto(profile, courses));
+    }
+
+    // 4. Return as JSON response
+    return Response.ok(team).build();
+}
+
 
 }
 

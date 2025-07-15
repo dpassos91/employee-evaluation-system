@@ -179,7 +179,7 @@ useEffect(() => {
       {/* Bottom Buttons */}
 <div className="flex flex-wrap gap-6 justify-center mt-16">
   {/* Todos os utilizadores vêem */}
-  <AppButton variant="secondary" onClick={() => navigate(`/profile/${userId}/courseshistory`)}>
+  <AppButton variant="secondary" onClick={() => navigate("/teamCourses")}>
     <FaSearch className="mr-2" />
     <FormattedMessage id="dashboard.buttons.teamTrainings" defaultMessage="Formações da equipa" />
   </AppButton>

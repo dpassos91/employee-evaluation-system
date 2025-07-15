@@ -37,6 +37,17 @@ const createCourse = async (data) => {
 };
 
 /**
+ * Gets all team members (flat profile + courses) for the manager.
+ * Requires a valid session token (usually included via credentials/interceptors).
+ * @returns {Promise<Array<UserTeamCoursesDto>>} List of UserTeamCoursesDto (user + courses).
+ */
+const getTeamCourses = async () => {
+  // Aqui assumimos que o apiCall já trata do header do token via interceptors,
+  // caso contrário, podes adicionar manualmente nas options.
+  return apiCall(API_ENDPOINTS.courses.teamCourses, { method: 'GET' });
+};
+
+/**
  * Updates a course by ID.
  * @param {number} id - Course ID.
  * @param {Object} data - UpdateCourseDto.
@@ -149,6 +160,7 @@ const getUserCourseYears = async (userId) => {
 export const courseAPI = {
   listCourses,
   getCourse,
+  getTeamCourses,
   createCourse,
   updateCourse,
   deactivateCourse,
