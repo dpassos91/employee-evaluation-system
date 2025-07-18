@@ -19,6 +19,7 @@ import profileIcon from "../images/profile_icon.png";
 import { useIntl } from "react-intl";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { profileAPI } from "../api/profileAPI";
 import AvatarCell from "../components/AvatarCell";
 
 export default function EvaluationFormPage() {
@@ -188,11 +189,11 @@ const isReadOnlyEvaluation = evaluationState === "EVALUATED" || evaluationState 
       <div className="flex items-start gap-10 px-10 pt-6">
         {/* Avatar at the left */}
         <div className="flex-shrink-0">
-          <img
-            src={photo || profileIcon}
-            alt="avatar"
-            className="w-28 h-28 rounded-full object-cover border"
-          />
+<img
+  src={photo ? profileAPI.getPhoto(photo) : profileIcon}
+  alt="avatar"
+  className="w-28 h-28 rounded-full object-cover border"
+/>
         </div>
 
         {/* Form at the right */}

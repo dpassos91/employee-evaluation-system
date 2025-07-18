@@ -55,6 +55,7 @@ useEffect(() => {
   // Role-awareness (podes afinar com base em userStore)
   const isManager = user?.role?.toUpperCase() === "MANAGER";
   const isAdmin = user?.role?.toUpperCase() === "ADMIN";
+  const isUser = user?.role.toUpperCase() === "USER";
   const userName = user?.firstName && user?.lastName
   ? `${user.firstName} ${user.lastName}`
   : user?.email;
@@ -178,25 +179,54 @@ useEffect(() => {
 
       {/* Bottom Buttons */}
 <div className="flex flex-wrap gap-6 justify-center mt-16">
-  {/* Todos os utilizadores vêem */}
-  <AppButton variant="secondary" onClick={() => navigate("/teamCourses")}>
-    <FaSearch className="mr-2" />
-    <FormattedMessage id="dashboard.buttons.teamTrainings" defaultMessage="Formações da equipa" />
-  </AppButton>
+  {/* User */}
+  {isUser && (
+    <>
+      <AppButton
+        variant="secondary"
+        onClick={() => navigate(`/profile/${user.id}/evaluationhistory`)}
+      >
+        <FaSearch className="mr-2" />
+        <FormattedMessage
+          id="dashboard.buttons.evaluationsHistory"
+          defaultMessage="Histórico de avaliações"
+        />
+      </AppButton>
+
+      <AppButton
+        variant="primary"
+        onClick={() => navigate(`/profile/${user.id}/courseshistory`)}
+      >
+        <FaSearch className="mr-2" />
+        <FormattedMessage
+          id="dashboard.buttons.coursesHistory"
+          defaultMessage="Histórico de formações"
+        />
+      </AppButton>
+    </>
+  )}
+
 
   {/* Só managers e admins */}
-  {(isManager || isAdmin) && (
-    <AppButton variant="primary"   onClick={() => {
-    if (isAdmin) {
-      navigate("/evaluations");
-    } else if (isManager) {
-      navigate("/evaluationlist");
-  }
+{(isManager || isAdmin) && (
+  <>
+    <AppButton variant="secondary" onClick={() => navigate("/teamCourses")}>
+      <FaSearch className="mr-2" />
+      <FormattedMessage id="dashboard.buttons.teamTrainings" defaultMessage="Formações da equipa" />
+    </AppButton>
+
+    <AppButton variant="primary" onClick={() => {
+      if (isAdmin) {
+        navigate("/evaluations");
+      } else if (isManager) {
+        navigate("/evaluationlist");
+      }
     }}>
       <FaFileAlt className="mr-2" />
       <FormattedMessage id="dashboard.buttons.teamEvaluations" defaultMessage="Avaliações da equipa" />
     </AppButton>
-  )}
+  </>
+)}
 
   {/* Só admins */}
   {isAdmin && (

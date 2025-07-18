@@ -94,6 +94,8 @@ const canViewManager = () => {
   return isManager ;
 };
 
+const [hasShownToast, setHasShownToast] = useState(false);
+
 
 
   // Only ADMIN can edit MANAGER on USER profiles
@@ -181,32 +183,38 @@ useEffect(() => {
    * Display a toast with missing profile fields if own profile is incomplete.
    * This effect only depends on values - never calls setters or fetch!
    */
-  useEffect(() => {
-    if (canEdit && userStore.getState().profileComplete === false) {
-      const missingFields = userStore.getState().missingFields;
-      const missingLabels = (missingFields || [])
-        .map((field) =>
-          fieldLabelKeys[field]
-            ? formatMessage({ id: fieldLabelKeys[field] })
-            : field
-        )
-        .join(", ");
-      toast.info(
-        formatMessage(
-          {
-            id: "profile.incomplete.fields",
-            defaultMessage: "Please complete all required profile fields: {fields}",
-          },
-          { fields: missingLabels }
-        )
-      );
-    }
-  }, [
-    canEdit,
-    userStore.getState().profileComplete,
-    userStore.getState().missingFields,
-    formatMessage,
-  ]);
+useEffect(() => {
+  if (
+    canEdit &&
+    userStore.getState().profileComplete === false &&
+    !hasShownToast
+  ) {
+    const missingFields = userStore.getState().missingFields;
+    const missingLabels = (missingFields || [])
+      .map((field) =>
+        fieldLabelKeys[field]
+          ? formatMessage({ id: fieldLabelKeys[field] })
+          : field
+      )
+      .join(", ");
+    toast.info(
+      formatMessage(
+        {
+          id: "profile.incomplete.fields",
+          defaultMessage: "Please complete all required profile fields: {fields}",
+        },
+        { fields: missingLabels }
+      )
+    );
+    setHasShownToast(true); // 🔒 mostra só uma vez
+  }
+}, [
+  canEdit,
+  userStore.getState().profileComplete,
+  userStore.getState().missingFields,
+  formatMessage,
+  hasShownToast
+]);
 
   /**
    * Local profile edit handlers (used for editing inputs)

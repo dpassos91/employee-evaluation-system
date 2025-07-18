@@ -27,7 +27,7 @@ export default function PageLayout({ title, subtitle, children }) {
   useSessionMonitor(!!token); // ativa apenas se estiver logado
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
       <main className="relative flex-1 p-4 pt-8 transition-all
         lg:ml-64 lg:px-[105px] lg:pt-16
