@@ -63,7 +63,9 @@ pgsql
 
 ## 📸 Screenshots
 
+Here is a preview of the application:
 
+![Homepage Screenshot](assets/Login.png)      ![Dashboard Screenshot](assets/Dashboard.png)   ![Profile Screenshot](assets/Profile.png)                           
 
 ## 🔭 Future Improvements
 
