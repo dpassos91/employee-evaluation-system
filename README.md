@@ -51,6 +51,8 @@ pgsql
 
 > and the PostgreSQL database is correctly connected.
 
+---
+
 ## ✅ Features
 
 - 🔐 Secure login with session handling  
