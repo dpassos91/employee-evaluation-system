@@ -65,7 +65,7 @@ pgsql
 
 Here is a preview of the application:
 
-![Homepage Screenshot](assets/Login.png)      ![Dashboard Screenshot](assets/Dashboard.png)   ![Profile Screenshot](assets/Profile.png)                           
+![Homepage Screenshot](assets/Login)      ![Dashboard Screenshot](assets/Dashboard)   ![Profile Screenshot](assets/Profile)                           
 
 ## 🔭 Future Improvements
 
