@@ -17,10 +17,10 @@ This system was designed to support HR and management teams in the creation, eva
 
 ## 🛠️ Technologies Used
 
-- **Backend:** Java, Java EE, RESTful APIs
-- **Frontend:** React.js, Tailwind CSS
-- **Database:** PostgreSQL
-- **Testing:** JUnit
+- **Backend:** Java, Java EE, RESTful APIs  
+- **Frontend:** React.js, Tailwind CSS  
+- **Database:** PostgreSQL  
+- **Testing:** JUnit  
 - **Other:** WebSockets, Zustand (state management), i18n (internationalization)
 
 ## 🖥️ Installation
@@ -28,59 +28,55 @@ This system was designed to support HR and management teams in the creation, eva
 To run the project locally:
 
 1. Clone the repository:
-```bash
-git clone https://github.com/dpassos91/employee-evaluation-system.git
-cd employee-evaluation-system
+   ```bash
+   git clone https://github.com/dpassos91/employee-evaluation-system.git
+   cd employee-evaluation-system
+Set up the PostgreSQL database and configure credentials in application.properties.
 
-2. Set up the **PostgreSQL** database and configure credentials in `application.properties`.
+Navigate to the /backend folder and run the Spring Boot application.
 
-3. Navigate to the `/backend` folder and run the Spring Boot application.
+Navigate to the /frontend folder and start the React app:
 
-4. Navigate to the `/frontend` folder and start the React app:
+bash
+Copiar
+Editar
 npm install
 npm run dev
-
-5. Start the frontend and open your browser at:
-
+Start the frontend and open your browser at:
 https://localhost:3000
 
-> Ensure the backend is running at:
+Ensure the backend is running at:
 http://localhost:8443
+and the PostgreSQL database is correctly connected.
 
-pgsql
+✅ Features
+🔐 Secure login with session handling
 
-> and the PostgreSQL database is correctly connected.
+👤 Role-based access: Admin, Manager, User
 
----
+📝 Evaluation creation and score assignment
 
-###
+👥 Reviewer delegation and form progress tracking
 
-## ✅ Features
+💬 Real-time chat and notifications (WebSockets)
 
-- 🔐 Secure login with session handling  
-- 👤 Role-based access: Admin, Manager, User  
-- 📝 Evaluation creation and score assignment  
-- 👥 Reviewer delegation and form progress tracking  
-- 💬 Real-time chat and notifications (WebSockets)  
-- 📊 Responsive dashboard with statistics and filters  
-- 🌍 Full support for multiple languages (EN, PT)  
+📊 Responsive dashboard with statistics and filters
 
-## 📸 Screenshots
+🌍 Full support for multiple languages (EN, PT)
 
+📸 Screenshots
 Here is a preview of the application:
 
-![Homepage Screenshot](assets/Login.png)  
-![Dashboard Screenshot](assets/Dashboard.png)  
-![Profile Screenshot](assets/Profile.png)                      
 
-## 🔭 Future Improvements
 
-- 📤 Export evaluations to PDF or Excel  
-- 🔗 Integration with HR systems (e.g. BambooHR)  
-- 📈 Advanced analytics and performance trends  
-- ⏰ Reminder system for incomplete evaluations  
+🔭 Future Improvements
+📤 Export evaluations to PDF or Excel
 
----
+🔗 Integration with HR systems (e.g. BambooHR)
 
-**Disclaimer:**  
+📈 Advanced analytics and performance trends
+
+⏰ Reminder system for incomplete evaluations
+
+Disclaimer:
 This project was developed for educational purposes.
